@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import type { ChineseWord, SentenceExercise, LessonCustomConfig } from '../../types';
 import { audioService } from '../../utils/audio';
+import { autoGenerateWordFromVietnamese } from '../../utils/vietnameseAutoGenerator';
 
 interface CustomLessonModalProps {
   isOpen: boolean;
@@ -52,6 +53,11 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
   // Forms Collapsible States
   const [isWordFormOpen, setIsWordFormOpen] = useState(false);
   const [isSentenceFormOpen, setIsSentenceFormOpen] = useState(false);
+
+  // Vietnamese Auto-Generation State
+  const [addWordMode, setAddWordMode] = useState<'vietnamese' | 'manual'>('vietnamese');
+  const [vietnameseInput, setVietnameseInput] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Word Form State
   const [wordHanzi, setWordHanzi] = useState('');
@@ -172,6 +178,82 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
       onSaveConfig({ ...lessonConfig, speakingSentenceIds: allIds });
     }
     showToast('Đã chọn tất cả câu bài tập.');
+  };
+
+  // Handle Auto-Generate from Vietnamese Input (No Hanzi or Pinyin needed)
+  const handleAutoGenerateFromVietnamese = async () => {
+    if (!vietnameseInput.trim()) {
+      showToast('Vui lòng nhập từ tiếng Việt.', 'error');
+      return;
+    }
+    setIsGenerating(true);
+    audioService.playClick();
+    try {
+      const res = await autoGenerateWordFromVietnamese(vietnameseInput.trim());
+      if (res.success && res.word) {
+        // Check if word is already in library
+        const existingWord = words.find((w) => w.hanzi.trim() === res.word!.hanzi.trim());
+        let wordId = existingWord?.id;
+
+        if (!existingWord) {
+          const added = onAddWord(res.word);
+          if (added.success && added.word) {
+            wordId = added.word.id;
+          } else {
+            showToast(added.message, 'error');
+            return;
+          }
+        }
+
+        if (wordId) {
+          if (activeTab === 'flashcard') {
+            const cur = lessonConfig.flashcardWordIds ?? words.map((w) => w.id);
+            if (!cur.includes(wordId)) {
+              onSaveConfig({ ...lessonConfig, flashcardWordIds: [wordId, ...cur] });
+            }
+          } else if (activeTab === 'writing') {
+            const cur = lessonConfig.writingWordIds ?? words.map((w) => w.id);
+            if (!cur.includes(wordId)) {
+              onSaveConfig({ ...lessonConfig, writingWordIds: [wordId, ...cur] });
+            }
+          }
+          setVietnameseInput('');
+          setIsWordFormOpen(false);
+          showToast(`Đã thêm "${res.word.hanzi}" (${res.word.pinyin}) vào bài học!`);
+          audioService.playSuccessChime();
+        }
+      } else {
+        showToast(res.message, 'error');
+      }
+    } catch {
+      showToast('Có lỗi xảy ra khi tạo từ.', 'error');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Helper to auto-fill manual form from Vietnamese meaning
+  const handleAutoFillManualFromVietnamese = async () => {
+    const input = wordMeaning.trim() || vietnameseInput.trim();
+    if (!input) {
+      showToast('Vui lòng nhập nghĩa tiếng Việt để tự động điền.', 'error');
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const res = await autoGenerateWordFromVietnamese(input);
+      if (res.success && res.word) {
+        setWordHanzi(res.word.hanzi);
+        setWordPinyin(res.word.pinyin);
+        setWordHanviet(res.word.hanviet);
+        setWordMeaning(res.word.meaning);
+        showToast(`Đã tự điền chữ Hán: ${res.word.hanzi}`);
+      } else {
+        showToast(res.message, 'error');
+      }
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   // Handle Add New Word to Flashcard or Writing
@@ -328,6 +410,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
         {/* Tab Navigation */}
         <div className="grid grid-cols-4 p-2 bg-slate-850 border-b border-slate-800 gap-1 text-xs">
           <button
+            data-testid="modal-tab-flashcard"
             onClick={() => {
               audioService.playClick();
               setActiveTab('flashcard');
@@ -344,6 +427,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
           </button>
 
           <button
+            data-testid="modal-tab-writing"
             onClick={() => {
               audioService.playClick();
               setActiveTab('writing');
@@ -360,6 +444,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
           </button>
 
           <button
+            data-testid="modal-tab-assembly"
             onClick={() => {
               audioService.playClick();
               setActiveTab('assembly');
@@ -376,6 +461,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
           </button>
 
           <button
+            data-testid="modal-tab-speaking"
             onClick={() => {
               audioService.playClick();
               setActiveTab('speaking');
@@ -436,6 +522,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
               {/* Add Word Collapsible Button */}
               <button
                 type="button"
+                data-testid="toggle-add-word-btn"
                 onClick={() => setIsWordFormOpen(!isWordFormOpen)}
                 className="w-full py-2 px-3 rounded-2xl bg-rose-600/10 hover:bg-rose-600/20 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center justify-between transition-all"
               >
@@ -448,77 +535,164 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                 {isWordFormOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
 
-              {/* Add Word Form */}
+              {/* Add Word Form with Vietnamese Auto-Generate */}
               {isWordFormOpen && (
-                <form
-                  onSubmit={handleAddNewWord}
-                  className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2.5 animate-fadeIn"
-                >
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-[10px] text-slate-400 font-semibold block mb-1">
-                        Chữ Hán *
-                      </label>
-                      <input
-                        type="text"
-                        value={wordHanzi}
-                        onChange={(e) => setWordHanzi(e.target.value)}
-                        placeholder="VD: 朋友"
-                        required
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] text-slate-400 font-semibold block mb-1">
-                        Pinyin
-                      </label>
-                      <input
-                        type="text"
-                        value={wordPinyin}
-                        onChange={(e) => setWordPinyin(e.target.value)}
-                        placeholder="VD: péngyou"
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-[10px] text-slate-400 font-semibold block mb-1">
-                        Âm Hán Việt
-                      </label>
-                      <input
-                        type="text"
-                        value={wordHanviet}
-                        onChange={(e) => setWordHanviet(e.target.value)}
-                        placeholder="VD: BẰNG HỮU"
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] text-slate-400 font-semibold block mb-1">
-                        Nghĩa tiếng Việt *
-                      </label>
-                      <input
-                        type="text"
-                        value={wordMeaning}
-                        onChange={(e) => setWordMeaning(e.target.value)}
-                        placeholder="VD: Bạn bè, người bạn"
-                        required
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end pt-1">
+                <div className="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 space-y-3 animate-fadeIn">
+                  {/* Mode switcher */}
+                  <div className="grid grid-cols-2 p-1 bg-slate-900 rounded-xl border border-slate-750 gap-1 text-xs">
                     <button
-                      type="submit"
-                      className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-md shadow-rose-900/30"
+                      type="button"
+                      onClick={() => {
+                        audioService.playClick();
+                        setAddWordMode('vietnamese');
+                      }}
+                      className={`py-1.5 px-2 rounded-lg font-semibold flex items-center justify-center space-x-1 transition-all ${
+                        addWordMode === 'vietnamese'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
                     >
-                      Lưu từ vựng
+                      <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                      <span>Nhập tiếng Việt (Tự tạo AI)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        audioService.playClick();
+                        setAddWordMode('manual');
+                      }}
+                      className={`py-1.5 px-2 rounded-lg font-semibold flex items-center justify-center space-x-1 transition-all ${
+                        addWordMode === 'manual'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <span>Tự điền chi tiết</span>
                     </button>
                   </div>
-                </form>
+
+                  {/* Mode 1: Auto-generate from Vietnamese */}
+                  {addWordMode === 'vietnamese' ? (
+                    <div className="space-y-2.5">
+                      <div>
+                        <label className="text-[11px] text-slate-300 font-semibold block mb-1">
+                          Từ tiếng Việt (Hệ thống tự dịch chữ Hán, Pinyin & Hán Việt):
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            data-testid="vietnamese-word-input"
+                            value={vietnameseInput}
+                            onChange={(e) => setVietnameseInput(e.target.value)}
+                            placeholder="VD: cà phê, trà, bác sĩ, bạn bè, yêu, đi ngủ..."
+                            className="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleAutoGenerateFromVietnamese();
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            data-testid="auto-generate-btn"
+                            disabled={isGenerating || !vietnameseInput.trim()}
+                            onClick={handleAutoGenerateFromVietnamese}
+                            className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-rose-900/30 flex items-center space-x-1 shrink-0 active:scale-95"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                            <span>{isGenerating ? 'Đang tạo...' : 'Tự tạo & Thêm'}</span>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-slate-850/80 border border-slate-750 text-[11px] text-slate-400 space-y-1">
+                        <div className="flex items-center space-x-1.5 text-slate-300 font-medium">
+                          <Sparkles className="w-3 h-3 text-rose-400" />
+                          <span>Tính năng thông minh:</span>
+                        </div>
+                        <p>
+                          Chỉ cần gõ từ tiếng Việt, AI sẽ tự động tra cứu, tạo chữ Hán, Pinyin chuẩn thanh điệu, âm Hán Việt và thêm ngay vào bài học mà bạn không cần gõ tiếng Trung!
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Mode 2: Manual fill */
+                    <form onSubmit={handleAddNewWord} className="space-y-2.5">
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[10px] text-slate-400 font-semibold block mb-1">
+                            Chữ Hán *
+                          </label>
+                          <input
+                            type="text"
+                            value={wordHanzi}
+                            onChange={(e) => setWordHanzi(e.target.value)}
+                            placeholder="VD: 朋友"
+                            required
+                            className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-slate-400 font-semibold block mb-1">
+                            Pinyin
+                          </label>
+                          <input
+                            type="text"
+                            value={wordPinyin}
+                            onChange={(e) => setWordPinyin(e.target.value)}
+                            placeholder="VD: péngyou"
+                            className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[10px] text-slate-400 font-semibold block mb-1">
+                            Âm Hán Việt
+                          </label>
+                          <input
+                            type="text"
+                            value={wordHanviet}
+                            onChange={(e) => setWordHanviet(e.target.value)}
+                            placeholder="VD: BẰNG HỮU"
+                            className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-slate-400 font-semibold block mb-1">
+                            Nghĩa tiếng Việt *
+                          </label>
+                          <input
+                            type="text"
+                            value={wordMeaning}
+                            onChange={(e) => setWordMeaning(e.target.value)}
+                            placeholder="VD: Bạn bè, người bạn"
+                            required
+                            className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <button
+                          type="button"
+                          onClick={handleAutoFillManualFromVietnamese}
+                          className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center space-x-1"
+                        >
+                          <Sparkles className="w-3 h-3" />
+                          <span>Tự điền từ nghĩa</span>
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-md shadow-rose-900/30"
+                        >
+                          Lưu từ vựng
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
               )}
 
               {/* Search filter input */}

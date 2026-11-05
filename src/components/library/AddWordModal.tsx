@@ -5,6 +5,7 @@ import type { ChineseWord } from '../../types';
 import { DICTIONARY_WORDS } from '../../data/dictionaryData';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
+import { autoGenerateWordFromVietnamese } from '../../utils/vietnameseAutoGenerator';
 
 interface AddWordModalProps {
   isOpen: boolean;
@@ -36,8 +37,46 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
   const [examplePinyin, setExamplePinyin] = useState('');
   const [exampleVi, setExampleVi] = useState('');
 
+  const [vietnameseQuickInput, setVietnameseQuickInput] = useState('');
+  const [isQuickGenerating, setIsQuickGenerating] = useState(false);
+
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
+
+  const handleQuickAutoFill = async () => {
+    if (!vietnameseQuickInput.trim()) {
+      setFormError('Vui lòng nhập từ tiếng Việt.');
+      return;
+    }
+    setIsQuickGenerating(true);
+    setFormError('');
+    setFormSuccess('');
+    audioService.playClick();
+    try {
+      const res = await autoGenerateWordFromVietnamese(vietnameseQuickInput.trim());
+      if (res.success && res.word) {
+        setHanzi(res.word.hanzi);
+        setPinyin(res.word.pinyin);
+        setHanviet(res.word.hanviet);
+        setMeaning(res.word.meaning);
+        setPos(res.word.pos || 'Danh từ');
+        setLevel((res.word.level as any) || 'HSK1');
+        if (res.word.examples && res.word.examples.length > 0) {
+          setExampleZh(res.word.examples[0].zh);
+          setExamplePinyin(res.word.examples[0].pinyin);
+          setExampleVi(res.word.examples[0].vi);
+        }
+        setFormSuccess(`Đã tự động tạo: "${res.word.hanzi}" (${res.word.pinyin}). Hãy bấm "Lưu vào sổ từ" để hoàn tất!`);
+        audioService.playSuccessChime();
+      } else {
+        setFormError(res.message);
+      }
+    } catch {
+      setFormError('Có lỗi xảy ra khi tạo từ.');
+    } finally {
+      setIsQuickGenerating(false);
+    }
+  };
 
   // Set of saved Hanzi for fast duplicate lookup
   const savedHanziSet = useMemo(() => {
@@ -346,6 +385,38 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
                   <span>{formSuccess}</span>
                 </div>
               )}
+
+              {/* Quick Auto-Fill by Vietnamese Bar */}
+              <div className="p-3 rounded-2xl bg-gradient-to-r from-rose-950/40 to-slate-800/90 border border-rose-500/30 space-y-1.5">
+                <div className="flex items-center space-x-1.5 text-xs font-bold text-rose-300">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Tự động tạo từ tiếng Việt (Không cần gõ chữ Hán)</span>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={vietnameseQuickInput}
+                    onChange={(e) => setVietnameseQuickInput(e.target.value)}
+                    placeholder="Gõ từ tiếng Việt: cà phê, trà, bác sĩ, bạn bè..."
+                    className="flex-1 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleQuickAutoFill();
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    disabled={isQuickGenerating || !vietnameseQuickInput.trim()}
+                    onClick={handleQuickAutoFill}
+                    className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-sm flex items-center space-x-1 shrink-0 active:scale-95"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <span>{isQuickGenerating ? 'Đang tạo...' : 'Tự tạo'}</span>
+                  </button>
+                </div>
+              </div>
 
               <div className="grid grid-cols-2 gap-3">
                 {/* Hanzi */}
