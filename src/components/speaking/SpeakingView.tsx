@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, Volume2, Play, ChevronLeft, ChevronRight, Snail } from 'lucide-react';
+import { Mic, MicOff, Volume2, Play, ChevronLeft, ChevronRight, Snail, HelpCircle, ShieldAlert, X, AlertTriangle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ChineseWord, SentenceExercise } from '../../types';
 import { INITIAL_SENTENCES } from '../../data/hsk1Sentences';
@@ -43,6 +43,8 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [userAudioUrl, setUserAudioUrl] = useState<string | null>(null);
   const [isPlayingUserAudio, setIsPlayingUserAudio] = useState(false);
   const [isSpeechSupported, setIsSpeechSupported] = useState(true);
+  const [showPermissionGuide, setShowPermissionGuide] = useState(false);
+  const [hasPermissionError, setHasPermissionError] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -197,8 +199,12 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
         };
 
         recorder.start(100);
-      } catch (err) {
+      } catch (err: any) {
         console.warn('[MediaRecorder] Mic stream error:', err);
+        if (err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError') {
+          setHasPermissionError(true);
+          setEvalFeedback('Micro bị chặn hoặc vướng lớp phủ màn hình. Hãy bấm "Xem cách khắc phục" bên dưới.');
+        }
       }
     }
 
@@ -215,6 +221,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
 
         recognition.onstart = () => {
           setIsRecording(true);
+          setHasPermissionError(false);
         };
 
         recognition.onresult = (event: any) => {
@@ -232,7 +239,8 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             } catch {}
           }
           if (event.error === 'not-allowed') {
-            setEvalFeedback('Vui lòng cấp quyền Microphone để ghi âm giọng nói.');
+            setHasPermissionError(true);
+            setEvalFeedback('Micro bị chặn hoặc vướng lớp phủ màn hình. Hãy bấm "Xem cách khắc phục" bên dưới.');
           } else if (event.error === 'no-speech') {
             setEvalFeedback('Chưa nghe rõ giọng nói. Bạn hãy nói to hơn và gần micro hơn nhé!');
           } else if (event.error === 'network' || event.error === 'audio-capture') {
@@ -363,17 +371,43 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
         </button>
       </div>
 
-      {/* Item Counter */}
+      {/* Item Counter & Micro Guide Button */}
       <div className="flex items-center justify-between text-xs text-slate-400 mb-2 px-1">
         <span className="font-medium text-slate-300">
           {practiceType === 'word'
             ? `Từ ${wordIndex + 1} / ${words.length || 1}`
             : `Câu ${sentenceIndex + 1} / ${activeSentences.length}`}
         </span>
-        <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-750">
-          Nhận diện giọng nói AI
-        </span>
+        <button
+          onClick={() => setShowPermissionGuide(true)}
+          className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
+          title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
+        >
+          <HelpCircle className="w-3 h-3 text-sky-400" />
+          <span>Trợ giúp Micro</span>
+        </button>
       </div>
+
+      {/* Permission / Overlay Error Alert Banner */}
+      {hasPermissionError && (
+        <div className="p-3 mb-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start justify-between gap-3 animate-fadeIn">
+          <div className="flex items-start space-x-2.5">
+            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <div className="text-xs font-bold text-amber-300">Bị vướng lớp phủ hoặc chưa cấp quyền Micro</div>
+              <div className="text-[11px] text-slate-300 mt-0.5">
+                Android chặn pop-up cấp quyền nếu có bong bóng chat Messenger/Zalo.
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowPermissionGuide(true)}
+            className="px-2.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shrink-0 active:scale-95 transition-all shadow-md"
+          >
+            Cách mở
+          </button>
+        </div>
+      )}
 
       {/* Main Flash / Speaking Target Card */}
       <div className="p-5 rounded-3xl bg-gradient-to-b from-slate-800/90 to-slate-900 border border-slate-700/80 shadow-xl mb-4 text-center relative overflow-hidden">
@@ -549,6 +583,85 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
           <ChevronRight className="w-4 h-4 ml-1" />
         </button>
       </div>
+
+      {/* Permission & Screen Overlay Guide Modal */}
+      {showPermissionGuide && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-slate-900 border border-slate-750 w-full max-w-sm rounded-3xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto space-y-4">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-9 h-9 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-100 text-sm">Khắc phục lỗi cấp quyền Micro</h3>
+                  <p className="text-[11px] text-slate-400">Lỗi "Lớp phủ màn hình / Overlay" trên Android</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPermissionGuide(false)}
+                className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Why this happens explanation */}
+            <div className="p-3 rounded-2xl bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300 leading-relaxed">
+              <span className="font-bold text-amber-400">Vì sao bị lỗi này?</span>
+              <p className="mt-1 text-[11px] text-slate-400">
+                Đây là tính năng bảo mật của Android. Khi màn hình có <b>bong bóng chat Messenger, Zalo</b>, video nổi YouTube hoặc app lọc ánh sáng xanh, Android sẽ chặn bấm nút cấp quyền để chống bấm nhầm.
+              </p>
+            </div>
+
+            {/* Solution 1: Recommended */}
+            <div className="space-y-2">
+              <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold">1</span>
+                Cách 1: Cấp quyền trực tiếp trong Chrome (Nhanh nhất)
+              </div>
+              <div className="p-3 rounded-2xl bg-slate-800/50 border border-slate-750 text-xs text-slate-300 space-y-2">
+                <div className="flex items-start gap-2">
+                  <span className="text-rose-400 font-bold shrink-0">B1:</span>
+                  <span>Nhấn vào icon <b>Bộ lọc 🎛️</b> hoặc <b>Ổ khóa 🔒</b> ở bên trái thanh nhập địa chỉ web Chrome.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-rose-400 font-bold shrink-0">B2:</span>
+                  <span>Chọn <b>"Quyền"</b> (hoặc <i>Cài đặt trang web</i>).</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-rose-400 font-bold shrink-0">B3:</span>
+                  <span>Bật mục <b>Micro (Microphone)</b> sang <b>"Cho phép" (Allow)</b>.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-rose-400 font-bold shrink-0">B4:</span>
+                  <span>Quay lại trang và vuốt xuống để <b>tải lại trang (F5)</b>.</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Solution 2 */}
+            <div className="space-y-2">
+              <div className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px] font-bold">2</span>
+                Cách 2: Đóng bong bóng chat & cửa sổ nổi
+              </div>
+              <div className="p-3 rounded-2xl bg-slate-800/50 border border-slate-750 text-xs text-slate-300 space-y-1.5 text-[11px]">
+                <p>• Kéo các <b>bong bóng chat Messenger, Zalo</b> xuống dấu <b>[X]</b> ở đáy màn hình để đóng.</p>
+                <p>• Tắt video nổi nhỏ (YouTube PiP) hoặc nút quay phim màn hình.</p>
+                <p>• Bấm lại nút Ghi âm và nhấn <b>Cho phép</b> khi hiện pop-up.</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowPermissionGuide(false)}
+              className="w-full py-3 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs shadow-lg shadow-rose-900/30 transition-all active:scale-98"
+            >
+              Tôi đã hiểu, quay lại Luyện nói
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
