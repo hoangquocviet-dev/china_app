@@ -1,0 +1,381 @@
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import HanziWriter from 'hanzi-writer';
+import { Play, RotateCcw, HelpCircle, Volume2, CheckCircle2 } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import type { ChineseWord } from '../../types';
+import { audioService } from '../../utils/audio';
+
+interface HanziWriterViewProps {
+  words: ChineseWord[];
+}
+
+export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
+  const [selectedWordIndex, setSelectedWordIndex] = useState(0);
+  const [currentCharIndex, setCurrentCharIndex] = useState(0);
+  const [mode, setMode] = useState<'animate' | 'guide' | 'quiz'>('guide');
+  const [gridType, setGridType] = useState<'mi' | 'tian'>('mi'); // Ô Mễ (米) hoặc Ô Điền (田)
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 375
+  );
+
+  useEffect(() => {
+    let timeoutId: number;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => {
+        setWindowWidth(window.innerWidth);
+      }, 150);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const writerRef = useRef<HanziWriter | null>(null);
+
+  const currentWord = words[selectedWordIndex] || words[0];
+  const characters = Array.from(currentWord.hanzi);
+  const currentChar = characters[currentCharIndex] || characters[0];
+
+  const initWriter = useCallback(() => {
+    if (!containerRef.current || !currentChar) return;
+
+    // Clear previous SVG
+    containerRef.current.innerHTML = '';
+    setIsLoading(true);
+    setIsCompleted(false);
+
+    try {
+      const size = Math.min(Math.max(windowWidth - 64, 220), 280);
+
+      const writer = HanziWriter.create(containerRef.current, currentChar, {
+        width: size,
+        height: size,
+        padding: 20,
+        showOutline: mode !== 'quiz',
+        strokeAnimationSpeed: 1.2,
+        delayBetweenStrokes: 150,
+        strokeColor: '#f43f5e', // Rose-500
+        outlineColor: '#475569', // Slate-600
+        drawingColor: '#38bdf8', // Sky-400
+        drawingWidth: 16,
+        showCharacter: false,
+        onLoadCharDataSuccess: () => {
+          setIsLoading(false);
+          if (mode === 'animate') {
+            writer.animateCharacter();
+          } else {
+            startQuiz(writer, mode === 'guide');
+          }
+        },
+        onLoadCharDataError: () => {
+          setIsLoading(false);
+        },
+      });
+
+      writerRef.current = writer;
+    } catch (e) {
+      console.error('Failed to init HanziWriter', e);
+      setIsLoading(false);
+    }
+  }, [currentChar, mode, windowWidth]);
+
+  const startQuiz = (writer: HanziWriter, showOutline: boolean) => {
+    if (showOutline) {
+      writer.showOutline();
+    } else {
+      writer.hideOutline();
+    }
+    writer.quiz({
+      onMistake: () => {
+        audioService.playErrorBuzz();
+      },
+      onCorrectStroke: () => {
+        audioService.playStrokeSuccess();
+      },
+      onComplete: () => {
+        audioService.playSuccessChime();
+        setIsCompleted(true);
+        confetti({
+          particleCount: 30,
+          spread: 70,
+          origin: { y: 0.7 },
+        });
+      },
+    });
+  };
+
+  useEffect(() => {
+    initWriter();
+    return () => {
+      writerRef.current = null;
+    };
+  }, [initWriter]);
+
+  const handleAnimate = () => {
+    if (!writerRef.current) return;
+    audioService.playClick();
+    setMode('animate');
+    writerRef.current.animateCharacter();
+  };
+
+  const handleReset = () => {
+    audioService.playClick();
+    initWriter();
+  };
+
+  const handleHint = () => {
+    if (!writerRef.current) return;
+    audioService.playClick();
+    writerRef.current.showOutline();
+  };
+
+  const handleSpeak = () => {
+    audioService.playClick();
+    audioService.speakChinese(currentChar);
+  };
+
+  return (
+    <div className="flex flex-col flex-1 max-w-md w-full mx-auto p-4 pb-24">
+      {/* Word & Char Selectors */}
+      <div className="flex items-center justify-between mb-3">
+        <select
+          value={selectedWordIndex}
+          onChange={(e) => {
+            audioService.playClick();
+            setSelectedWordIndex(Number(e.target.value));
+            setCurrentCharIndex(0);
+          }}
+          className="bg-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-rose-500 font-medium max-w-[200px]"
+        >
+          {words.map((w, idx) => (
+            <option key={w.id} value={idx}>
+              {w.hanzi} - {w.pinyin} ({w.hanviet})
+            </option>
+          ))}
+        </select>
+
+        {/* Character tabs if multi-char word */}
+        <div className="flex items-center space-x-1.5">
+          {characters.map((char, cIdx) => (
+            <button
+              key={cIdx}
+              onClick={() => {
+                audioService.playClick();
+                setCurrentCharIndex(cIdx);
+              }}
+              className={`w-8 h-8 rounded-lg font-bold text-sm transition-all ${
+                currentCharIndex === cIdx
+                  ? 'bg-rose-600 text-white shadow-md shadow-rose-900/30'
+                  : 'bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700'
+              }`}
+            >
+              {char}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Info card banner */}
+      <div className="p-3 rounded-2xl bg-slate-800/80 border border-slate-750 flex items-center justify-between mb-4">
+        <div>
+          <div className="flex items-center space-x-2">
+            <span className="text-xl font-bold text-slate-100">{currentChar}</span>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
+              {currentWord.hanviet}
+            </span>
+          </div>
+          <p className="text-xs text-slate-400 mt-0.5">{currentWord.meaning}</p>
+        </div>
+        <button
+          onClick={handleSpeak}
+          className="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-all active:scale-95 border border-rose-500/20"
+        >
+          <Volume2 className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Mode Switches */}
+      <div className="grid grid-cols-3 gap-2 p-1 bg-slate-800/80 rounded-xl border border-slate-700/80 mb-4">
+        <button
+          onClick={() => {
+            audioService.playClick();
+            setMode('animate');
+          }}
+          className={`py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${
+            mode === 'animate'
+              ? 'bg-rose-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          1. Xem mẫu
+        </button>
+        <button
+          onClick={() => {
+            audioService.playClick();
+            setMode('guide');
+          }}
+          className={`py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${
+            mode === 'guide'
+              ? 'bg-rose-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          2. Đồ nét
+        </button>
+        <button
+          onClick={() => {
+            audioService.playClick();
+            setMode('quiz');
+          }}
+          className={`py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${
+            mode === 'quiz'
+              ? 'bg-rose-600 text-white shadow-sm'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          3. Tự viết
+        </button>
+      </div>
+
+      {/* Hanzi Canvas Container with Mễ / Điền Grid */}
+      <div className="relative mx-auto rounded-3xl overflow-hidden bg-slate-900 border-2 border-slate-700 shadow-2xl flex items-center justify-center p-2 mb-4 w-full aspect-square max-w-[300px]">
+        {/* SVG Background Grid */}
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none p-4"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          {/* Outer Border */}
+          <rect
+            x="0"
+            y="0"
+            width="100"
+            height="100"
+            fill="none"
+            stroke="#475569"
+            strokeWidth="1.2"
+          />
+
+          {/* Cross (Điền tự cách) */}
+          <line
+            x1="50"
+            y1="0"
+            x2="50"
+            y2="100"
+            stroke="#334155"
+            strokeWidth="0.8"
+            strokeDasharray="3 3"
+          />
+          <line
+            x1="0"
+            y1="50"
+            x2="100"
+            y2="50"
+            stroke="#334155"
+            strokeWidth="0.8"
+            strokeDasharray="3 3"
+          />
+
+          {/* Diagonals (Mễ tự cách) */}
+          {gridType === 'mi' && (
+            <>
+              <line
+                x1="0"
+                y1="0"
+                x2="100"
+                y2="100"
+                stroke="#334155"
+                strokeWidth="0.8"
+                strokeDasharray="3 3"
+              />
+              <line
+                x1="100"
+                y1="0"
+                x2="0"
+                y2="100"
+                stroke="#334155"
+                strokeWidth="0.8"
+                strokeDasharray="3 3"
+              />
+            </>
+          )}
+        </svg>
+
+        {/* Loading Indicator */}
+        {isLoading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/80 backdrop-blur-xs text-xs text-slate-400">
+            Đang tải dữ liệu nét...
+          </div>
+        )}
+
+        {/* The HanziWriter Canvas mount point */}
+        <div
+          ref={containerRef}
+          className="hanzi-canvas-container relative z-10 flex items-center justify-center cursor-crosshair"
+        />
+
+        {/* Completion Overlay */}
+        {isCompleted && (
+          <div className="absolute inset-x-0 bottom-3 z-20 flex justify-center pointer-events-none">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-semibold shadow-lg backdrop-blur-md">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Hoàn thành xuất sắc!
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Grid Switch & Canvas Controls */}
+      <div className="flex items-center justify-between mb-3 text-xs text-slate-400 px-1">
+        <div className="flex items-center space-x-2">
+          <span>Khung kẻ:</span>
+          <button
+            onClick={() => {
+              audioService.playClick();
+              setGridType(gridType === 'mi' ? 'tian' : 'mi');
+            }}
+            className="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-medium"
+          >
+            {gridType === 'mi' ? 'Ô Mễ (米)' : 'Ô Điền (田)'}
+          </button>
+        </div>
+
+        <span className="text-slate-500">
+          {mode === 'quiz' ? 'Viết tự do từ trí nhớ' : mode === 'guide' ? 'Đồ theo nét mờ' : 'Xem thứ tự nét'}
+        </span>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="grid grid-cols-3 gap-2">
+        <button
+          onClick={handleAnimate}
+          className="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 active:scale-95 transition-all text-xs font-medium"
+        >
+          <Play className="w-3.5 h-3.5 text-rose-400" />
+          <span>Vẽ lại mẫu</span>
+        </button>
+
+        <button
+          onClick={handleReset}
+          className="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 active:scale-95 transition-all text-xs font-medium"
+        >
+          <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
+          <span>Xóa viết lại</span>
+        </button>
+
+        <button
+          onClick={handleHint}
+          className="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 active:scale-95 transition-all text-xs font-medium"
+        >
+          <HelpCircle className="w-3.5 h-3.5 text-sky-400" />
+          <span>Gợi ý nét</span>
+        </button>
+      </div>
+    </div>
+  );
+};
