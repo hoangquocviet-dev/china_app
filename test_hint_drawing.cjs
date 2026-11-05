@@ -120,4 +120,4 @@ async function testHintDrawing(targetUrl) {
   }
 }
 
-testHintDrawing('http://localhost:4173');
+testHintDrawing(process.argv[2] || 'https://chinaapp.vercel.app');
