@@ -42,9 +42,10 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const writerRef = useRef<HanziWriter | null>(null);
 
-  const currentWord = words[selectedWordIndex] || words[0];
-  const characters = Array.from(currentWord.hanzi);
-  const currentChar = characters[currentCharIndex] || characters[0];
+  const hasWords = Boolean(words && words.length > 0);
+  const currentWord = hasWords ? (words[selectedWordIndex] || words[0]) : null;
+  const characters = currentWord ? Array.from(currentWord.hanzi) : [];
+  const currentChar = characters[currentCharIndex] || characters[0] || '';
 
   const initWriter = useCallback(() => {
     if (!containerRef.current || !currentChar) return;
@@ -146,7 +147,9 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
         } else {
           // Completed full word! Speak full word after 700ms
           setTimeout(() => {
-            audioService.speakChinese(currentWord.hanzi);
+            if (currentWord) {
+              audioService.speakChinese(currentWord.hanzi);
+            }
           }, 700);
         }
       },
@@ -189,6 +192,14 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
     audioService.playClick();
     audioService.speakChinese(currentChar);
   };
+
+  if (!hasWords || !currentWord) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
+        <p className="text-slate-400">Chưa có từ vựng nào trong danh sách.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col flex-1 max-w-md w-full mx-auto p-4 pb-24">

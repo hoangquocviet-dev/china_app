@@ -15,15 +15,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   const [hidePinyin, setHidePinyin] = useState(false);
   const [hideHanviet, setHideHanviet] = useState(false);
 
-  if (!words || words.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
-        <p className="text-slate-400">Chưa có từ vựng nào trong danh sách.</p>
-      </div>
-    );
-  }
-
-  const currentWord = words[currentIndex] || words[0];
+  const hasWords = Boolean(words && words.length > 0);
+  const currentWord = hasWords ? (words[currentIndex] || words[0]) : null;
 
   const handleFlip = () => {
     audioService.playClick();
@@ -37,16 +30,19 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   };
 
   const handleNext = () => {
+    if (!hasWords) return;
     setIsFlipped(false);
     setCurrentIndex((prev) => (prev + 1) % words.length);
   };
 
   const handlePrev = () => {
+    if (!hasWords) return;
     setIsFlipped(false);
     setCurrentIndex((prev) => (prev - 1 + words.length) % words.length);
   };
 
   const handleAnswer = (isCorrect: boolean) => {
+    if (!currentWord) return;
     audioService.stopSpeech();
     if (isCorrect) {
       audioService.playSuccessChime();
@@ -64,6 +60,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   };
 
   useEffect(() => {
+    if (!hasWords) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
       if (e.code === 'Space') {
@@ -84,7 +81,15 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
       window.removeEventListener('keydown', handleKeyDown);
       audioService.stopSpeech();
     };
-  }, [currentIndex, isFlipped, words]);
+  }, [currentIndex, isFlipped, words, hasWords, currentWord]);
+
+  if (!hasWords || !currentWord) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
+        <p className="text-slate-400">Chưa có từ vựng nào trong danh sách.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col flex-1 max-w-md w-full mx-auto p-4 pb-24">

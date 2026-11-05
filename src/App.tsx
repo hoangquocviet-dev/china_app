@@ -21,7 +21,7 @@ export function App() {
     }
     return 'flashcard';
   });
-  const [words, setWords] = useState<ChineseWord[]>([]);
+  const [words, setWords] = useState<ChineseWord[]>(() => storageService.getWords());
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
   const handleTabChange = (tab: ActiveTab) => {
