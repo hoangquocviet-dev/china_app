@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const APP_URL = 'http://localhost:4175';
+const APP_URL = 'https://chinaapp.vercel.app';
 const ARTIFACT_DIR = 'C:\\Users\\Admin\\.gemini\\antigravity\\brain\\8b1ba9a7-0900-4573-8a79-30d47902b911';
 
 async function testFeedbackFixes() {
