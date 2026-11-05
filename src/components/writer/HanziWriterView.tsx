@@ -8,10 +8,17 @@ import bundledStrokes from '../../data/bundledStrokes.json';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
+  initialWordId?: string | null;
 }
 
-export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
-  const [selectedWordIndex, setSelectedWordIndex] = useState(0);
+export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initialWordId }) => {
+  const [selectedWordIndex, setSelectedWordIndex] = useState(() => {
+    if (initialWordId) {
+      const idx = words.findIndex((w) => w.id === initialWordId);
+      if (idx !== -1) return idx;
+    }
+    return 0;
+  });
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [mode, setMode] = useState<'animate' | 'guide' | 'quiz'>('guide');
   const [gridType, setGridType] = useState<'mi' | 'tian'>('mi'); // Ô Mễ (米) hoặc Ô Điền (田)
@@ -23,6 +30,16 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 375
   );
+
+  useEffect(() => {
+    if (initialWordId) {
+      const idx = words.findIndex((w) => w.id === initialWordId);
+      if (idx !== -1) {
+        setSelectedWordIndex(idx);
+        setCurrentCharIndex(0);
+      }
+    }
+  }, [initialWordId, words]);
 
   useEffect(() => {
     let timeoutId: number;

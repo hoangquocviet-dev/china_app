@@ -57,14 +57,50 @@ class SafeStorageService {
       this.set(STORAGE_KEYS.WORDS, INITIAL_WORDS);
       return INITIAL_WORDS;
     }
-    // Merge new initial words if any missing
-    const missing = INITIAL_WORDS.filter((iw) => !words.some((w) => w.id === iw.id));
-    if (missing.length > 0) {
-      const merged = [...words, ...missing];
-      this.set(STORAGE_KEYS.WORDS, merged);
-      return merged;
-    }
     return words;
+  }
+
+  public addWord(word: Omit<ChineseWord, 'id'> & { id?: string }): { success: boolean; message: string; word?: ChineseWord } {
+    const words = this.getWords();
+    const cleanHanzi = word.hanzi.trim();
+    if (!cleanHanzi) {
+      return { success: false, message: 'Vui lòng nhập chữ Hán.' };
+    }
+
+    const exists = words.some((w) => w.hanzi.trim() === cleanHanzi);
+    if (exists) {
+      return { success: false, message: `Từ "${cleanHanzi}" đã có trong sổ từ vựng của bạn.` };
+    }
+
+    const newWord: ChineseWord = {
+      ...word,
+      id: word.id || `word_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      hanzi: cleanHanzi,
+      pinyin: word.pinyin.trim(),
+      hanviet: word.hanviet ? word.hanviet.trim().toUpperCase() : '',
+      meaning: word.meaning.trim(),
+      pos: word.pos || 'Danh từ',
+      level: word.level || 'HSK1',
+      examples: word.examples || [],
+      box: word.box || 1,
+      lastReviewed: undefined,
+    };
+
+    const updated = [newWord, ...words];
+    this.saveWords(updated);
+    return { success: true, message: `Đã thêm thành công "${cleanHanzi}" vào sổ từ!`, word: newWord };
+  }
+
+  public deleteWord(wordId: string): boolean {
+    const words = this.getWords();
+    const updated = words.filter((w) => w.id !== wordId);
+    this.saveWords(updated);
+    return true;
+  }
+
+  public isWordInLibrary(hanzi: string): boolean {
+    const words = this.getWords();
+    return words.some((w) => w.hanzi.trim() === hanzi.trim());
   }
 
   public saveWords(words: ChineseWord[]): void {

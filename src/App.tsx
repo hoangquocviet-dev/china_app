@@ -63,7 +63,10 @@ export function App() {
     loadWords();
   };
 
-  const handleSelectWordForWriting = (_word: ChineseWord) => {
+  const [selectedWordIdForWriting, setSelectedWordIdForWriting] = useState<string | null>(null);
+
+  const handleSelectWordForWriting = (word: ChineseWord) => {
+    setSelectedWordIdForWriting(word.id);
     handleTabChange('writing');
   };
 
@@ -160,7 +163,9 @@ export function App() {
           <FlashcardView words={words} onUpdateWordSRS={handleUpdateWordSRS} />
         )}
 
-        {activeTab === 'writing' && <HanziWriterView words={words} />}
+        {activeTab === 'writing' && (
+          <HanziWriterView words={words} initialWordId={selectedWordIdForWriting} />
+        )}
 
         {activeTab === 'assembly' && <AssemblyView />}
 
