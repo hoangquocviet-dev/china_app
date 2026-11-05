@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, PenTool, Puzzle, Languages, BookOpen } from 'lucide-react';
+import { Layers, PenTool, Puzzle, Mic, BookOpen } from 'lucide-react';
 import type { ActiveTab } from '../../types';
 import { audioService } from '../../utils/audio';
 
@@ -13,7 +13,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) 
     { id: 'flashcard', label: 'Flashcard', icon: Layers },
     { id: 'writing', label: 'Luyện viết', icon: PenTool },
     { id: 'assembly', label: 'Ghép câu', icon: Puzzle },
-    { id: 'translation', label: 'Luyện dịch', icon: Languages },
+    { id: 'speaking', label: 'Luyện nói', icon: Mic },
     { id: 'library', label: 'Từ vựng', icon: BookOpen },
   ];
 

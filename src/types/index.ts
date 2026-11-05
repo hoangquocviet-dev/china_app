@@ -33,4 +33,4 @@ export interface SentenceExercise {
   grammarNote?: string;
 }
 
-export type ActiveTab = 'flashcard' | 'writing' | 'assembly' | 'translation' | 'library';
+export type ActiveTab = 'flashcard' | 'writing' | 'assembly' | 'speaking' | 'library';

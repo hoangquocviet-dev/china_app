@@ -6,7 +6,7 @@ import { BottomNav } from './components/common/BottomNav';
 import { FlashcardView } from './components/flashcard/FlashcardView';
 import { HanziWriterView } from './components/writer/HanziWriterView';
 import { AssemblyView } from './components/assembly/AssemblyView';
-import { TranslationView } from './components/translation/TranslationView';
+import { SpeakingView } from './components/speaking/SpeakingView';
 import { WordListView } from './components/library/WordListView';
 import { storageService } from './utils/storage';
 import { audioService } from './utils/audio';
@@ -15,7 +15,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.replace('#', '') as ActiveTab;
-      if (['flashcard', 'writing', 'assembly', 'translation', 'library'].includes(hash)) {
+      if (['flashcard', 'writing', 'assembly', 'speaking', 'library'].includes(hash)) {
         return hash;
       }
     }
@@ -42,7 +42,7 @@ export function App() {
     const handleHashChange = () => {
       if (typeof window !== 'undefined') {
         const hash = window.location.hash.replace('#', '') as ActiveTab;
-        if (['flashcard', 'writing', 'assembly', 'translation', 'library'].includes(hash)) {
+        if (['flashcard', 'writing', 'assembly', 'speaking', 'library'].includes(hash)) {
           setActiveTab(hash);
         }
       }
@@ -78,8 +78,8 @@ export function App() {
         return { title: 'Luyện Viết', subtitle: 'Tập viết thuận bút chuẩn thư pháp' };
       case 'assembly':
         return { title: 'Ghép Câu', subtitle: 'Tư duy cấu trúc ngữ pháp tiếng Trung' };
-      case 'translation':
-        return { title: 'Luyện Dịch', subtitle: 'Phản xạ dịch song ngữ 2 chiều' };
+      case 'speaking':
+        return { title: 'Luyện Nói', subtitle: 'Phát âm chuẩn thanh điệu & nhận diện giọng nói AI' };
       case 'library':
         return { title: 'Kho Từ Vựng', subtitle: 'Tra cứu & quản lý bộ từ HSK' };
     }
@@ -169,7 +169,7 @@ export function App() {
 
         {activeTab === 'assembly' && <AssemblyView />}
 
-        {activeTab === 'translation' && <TranslationView />}
+        {activeTab === 'speaking' && <SpeakingView words={words} />}
 
         {activeTab === 'library' && (
           <WordListView
