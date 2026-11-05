@@ -89,6 +89,8 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
         outlineColor: '#475569', // Slate-600
         drawingColor: '#38bdf8', // Sky-400
         drawingWidth: 16,
+        highlightColor: '#f59e0b', // Amber-500 for hint animation
+        strokeHighlightSpeed: 1.5,
         showCharacter: false,
         charDataLoader: (char, onLoad, onError) => {
           const localData = (bundledStrokes as Record<string, any>)[char];
@@ -131,7 +133,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
     }
   }, [currentChar, mode, windowWidth]);
 
-  const startQuiz = (writer: HanziWriter, showOutline: boolean) => {
+  const startQuiz = (writer: HanziWriter, showOutline: boolean, startStrokeNum: number = 0) => {
     if (showOutline) {
       writer.showOutline();
     } else {
@@ -139,6 +141,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
     }
     writer.quiz({
       showHintAfterMisses: 2,
+      quizStartStrokeNum: startStrokeNum,
       onMistake: (strokeData) => {
         audioService.playErrorBuzz();
         setHintMessage(`Chưa đúng hướng nét ${strokeData.strokeNum + 1}! Bấm "Gợi ý nét" nếu cần chỉ dẫn.`);
@@ -196,12 +199,16 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
   const handleAnimate = () => {
     if (!writerRef.current) return;
     audioService.playClick();
-    setMode('animate');
+    setMode('guide');
     setHintMessage('Đang phát video mô phỏng thứ tự các nét...');
     writerRef.current.animateCharacter({
       onComplete: () => {
         setHintMessage('Đã xem xong mẫu! Bạn có thể bắt đầu đồ lại nét.');
         setTimeout(() => setHintMessage(null), 3000);
+        if (writerRef.current) {
+          setCurrentStroke(1);
+          startQuiz(writerRef.current, true, 0);
+        }
       },
     });
   };
@@ -224,10 +231,29 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
     if (!writerRef.current) return;
     audioService.playClick();
     const strokeIndex = Math.max(0, currentStroke - 1);
-    // Show outline and animate the single next stroke
+    
+    // Luôn hiển thị nét outline mờ để người dùng dễ căn chỉnh
     writerRef.current.showOutline();
-    writerRef.current.animateStroke(strokeIndex);
-    setHintMessage(`Gợi ý: Đang minh họa cách viết nét thứ ${currentStroke}/${totalStrokes || '?'}`);
+
+    // Kiểm tra xem quiz có đang hoạt động hay không, nếu không thì kích hoạt lại ở đúng nét hiện tại
+    const isQuizActive = (writerRef.current as any)._quiz?._isActive;
+    if (!isQuizActive) {
+      startQuiz(writerRef.current, mode === 'guide', strokeIndex);
+    }
+
+    // Dùng highlightStroke thay vì animateStroke để KHÔNG gọi cancelQuiz(), giữ nguyên canvas vẽ cho user
+    writerRef.current.highlightStroke(strokeIndex, {
+      onComplete: () => {
+        if (writerRef.current) {
+          const quizActiveAfter = (writerRef.current as any)._quiz?._isActive;
+          if (!quizActiveAfter) {
+            startQuiz(writerRef.current, mode === 'guide', strokeIndex);
+          }
+        }
+      },
+    });
+
+    setHintMessage(`Gợi ý: Đang minh họa nét thứ ${currentStroke}/${totalStrokes || '?'}. Bạn hãy vẽ tiếp theo nét sáng nhé!`);
     setTimeout(() => setHintMessage(null), 3500);
   };
 
