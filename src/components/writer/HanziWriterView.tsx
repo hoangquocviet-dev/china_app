@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import HanziWriter from 'hanzi-writer';
-import { Play, RotateCcw, HelpCircle, Volume2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Play, RotateCcw, HelpCircle, Volume2, CheckCircle2, AlertCircle, ChevronRight, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
@@ -134,8 +134,30 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
           spread: 75,
           origin: { y: 0.7 },
         });
+
+        // Speak current character
+        audioService.speakChinese(currentChar);
+
+        // If there is another character in this word, auto advance after 1.2s
+        if (currentCharIndex < characters.length - 1) {
+          setTimeout(() => {
+            setCurrentCharIndex((prev) => prev + 1);
+          }, 1200);
+        } else {
+          // Completed full word! Speak full word after 700ms
+          setTimeout(() => {
+            audioService.speakChinese(currentWord.hanzi);
+          }, 700);
+        }
       },
     });
+  };
+
+  const handleNextWord = () => {
+    audioService.playClick();
+    setSelectedWordIndex((prev) => (prev + 1) % words.length);
+    setCurrentCharIndex(0);
+    setIsCompleted(false);
   };
 
   useEffect(() => {
@@ -375,11 +397,61 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
         {isCompleted && (
           <div className="absolute inset-x-0 bottom-3 z-20 flex justify-center pointer-events-none">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-semibold shadow-lg backdrop-blur-md">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Hoàn thành xuất sắc!
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              {currentCharIndex < characters.length - 1
+                ? `Đã xong chữ [${currentChar}]! Chuyển chữ tiếp theo...`
+                : 'Hoàn thành xuất sắc!'}
             </span>
           </div>
         )}
       </div>
+
+      {/* Full Word Completion Action Card */}
+      {isCompleted && currentCharIndex === characters.length - 1 && (
+        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-850 to-slate-800 border border-emerald-500/40 mb-4 animate-in fade-in duration-300 shadow-xl">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-sm">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" /> Đã hoàn thành từ vựng!
+                </div>
+                <div className="text-sm font-bold text-slate-100 flex items-center gap-1.5">
+                  <span>{currentWord.hanzi}</span>
+                  <span className="text-xs text-rose-400 font-normal pinyin-text">({currentWord.pinyin})</span>
+                  <span className="text-xs text-slate-400 font-normal">• {currentWord.hanviet}</span>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => audioService.speakChinese(currentWord.hanzi)}
+              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300"
+              title="Nghe phát âm cả từ"
+            >
+              <Volume2 className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={handleReset}
+              className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 active:scale-95 transition-all"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
+              <span>Viết lại</span>
+            </button>
+            <button
+              onClick={handleNextWord}
+              className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-semibold shadow-md shadow-rose-900/30 flex items-center justify-center gap-1.5 active:scale-95 transition-all"
+            >
+              <span>Từ tiếp theo</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Grid Switch & Canvas Controls */}
       <div className="flex items-center justify-between mb-3 text-xs text-slate-400 px-1">
