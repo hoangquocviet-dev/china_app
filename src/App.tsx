@@ -38,6 +38,18 @@ export function App() {
 
   useEffect(() => {
     loadWords();
+
+    const handleHashChange = () => {
+      if (typeof window !== 'undefined') {
+        const hash = window.location.hash.replace('#', '') as ActiveTab;
+        if (['flashcard', 'writing', 'assembly', 'translation', 'library'].includes(hash)) {
+          setActiveTab(hash);
+        }
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   const handleToggleSound = () => {

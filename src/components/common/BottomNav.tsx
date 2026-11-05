@@ -26,6 +26,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) 
           return (
             <button
               key={item.id}
+              data-tab={item.id}
+              aria-label={item.label}
               onClick={() => {
                 audioService.playClick();
                 onChangeTab(item.id);
