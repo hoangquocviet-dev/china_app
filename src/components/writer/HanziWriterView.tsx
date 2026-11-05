@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import HanziWriter from 'hanzi-writer';
-import { Play, RotateCcw, HelpCircle, Volume2, CheckCircle2 } from 'lucide-react';
+import { Play, RotateCcw, HelpCircle, Volume2, CheckCircle2, AlertCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
+import bundledStrokes from '../../data/bundledStrokes.json';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -16,6 +17,9 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
   const [gridType, setGridType] = useState<'mi' | 'tian'>('mi'); // Ô Mễ (米) hoặc Ô Điền (田)
   const [isCompleted, setIsCompleted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [totalStrokes, setTotalStrokes] = useState<number>(0);
+  const [currentStroke, setCurrentStroke] = useState<number>(1);
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 375
   );
@@ -49,6 +53,8 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
     containerRef.current.innerHTML = '';
     setIsLoading(true);
     setIsCompleted(false);
+    setLoadError(false);
+    setCurrentStroke(1);
 
     try {
       const size = Math.min(Math.max(windowWidth - 64, 220), 280);
@@ -65,8 +71,27 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
         drawingColor: '#38bdf8', // Sky-400
         drawingWidth: 16,
         showCharacter: false,
-        onLoadCharDataSuccess: () => {
+        charDataLoader: (char, onLoad, onError) => {
+          const localData = (bundledStrokes as Record<string, any>)[char];
+          if (localData) {
+            onLoad(localData);
+            return;
+          }
+          fetch(`https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0/${encodeURIComponent(char)}.json`)
+            .then((res) => {
+              if (!res.ok) throw new Error('Network error');
+              return res.json();
+            })
+            .then((data) => onLoad(data))
+            .catch((err) => {
+              console.warn('[HanziWriter] Failed to load stroke data', err);
+              if (onError) onError(err);
+            });
+        },
+        onLoadCharDataSuccess: (data) => {
           setIsLoading(false);
+          setLoadError(false);
+          setTotalStrokes(data && data.strokes ? data.strokes.length : 0);
           if (mode === 'animate') {
             writer.animateCharacter();
           } else {
@@ -75,6 +100,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
         },
         onLoadCharDataError: () => {
           setIsLoading(false);
+          setLoadError(true);
         },
       });
 
@@ -82,6 +108,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
     } catch (e) {
       console.error('Failed to init HanziWriter', e);
       setIsLoading(false);
+      setLoadError(true);
     }
   }, [currentChar, mode, windowWidth]);
 
@@ -95,15 +122,16 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
       onMistake: () => {
         audioService.playErrorBuzz();
       },
-      onCorrectStroke: () => {
+      onCorrectStroke: (strokeData) => {
         audioService.playStrokeSuccess();
+        setCurrentStroke(strokeData.strokeNum + 2);
       },
       onComplete: () => {
         audioService.playSuccessChime();
         setIsCompleted(true);
         confetti({
-          particleCount: 30,
-          spread: 70,
+          particleCount: 35,
+          spread: 75,
           origin: { y: 0.7 },
         });
       },
@@ -186,11 +214,20 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
         <div>
           <div className="flex items-center space-x-2">
             <span className="text-xl font-bold text-slate-100">{currentChar}</span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 uppercase">
               {currentWord.hanviet}
             </span>
+            {totalStrokes > 0 && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-slate-700/80 text-slate-300 font-medium">
+                {totalStrokes} nét
+              </span>
+            )}
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">{currentWord.meaning}</p>
+          <div className="flex items-center space-x-2 mt-0.5">
+            <span className="text-xs text-rose-400 font-medium pinyin-text tracking-normal">{currentWord.pinyin}</span>
+            <span className="text-xs text-slate-500">•</span>
+            <span className="text-xs text-slate-400">{currentWord.meaning}</span>
+          </div>
         </div>
         <button
           onClick={handleSpeak}
@@ -314,6 +351,20 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
           </div>
         )}
 
+        {/* Error Indicator with Retry */}
+        {loadError && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-xs text-xs text-rose-400 p-4 text-center">
+            <AlertCircle className="w-6 h-6 mb-2" />
+            <p className="mb-2">Chưa tải được dữ liệu nét chữ này</p>
+            <button
+              onClick={handleReset}
+              className="px-3 py-1.5 rounded-lg bg-rose-600 text-white font-medium hover:bg-rose-500 active:scale-95 transition-all"
+            >
+              Thử tải lại
+            </button>
+          </div>
+        )}
+
         {/* The HanziWriter Canvas mount point */}
         <div
           ref={containerRef}
@@ -345,9 +396,16 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words }) => {
           </button>
         </div>
 
-        <span className="text-slate-500">
-          {mode === 'quiz' ? 'Viết tự do từ trí nhớ' : mode === 'guide' ? 'Đồ theo nét mờ' : 'Xem thứ tự nét'}
-        </span>
+        <div className="flex items-center space-x-2">
+          {mode !== 'animate' && totalStrokes > 0 && (
+            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">
+              Nét {Math.min(currentStroke, totalStrokes)} / {totalStrokes}
+            </span>
+          )}
+          <span className="text-slate-500">
+            {mode === 'quiz' ? 'Tự viết từ trí nhớ' : mode === 'guide' ? 'Đồ theo nét mờ' : 'Xem thứ tự nét'}
+          </span>
+        </div>
       </div>
 
       {/* Action Buttons */}
