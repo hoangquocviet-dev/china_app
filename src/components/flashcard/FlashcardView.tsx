@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Volume2, Eye, EyeOff, Check, RotateCcw, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
@@ -15,6 +15,12 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   const [hidePinyin, setHidePinyin] = useState(false);
   const [hideHanviet, setHideHanviet] = useState(false);
 
+  // Swipe gesture state
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const touchStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const isHorizontalSwipeRef = useRef<boolean | null>(null);
+
   const hasWords = Boolean(words && words.length > 0);
   const currentWord = hasWords ? (words[currentIndex] || words[0]) : null;
 
@@ -29,15 +35,22 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
     audioService.speakChinese(text);
   };
 
+  const handleSpeakSentence = (e: React.MouseEvent, text: string) => {
+    e.stopPropagation();
+    audioService.speakChinese(text);
+  };
+
   const handleNext = () => {
     if (!hasWords) return;
     setIsFlipped(false);
+    setDragOffset(0);
     setCurrentIndex((prev) => (prev + 1) % words.length);
   };
 
   const handlePrev = () => {
     if (!hasWords) return;
     setIsFlipped(false);
+    setDragOffset(0);
     setCurrentIndex((prev) => (prev - 1 + words.length) % words.length);
   };
 
@@ -57,6 +70,50 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
 
     onUpdateWordSRS(currentWord.id, isCorrect);
     handleNext();
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+    };
+    isHorizontalSwipeRef.current = null;
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const deltaX = e.touches[0].clientX - touchStartRef.current.x;
+    const deltaY = e.touches[0].clientY - touchStartRef.current.y;
+
+    if (isHorizontalSwipeRef.current === null) {
+      if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+        isHorizontalSwipeRef.current = Math.abs(deltaX) > Math.abs(deltaY);
+      }
+    }
+
+    if (isHorizontalSwipeRef.current) {
+      setDragOffset(deltaX);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    if (isHorizontalSwipeRef.current) {
+      if (dragOffset > 70) {
+        // Vuốt sang phải -> Đã thuộc
+        handleAnswer(true);
+      } else if (dragOffset < -70) {
+        // Vuốt sang trái -> Chưa nhớ
+        handleAnswer(false);
+      }
+    } else {
+      if (Math.abs(dragOffset) < 10) {
+        handleFlip();
+      }
+    }
+    setDragOffset(0);
+    isHorizontalSwipeRef.current = null;
   };
 
   useEffect(() => {
@@ -148,11 +205,32 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
         />
       </div>
 
-      {/* 3D Flashcard Container */}
+      {/* 3D Flashcard Container with Touch Swipe Support */}
       <div
-        onClick={handleFlip}
-        className="relative w-full aspect-[4/5] min-h-[350px] max-h-[460px] perspective-1000 cursor-pointer select-none"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onClick={() => {
+          if (Math.abs(dragOffset) < 5) handleFlip();
+        }}
+        style={{
+          transform: `translateX(${dragOffset}px) rotate(${dragOffset * 0.04}deg)`,
+          transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+        }}
+        className="relative w-full aspect-[4/5] min-h-[350px] max-h-[460px] perspective-1000 cursor-pointer select-none touch-pan-y"
       >
+        {/* Swipe Pill Feedback */}
+        {dragOffset > 35 && (
+          <div className="absolute top-4 right-4 z-40 px-3.5 py-1.5 rounded-2xl bg-emerald-500 text-white font-bold text-xs shadow-xl animate-pulse">
+            ĐÃ THUỘC →
+          </div>
+        )}
+        {dragOffset < -35 && (
+          <div className="absolute top-4 left-4 z-40 px-3.5 py-1.5 rounded-2xl bg-rose-500 text-white font-bold text-xs shadow-xl animate-pulse">
+            ← CHƯA NHỚ
+          </div>
+        )}
+
         <div
           className={`relative w-full h-full duration-500 transform-style-3d transition-transform rounded-3xl ${
             isFlipped ? 'rotate-x-180' : ''
@@ -252,15 +330,23 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
                     {currentWord.examples.map((ex, idx) => (
                       <div
                         key={idx}
-                        onClick={(e) => handleSpeak(e, ex.zh)}
-                        className="p-2 rounded-lg bg-slate-800/60 border border-slate-750 hover:border-slate-700 transition-colors cursor-pointer"
+                        onClick={(e) => handleSpeakSentence(e, ex.zh)}
+                        className="p-2.5 rounded-2xl bg-slate-800/80 border border-slate-750 hover:border-slate-700 transition-colors cursor-pointer flex items-center justify-between gap-3 shadow-xs"
                       >
-                        <div className="text-sm font-medium text-slate-200 flex items-center justify-between">
-                          <span>{ex.zh}</span>
-                          <Volume2 className="w-3.5 h-3.5 text-slate-400" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold text-slate-100">{ex.zh}</div>
+                          <div className="text-xs text-rose-400 pinyin-text tracking-normal mt-0.5">{ex.pinyin}</div>
+                          <div className="text-xs text-slate-400 mt-0.5">{ex.vi}</div>
                         </div>
-                        <div className="text-xs text-rose-400/90 pinyin-text tracking-normal">{ex.pinyin}</div>
-                        <div className="text-xs text-slate-400 mt-0.5">{ex.vi}</div>
+                        <button
+                          type="button"
+                          onClick={(e) => handleSpeakSentence(e, ex.zh)}
+                          className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-transform active:scale-90 shrink-0 flex items-center gap-1"
+                          title="Nghe câu ví dụ"
+                        >
+                          <Volume2 className="w-4 h-4" />
+                          <span className="text-[10px] font-semibold">Nghe</span>
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -314,6 +400,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
         >
           Từ sau <ChevronRight className="w-4 h-4 ml-1" />
         </button>
+      </div>
+
+      {/* Swipe Gesture Hint */}
+      <div className="text-center text-[11px] text-slate-500 mt-2.5 select-none">
+        Mẹo: Vuốt thẻ sang phải (Đã thuộc) • Vuốt thẻ sang trái (Chưa nhớ)
       </div>
     </div>
   );

@@ -30,6 +30,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== 'undefined' ? window.innerWidth : 375
   );
+  const [hintMessage, setHintMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialWordId) {
@@ -137,16 +138,20 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
       writer.hideOutline();
     }
     writer.quiz({
-      onMistake: () => {
+      showHintAfterMisses: 2,
+      onMistake: (strokeData) => {
         audioService.playErrorBuzz();
+        setHintMessage(`Chưa đúng hướng nét ${strokeData.strokeNum + 1}! Bấm "Gợi ý nét" nếu cần chỉ dẫn.`);
       },
       onCorrectStroke: (strokeData) => {
         audioService.playStrokeSuccess();
         setCurrentStroke(strokeData.strokeNum + 2);
+        setHintMessage(null);
       },
       onComplete: () => {
         audioService.playSuccessChime();
         setIsCompleted(true);
+        setHintMessage('Hoàn thành nét chữ xuất sắc!');
         confetti({
           particleCount: 35,
           spread: 75,
@@ -178,6 +183,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
     setSelectedWordIndex((prev) => (prev + 1) % words.length);
     setCurrentCharIndex(0);
     setIsCompleted(false);
+    setHintMessage(null);
   };
 
   useEffect(() => {
@@ -191,18 +197,38 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
     if (!writerRef.current) return;
     audioService.playClick();
     setMode('animate');
-    writerRef.current.animateCharacter();
+    setHintMessage('Đang phát video mô phỏng thứ tự các nét...');
+    writerRef.current.animateCharacter({
+      onComplete: () => {
+        setHintMessage('Đã xem xong mẫu! Bạn có thể bắt đầu đồ lại nét.');
+        setTimeout(() => setHintMessage(null), 3000);
+      },
+    });
   };
 
   const handleReset = () => {
     audioService.playClick();
+    if (writerRef.current) {
+      try {
+        writerRef.current.cancelQuiz();
+      } catch {}
+    }
+    setCurrentStroke(1);
+    setIsCompleted(false);
+    setHintMessage('Đã làm mới bảng vẽ! Mời bạn viết lại từ nét đầu tiên.');
+    setTimeout(() => setHintMessage(null), 2500);
     initWriter();
   };
 
   const handleHint = () => {
     if (!writerRef.current) return;
     audioService.playClick();
+    const strokeIndex = Math.max(0, currentStroke - 1);
+    // Show outline and animate the single next stroke
     writerRef.current.showOutline();
+    writerRef.current.animateStroke(strokeIndex);
+    setHintMessage(`Gợi ý: Đang minh họa cách viết nét thứ ${currentStroke}/${totalStrokes || '?'}`);
+    setTimeout(() => setHintMessage(null), 3500);
   };
 
   const handleSpeak = () => {
@@ -329,6 +355,13 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
           3. Tự viết
         </button>
       </div>
+
+      {/* Interactive Guidance & Hint Banner */}
+      {hintMessage && (
+        <div className="p-2.5 mb-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-center font-medium animate-fadeIn">
+          {hintMessage}
+        </div>
+      )}
 
       {/* Hanzi Canvas Container with Mễ / Điền Grid */}
       <div className="relative mx-auto rounded-3xl overflow-hidden bg-slate-900 border-2 border-slate-700 shadow-2xl flex items-center justify-center p-2 mb-4 w-full aspect-square max-w-[300px]">

@@ -177,43 +177,75 @@ class AudioManager {
     }
   }
 
-  // Two-tier Chinese speech pronunciation
+  // Robust multi-tier Chinese speech pronunciation
   public speakChinese(text: string, rate: number = 0.85): Promise<void> {
     return new Promise((resolve) => {
+      if (!this.isSoundEnabled) {
+        resolve();
+        return;
+      }
+
       const cleanText = text.replace(/[/\\()[\]]/g, '').trim();
       if (!cleanText) {
         resolve();
         return;
       }
 
-      // Check if Web Speech API has Chinese voice available
-      const hasChinese =
-        this.voices.some((v) => v.lang.startsWith('zh') || v.lang.includes('cmn')) ||
-        Boolean(this.chineseVoice);
-
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window && hasChinese) {
+      // Tier 1: Device Native Web Speech API
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         try {
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
           window.speechSynthesis.cancel();
+
+          // Re-check voices if not loaded earlier
+          if (!this.chineseVoice) {
+            this.initVoices();
+          }
+
           const utterance = new SpeechSynthesisUtterance(cleanText);
           utterance.lang = 'zh-CN';
           utterance.rate = rate;
+
           if (this.chineseVoice) {
             utterance.voice = this.chineseVoice;
           }
-          utterance.onend = () => resolve();
-          utterance.onerror = () => {
-            this.fallbackSpeakAudio(cleanText).then(resolve);
+
+          let resolved = false;
+          utterance.onend = () => {
+            if (!resolved) {
+              resolved = true;
+              resolve();
+            }
           };
 
+          utterance.onerror = () => {
+            if (!resolved) {
+              resolved = true;
+              this.fallbackSpeakAudio(cleanText).then(resolve);
+            }
+          };
+
+          // Wake up audio context
           this.getAudioContext();
           window.speechSynthesis.speak(utterance);
+
+          // Safety timeout in case speech synthesis hangs on certain Android devices
+          setTimeout(() => {
+            if (!resolved) {
+              resolved = true;
+              resolve();
+            }
+          }, 6000);
+
           return;
         } catch {
           // Continue to Tier 2
         }
       }
 
-      // Tier 2 Fallback: Online Dictionary Audio endpoint
+      // Tier 2 Fallback: Online TTS endpoint
       this.fallbackSpeakAudio(cleanText).then(resolve);
     });
   }
@@ -225,12 +257,37 @@ class AudioManager {
           this.fallbackAudio.pause();
           this.fallbackAudio = null;
         }
-        const audioUrl = `https://dict.youdao.com/dictvoice?type=0&audio=${encodeURIComponent(text)}`;
-        const audio = new Audio(audioUrl);
+
+        // Primary fallback: Google Translate TTS (CORS-friendly audio)
+        const primaryUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=zh-CN&q=${encodeURIComponent(text)}`;
+        const audio = new Audio(primaryUrl);
         this.fallbackAudio = audio;
-        audio.onended = () => resolve();
-        audio.onerror = () => resolve();
-        audio.play().catch(() => resolve());
+
+        let done = false;
+        const finish = () => {
+          if (!done) {
+            done = true;
+            resolve();
+          }
+        };
+
+        audio.onended = finish;
+        audio.onerror = () => {
+          // Secondary fallback: Youdao
+          try {
+            const secondaryUrl = `https://dict.youdao.com/dictvoice?type=0&audio=${encodeURIComponent(text)}`;
+            const fallback2 = new Audio(secondaryUrl);
+            this.fallbackAudio = fallback2;
+            fallback2.onended = finish;
+            fallback2.onerror = finish;
+            fallback2.play().catch(finish);
+          } catch {
+            finish();
+          }
+        };
+
+        audio.play().catch(finish);
+        setTimeout(finish, 5000);
       } catch {
         resolve();
       }

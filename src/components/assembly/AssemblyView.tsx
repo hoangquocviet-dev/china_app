@@ -60,8 +60,10 @@ export const AssemblyView: React.FC = () => {
         spread: 60,
         origin: { y: 0.75 },
       });
-      // Speak target sentence
-      audioService.speakChinese(currentExercise.targetSentence);
+      // Allow success chime to play clearly, then speak full Chinese sentence
+      setTimeout(() => {
+        audioService.speakChinese(currentExercise.targetSentence);
+      }, 350);
     } else {
       audioService.playErrorBuzz();
     }
@@ -99,15 +101,32 @@ export const AssemblyView: React.FC = () => {
         </span>
       </div>
 
-      {/* Target prompt */}
-      <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700/80 mb-4 shadow-lg shadow-black/20">
-        <div className="text-xs uppercase tracking-wider text-slate-400 mb-1 font-semibold">
-          Câu tiếng Việt:
+      {/* Target prompt with listening support */}
+      <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700/80 mb-4 shadow-lg shadow-black/20 flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="text-xs uppercase tracking-wider text-slate-400 mb-1 font-semibold">
+            Câu tiếng Việt:
+          </div>
+          <div className="text-base sm:text-lg font-bold text-slate-100">{currentExercise.sourceSentence}</div>
+          {currentExercise.pinyin && (
+            <div className="text-xs text-rose-400/90 mt-1 pinyin-text tracking-normal">
+              {currentExercise.pinyin}
+            </div>
+          )}
         </div>
-        <div className="text-lg font-bold text-slate-100">{currentExercise.sourceSentence}</div>
-        {currentExercise.pinyin && (
-          <div className="text-xs text-rose-400/90 mt-1 pinyin-text tracking-normal">{currentExercise.pinyin}</div>
-        )}
+
+        <button
+          type="button"
+          onClick={() => {
+            audioService.playClick();
+            audioService.speakChinese(currentExercise.targetSentence);
+          }}
+          className="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-all active:scale-95 shrink-0 flex items-center space-x-1.5 shadow-xs"
+          title="Nghe câu mẫu tiếng Trung để vừa nghe vừa sắp xếp"
+        >
+          <Volume2 className="w-4 h-4" />
+          <span className="text-xs font-semibold">Nghe câu</span>
+        </button>
       </div>
 
       {/* RESULT TILE DROP ZONE (Upper Tray) */}

@@ -86,7 +86,9 @@ export const TranslationView: React.FC = () => {
         origin: { y: 0.75 },
       });
       if (currentExercise.targetLang === 'zh') {
-        audioService.speakChinese(currentExercise.targetSentence);
+        setTimeout(() => {
+          audioService.speakChinese(currentExercise.targetSentence);
+        }, 350);
       }
     } else {
       audioService.playErrorBuzz();
