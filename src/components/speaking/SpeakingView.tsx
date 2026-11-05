@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Mic, MicOff, Volume2, Play, ChevronLeft, ChevronRight, Snail } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import type { ChineseWord } from '../../types';
+import type { ChineseWord, SentenceExercise } from '../../types';
 import { INITIAL_SENTENCES } from '../../data/hsk1Sentences';
 import { audioService } from '../../utils/audio';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
+  sentences?: SentenceExercise[];
 }
 
 function createMinimalWavBlob(): Blob {
@@ -28,7 +29,8 @@ function createMinimalWavBlob(): Blob {
   return new Blob([buffer], { type: 'audio/wav' });
 }
 
-export const SpeakingView: React.FC<SpeakingViewProps> = ({ words }) => {
+export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = INITIAL_SENTENCES }) => {
+  const activeSentences = sentences && sentences.length > 0 ? sentences : INITIAL_SENTENCES;
   const [practiceType, setPracticeType] = useState<'word' | 'sentence'>('word');
   const [wordIndex, setWordIndex] = useState(0);
   const [sentenceIndex, setSentenceIndex] = useState(0);
@@ -49,7 +51,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words }) => {
 
   const hasWords = Boolean(words && words.length > 0);
   const currentWord = hasWords ? (words[wordIndex] || words[0]) : null;
-  const currentSentence = INITIAL_SENTENCES[sentenceIndex] || INITIAL_SENTENCES[0];
+  const currentSentence = activeSentences[sentenceIndex] || activeSentences[0];
 
   const targetText = practiceType === 'word'
     ? (currentWord ? currentWord.hanzi : '')
@@ -64,6 +66,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words }) => {
     : currentSentence.sourceSentence;
 
   const targetHanviet = practiceType === 'word' && currentWord ? currentWord.hanviet : null;
+
+  useEffect(() => {
+    setSentenceIndex(0);
+    resetEvalState();
+  }, [sentences]);
 
   // Check Web Speech API support
   useEffect(() => {
@@ -95,7 +102,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words }) => {
         setWordIndex((prev) => (prev + 1) % words.length);
       }
     } else {
-      setSentenceIndex((prev) => (prev + 1) % INITIAL_SENTENCES.length);
+      setSentenceIndex((prev) => (prev + 1) % activeSentences.length);
     }
   };
 
@@ -107,7 +114,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words }) => {
         setWordIndex((prev) => (prev - 1 + words.length) % words.length);
       }
     } else {
-      setSentenceIndex((prev) => (prev - 1 + INITIAL_SENTENCES.length) % INITIAL_SENTENCES.length);
+      setSentenceIndex((prev) => (prev - 1 + activeSentences.length) % activeSentences.length);
     }
   };
 
@@ -352,7 +359,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words }) => {
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          Luyện nói cả câu ({INITIAL_SENTENCES.length})
+          Luyện nói cả câu ({activeSentences.length})
         </button>
       </div>
 
@@ -361,7 +368,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words }) => {
         <span className="font-medium text-slate-300">
           {practiceType === 'word'
             ? `Từ ${wordIndex + 1} / ${words.length || 1}`
-            : `Câu ${sentenceIndex + 1} / ${INITIAL_SENTENCES.length}`}
+            : `Câu ${sentenceIndex + 1} / ${activeSentences.length}`}
         </span>
         <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-750">
           Nhận diện giọng nói AI

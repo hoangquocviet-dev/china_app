@@ -1,30 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Volume2, Check, RotateCcw, ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { INITIAL_SENTENCES } from '../../data/hsk1Sentences';
+import type { SentenceExercise } from '../../types';
 import { audioService } from '../../utils/audio';
 
-export const AssemblyView: React.FC = () => {
+interface AssemblyViewProps {
+  sentences?: SentenceExercise[];
+}
+
+export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_SENTENCES }) => {
+  const activeSentences = sentences && sentences.length > 0 ? sentences : INITIAL_SENTENCES;
   const [exerciseIndex, setExerciseIndex] = useState(0);
-  const currentExercise = INITIAL_SENTENCES[exerciseIndex] || INITIAL_SENTENCES[0];
 
   // Helper to initialize available tokens (shuffled correct tokens + distractors)
-  const getShuffledTokens = (exIndex: number) => {
-    const ex = INITIAL_SENTENCES[exIndex];
+  const getShuffledTokens = (exIndex: number, list: SentenceExercise[]) => {
+    const ex = list[exIndex] || list[0];
+    if (!ex) return [];
     const all = [...ex.tokens, ...(ex.distractorTokens || [])];
     return all.sort(() => Math.random() - 0.5);
   };
 
   const [availableTokens, setAvailableTokens] = useState<string[]>(() =>
-    getShuffledTokens(exerciseIndex)
+    getShuffledTokens(exerciseIndex, activeSentences)
   );
   const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
   const [isEvaluated, setIsEvaluated] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
+  useEffect(() => {
+    setExerciseIndex(0);
+    setAvailableTokens(getShuffledTokens(0, activeSentences));
+    setSelectedTokens([]);
+    setIsEvaluated(false);
+    setIsCorrect(false);
+  }, [sentences]);
+
+  const currentExercise = activeSentences[exerciseIndex] || activeSentences[0];
+
   const resetState = (newIndex: number) => {
     setExerciseIndex(newIndex);
-    setAvailableTokens(getShuffledTokens(newIndex));
+    setAvailableTokens(getShuffledTokens(newIndex, activeSentences));
     setSelectedTokens([]);
     setIsEvaluated(false);
     setIsCorrect(false);
@@ -71,7 +87,7 @@ export const AssemblyView: React.FC = () => {
 
   const handleResetCurrent = () => {
     audioService.playClick();
-    setAvailableTokens(getShuffledTokens(exerciseIndex));
+    setAvailableTokens(getShuffledTokens(exerciseIndex, activeSentences));
     setSelectedTokens([]);
     setIsEvaluated(false);
     setIsCorrect(false);
@@ -79,13 +95,13 @@ export const AssemblyView: React.FC = () => {
 
   const handleNext = () => {
     audioService.playClick();
-    const nextIdx = (exerciseIndex + 1) % INITIAL_SENTENCES.length;
+    const nextIdx = (exerciseIndex + 1) % activeSentences.length;
     resetState(nextIdx);
   };
 
   const handlePrev = () => {
     audioService.playClick();
-    const prevIdx = (exerciseIndex - 1 + INITIAL_SENTENCES.length) % INITIAL_SENTENCES.length;
+    const prevIdx = (exerciseIndex - 1 + activeSentences.length) % activeSentences.length;
     resetState(prevIdx);
   };
 
@@ -94,7 +110,7 @@ export const AssemblyView: React.FC = () => {
       {/* Header bar */}
       <div className="flex items-center justify-between mb-3 text-xs text-slate-400">
         <span className="font-medium text-slate-300">
-          Bài tập {exerciseIndex + 1} / {INITIAL_SENTENCES.length}
+          Bài tập {exerciseIndex + 1} / {activeSentences.length}
         </span>
         <span className="px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
           Sắp xếp trật tự câu

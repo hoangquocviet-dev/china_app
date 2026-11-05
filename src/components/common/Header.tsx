@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Sparkles, RotateCw } from 'lucide-react';
+import { Volume2, VolumeX, Sparkles, RotateCw, SlidersHorizontal } from 'lucide-react';
 import { audioService } from '../../utils/audio';
 
 interface HeaderProps {
@@ -8,6 +8,7 @@ interface HeaderProps {
   isSoundEnabled: boolean;
   onToggleSound: () => void;
   onReload?: () => void;
+  onOpenCustomModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   isSoundEnabled,
   onToggleSound,
   onReload,
+  onOpenCustomModal,
 }) => {
   const [isRotating, setIsRotating] = useState(false);
 
@@ -50,7 +52,23 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1.5 sm:space-x-2">
+          {onOpenCustomModal && (
+            <button
+              onClick={() => {
+                audioService.playClick();
+                onOpenCustomModal();
+              }}
+              data-testid="header-custom-lesson-btn"
+              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-semibold shadow-sm transition-all active:scale-95"
+              title="Tùy chỉnh & thêm bài học: Flashcard, Luyện viết, Ghép câu, Luyện nói"
+              aria-label="Custom bài học"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5 text-rose-400" />
+              <span>Custom</span>
+            </button>
+          )}
+
           <button
             onClick={handleReloadClick}
             className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors active:scale-95"

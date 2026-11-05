@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { RotateCw } from 'lucide-react';
-import type { ActiveTab, ChineseWord } from './types';
+import type { ActiveTab, ChineseWord, SentenceExercise, LessonCustomConfig } from './types';
 import { Header } from './components/common/Header';
 import { BottomNav } from './components/common/BottomNav';
 import { FlashcardView } from './components/flashcard/FlashcardView';
@@ -8,6 +8,7 @@ import { HanziWriterView } from './components/writer/HanziWriterView';
 import { AssemblyView } from './components/assembly/AssemblyView';
 import { SpeakingView } from './components/speaking/SpeakingView';
 import { WordListView } from './components/library/WordListView';
+import { CustomLessonModal } from './components/custom/CustomLessonModal';
 import { storageService } from './utils/storage';
 import { audioService } from './utils/audio';
 
@@ -22,6 +23,9 @@ export function App() {
     return 'flashcard';
   });
   const [words, setWords] = useState<ChineseWord[]>(() => storageService.getWords());
+  const [sentences, setSentences] = useState<SentenceExercise[]>(() => storageService.getSentences());
+  const [lessonConfig, setLessonConfig] = useState<LessonCustomConfig>(() => storageService.getLessonConfig());
+  const [isCustomLessonModalOpen, setIsCustomLessonModalOpen] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
   const handleTabChange = (tab: ActiveTab) => {
@@ -35,6 +39,62 @@ export function App() {
     const loaded = storageService.getWords();
     setWords(loaded);
   };
+
+  const loadSentences = () => {
+    const loaded = storageService.getSentences();
+    setSentences(loaded);
+  };
+
+  const handleSaveLessonConfig = (newConfig: LessonCustomConfig) => {
+    storageService.saveLessonConfig(newConfig);
+    setLessonConfig(newConfig);
+  };
+
+  const handleAddWord = (word: Omit<ChineseWord, 'id'>) => {
+    const res = storageService.addWord(word);
+    if (res.success) {
+      loadWords();
+    }
+    return res;
+  };
+
+  const handleAddSentence = (sentence: Omit<SentenceExercise, 'id'>) => {
+    const res = storageService.addSentence(sentence);
+    if (res.success) {
+      loadSentences();
+    }
+    return res;
+  };
+
+  const handleDeleteSentence = (sentenceId: string) => {
+    storageService.deleteSentence(sentenceId);
+    loadSentences();
+  };
+
+  const handleResetAllLessons = () => {
+    storageService.resetSentencesToDefaults();
+    storageService.resetLessonConfig();
+    loadWords();
+    loadSentences();
+    setLessonConfig({});
+  };
+
+  // Filtered lists for each practice mode according to lesson config
+  const activeFlashcardWords = words.filter(
+    (w) => !lessonConfig.flashcardWordIds?.length || lessonConfig.flashcardWordIds.includes(w.id)
+  );
+
+  const activeWritingWords = words.filter(
+    (w) => !lessonConfig.writingWordIds?.length || lessonConfig.writingWordIds.includes(w.id)
+  );
+
+  const activeAssemblySentences = sentences.filter(
+    (s) => !lessonConfig.assemblySentenceIds?.length || lessonConfig.assemblySentenceIds.includes(s.id)
+  );
+
+  const activeSpeakingSentences = sentences.filter(
+    (s) => !lessonConfig.speakingSentenceIds?.length || lessonConfig.speakingSentenceIds.includes(s.id)
+  );
 
   useEffect(() => {
     loadWords();
@@ -134,6 +194,7 @@ export function App() {
         isSoundEnabled={isSoundEnabled}
         onToggleSound={handleToggleSound}
         onReload={() => window.location.reload()}
+        onOpenCustomModal={() => setIsCustomLessonModalOpen(true)}
       />
 
       {/* Pull to refresh visual indicator */}
@@ -160,16 +221,31 @@ export function App() {
 
       <main className="flex-1 flex flex-col overflow-x-hidden">
         {activeTab === 'flashcard' && (
-          <FlashcardView words={words} onUpdateWordSRS={handleUpdateWordSRS} />
+          <FlashcardView
+            words={activeFlashcardWords.length > 0 ? activeFlashcardWords : words}
+            onUpdateWordSRS={handleUpdateWordSRS}
+          />
         )}
 
         {activeTab === 'writing' && (
-          <HanziWriterView words={words} initialWordId={selectedWordIdForWriting} />
+          <HanziWriterView
+            words={activeWritingWords.length > 0 ? activeWritingWords : words}
+            initialWordId={selectedWordIdForWriting}
+          />
         )}
 
-        {activeTab === 'assembly' && <AssemblyView />}
+        {activeTab === 'assembly' && (
+          <AssemblyView
+            sentences={activeAssemblySentences.length > 0 ? activeAssemblySentences : sentences}
+          />
+        )}
 
-        {activeTab === 'speaking' && <SpeakingView words={words} />}
+        {activeTab === 'speaking' && (
+          <SpeakingView
+            words={activeFlashcardWords.length > 0 ? activeFlashcardWords : words}
+            sentences={activeSpeakingSentences.length > 0 ? activeSpeakingSentences : sentences}
+          />
+        )}
 
         {activeTab === 'library' && (
           <WordListView
@@ -179,6 +255,19 @@ export function App() {
           />
         )}
       </main>
+
+      <CustomLessonModal
+        isOpen={isCustomLessonModalOpen}
+        onClose={() => setIsCustomLessonModalOpen(false)}
+        words={words}
+        sentences={sentences}
+        lessonConfig={lessonConfig}
+        onSaveConfig={handleSaveLessonConfig}
+        onAddWord={handleAddWord}
+        onAddSentence={handleAddSentence}
+        onDeleteSentence={handleDeleteSentence}
+        onResetAll={handleResetAllLessons}
+      />
 
       <BottomNav activeTab={activeTab} onChangeTab={handleTabChange} />
     </div>

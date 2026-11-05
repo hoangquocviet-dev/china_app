@@ -21,7 +21,7 @@ export interface ChineseWord {
 
 export interface SentenceExercise {
   id: string;
-  type: 'assembly' | 'translation';
+  type?: 'assembly' | 'translation' | 'speaking' | 'custom';
   sourceLang: 'zh' | 'vi';
   targetLang: 'vi' | 'zh';
   sourceSentence: string;
@@ -31,6 +31,16 @@ export interface SentenceExercise {
   distractorTokens?: string[]; // Mảnh ghép gây nhiễu
   acceptableAnswers?: string[]; // Các biến thể dịch chấp nhận được
   grammarNote?: string;
+  isCustom?: boolean;
+  includeInAssembly?: boolean;
+  includeInSpeaking?: boolean;
+}
+
+export interface LessonCustomConfig {
+  flashcardWordIds?: string[]; // IDs của từ vựng hiển thị trong Flashcard
+  writingWordIds?: string[];   // IDs của từ vựng hiển thị trong Luyện viết
+  assemblySentenceIds?: string[]; // IDs của câu hiển thị trong Ghép câu
+  speakingSentenceIds?: string[]; // IDs của câu hiển thị trong Luyện nói
 }
 
 export type ActiveTab = 'flashcard' | 'writing' | 'assembly' | 'speaking' | 'library';

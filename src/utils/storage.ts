@@ -1,5 +1,6 @@
 import { INITIAL_WORDS } from '../data/hsk1Words';
-import type { ChineseWord } from '../types';
+import { INITIAL_SENTENCES } from '../data/hsk1Sentences';
+import type { ChineseWord, SentenceExercise, LessonCustomConfig } from '../types';
 
 const STORAGE_KEYS = {
   WORDS: 'hanziflow_words',
@@ -7,6 +8,8 @@ const STORAGE_KEYS = {
   ACTIVE_TAB: 'hanziflow_active_tab',
   STREAK: 'hanziflow_streak',
   BACKUP: 'hanziflow_backup',
+  SENTENCES: 'hanziflow_sentences',
+  LESSON_CONFIG: 'hanziflow_lesson_config',
 };
 
 class SafeStorageService {
@@ -124,12 +127,103 @@ class SafeStorageService {
     this.saveWords(updated);
   }
 
+  // Sentence Management (for Ghép câu and Luyện nói)
+  public getSentences(): SentenceExercise[] {
+    const sentences = this.get<SentenceExercise[]>(STORAGE_KEYS.SENTENCES, []);
+    if (!sentences || sentences.length === 0) {
+      this.set(STORAGE_KEYS.SENTENCES, INITIAL_SENTENCES);
+      return INITIAL_SENTENCES;
+    }
+    return sentences;
+  }
+
+  public saveSentences(sentences: SentenceExercise[]): void {
+    this.set(STORAGE_KEYS.SENTENCES, sentences);
+  }
+
+  public addSentence(sentence: Omit<SentenceExercise, 'id'> & { id?: string }): {
+    success: boolean;
+    message: string;
+    sentence?: SentenceExercise;
+  } {
+    const sentences = this.getSentences();
+    const cleanTarget = sentence.targetSentence.trim();
+    if (!cleanTarget) {
+      return { success: false, message: 'Vui lòng nhập câu tiếng Trung.' };
+    }
+
+    const cleanSource = sentence.sourceSentence.trim();
+    if (!cleanSource) {
+      return { success: false, message: 'Vui lòng nhập dịch nghĩa tiếng Việt.' };
+    }
+
+    const exists = sentences.some((s) => s.targetSentence.trim() === cleanTarget);
+    if (exists) {
+      return { success: false, message: `Câu "${cleanTarget}" đã tồn tại trong danh sách bài học.` };
+    }
+
+    // Auto-generate tokens if not provided
+    let tokens = sentence.tokens && sentence.tokens.length > 0 ? sentence.tokens : [];
+    if (tokens.length === 0) {
+      // split by spaces or punctuation, or character-by-character if no spaces
+      const cleanChars = cleanTarget.replace(/[。，！？.!?]/g, '');
+      tokens = cleanChars.includes(' ') ? cleanChars.split(/\s+/) : Array.from(cleanChars);
+    }
+
+    const newSentence: SentenceExercise = {
+      ...sentence,
+      id: sentence.id || `sent_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      targetSentence: cleanTarget,
+      sourceSentence: cleanSource,
+      pinyin: sentence.pinyin ? sentence.pinyin.trim() : '',
+      tokens,
+      distractorTokens: sentence.distractorTokens || [],
+      isCustom: true,
+      includeInAssembly: sentence.includeInAssembly !== false,
+      includeInSpeaking: sentence.includeInSpeaking !== false,
+    };
+
+    const updated = [newSentence, ...sentences];
+    this.saveSentences(updated);
+    return { success: true, message: `Đã thêm thành công câu mới vào bài học!`, sentence: newSentence };
+  }
+
+  public deleteSentence(sentenceId: string): boolean {
+    const sentences = this.getSentences();
+    const updated = sentences.filter((s) => s.id !== sentenceId);
+    this.saveSentences(updated);
+    return true;
+  }
+
+  public resetSentencesToDefaults(): void {
+    this.saveSentences(INITIAL_SENTENCES);
+  }
+
+  // Lesson Custom Config Management
+  public getLessonConfig(): LessonCustomConfig {
+    return this.get<LessonCustomConfig>(STORAGE_KEYS.LESSON_CONFIG, {});
+  }
+
+  public saveLessonConfig(config: LessonCustomConfig): void {
+    this.set(STORAGE_KEYS.LESSON_CONFIG, config);
+  }
+
+  public resetLessonConfig(): void {
+    if (this.isLocalStorageAvailable()) {
+      try {
+        window.localStorage.removeItem(STORAGE_KEYS.LESSON_CONFIG);
+      } catch {}
+    }
+  }
+
   public resetToDefaults(): void {
     if (this.isLocalStorageAvailable()) {
       try {
         window.localStorage.removeItem(STORAGE_KEYS.WORDS);
         window.localStorage.removeItem(STORAGE_KEYS.FAVORITES);
         window.localStorage.removeItem(STORAGE_KEYS.STREAK);
+        window.localStorage.removeItem(STORAGE_KEYS.SENTENCES);
+        window.localStorage.removeItem(STORAGE_KEYS.LESSON_CONFIG);
       } catch {}
     }
   }
