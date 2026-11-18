@@ -18,6 +18,10 @@ const STORAGE_KEYS = {
 };
 
 class SafeStorageService {
+  // In-memory cache for high-frequency reads (avoids repeated JSON.parse overhead on massive datasets)
+  private memoryCache: Map<string, any> = new Map();
+  private cachedMergedDictionary: ChineseWord[] | null = null;
+
   private isLocalStorageAvailable(): boolean {
     try {
       if (typeof window === 'undefined' || !window.localStorage) return false;
@@ -31,11 +35,20 @@ class SafeStorageService {
   }
 
   private get<T>(key: string, fallback: T): T {
+    if (this.memoryCache.has(key)) {
+      return this.memoryCache.get(key) as T;
+    }
+
     if (!this.isLocalStorageAvailable()) return fallback;
     try {
       const item = window.localStorage.getItem(key);
-      if (!item) return fallback;
-      return JSON.parse(item) as T;
+      if (!item) {
+        this.memoryCache.set(key, fallback);
+        return fallback;
+      }
+      const parsed = JSON.parse(item) as T;
+      this.memoryCache.set(key, parsed);
+      return parsed;
     } catch (e) {
       console.warn(`[Storage] Failed to parse key: ${key}. Backing up and falling back.`, e);
       try {
@@ -44,11 +57,13 @@ class SafeStorageService {
           window.localStorage.setItem(`${STORAGE_KEYS.BACKUP}_corrupted_${Date.now()}`, raw);
         }
       } catch {}
+      this.memoryCache.set(key, fallback);
       return fallback;
     }
   }
 
   private set<T>(key: string, value: T): boolean {
+    this.memoryCache.set(key, value);
     if (!this.isLocalStorageAvailable()) return false;
     try {
       window.localStorage.setItem(key, JSON.stringify(value));
@@ -57,6 +72,11 @@ class SafeStorageService {
       console.error(`[Storage] Failed to save key: ${key}`, e);
       return false;
     }
+  }
+
+  public clearMemoryCache(): void {
+    this.memoryCache.clear();
+    this.cachedMergedDictionary = null;
   }
 
   public getWords(): ChineseWord[] {
@@ -129,10 +149,14 @@ class SafeStorageService {
   }
 
   public getDictionaryWords(): ChineseWord[] {
+    if (this.cachedMergedDictionary) {
+      return this.cachedMergedDictionary;
+    }
     const customWords = this.getCustomDictionaryWords();
     const customHanziSet = new Set(customWords.map((w) => w.hanzi.trim()));
     const defaultWords = DICTIONARY_WORDS.filter((w) => !customHanziSet.has(w.hanzi.trim()));
-    return [...customWords, ...defaultWords];
+    this.cachedMergedDictionary = [...customWords, ...defaultWords];
+    return this.cachedMergedDictionary;
   }
 
   public addWordToDictionary(word: ChineseWord): void {
@@ -152,6 +176,7 @@ class SafeStorageService {
         };
         const updated = [dictWord, ...customWords];
         this.set(STORAGE_KEYS.CUSTOM_DICTIONARY, updated);
+        this.cachedMergedDictionary = null; // Invalidate dictionary cache
       }
     }
   }
@@ -166,6 +191,7 @@ class SafeStorageService {
   }
 
   public resetMasteredFlashcards(): void {
+    this.memoryCache.delete(STORAGE_KEYS.MASTERED_FLASHCARDS);
     if (this.isLocalStorageAvailable()) {
       try {
         window.localStorage.removeItem(STORAGE_KEYS.MASTERED_FLASHCARDS);
@@ -277,7 +303,6 @@ class SafeStorageService {
     // Auto-generate tokens if not provided
     let tokens = sentence.tokens && sentence.tokens.length > 0 ? sentence.tokens : [];
     if (tokens.length === 0) {
-      // split by spaces or punctuation, or character-by-character if no spaces
       const cleanChars = cleanTarget.replace(/[。，！？.!?]/g, '');
       tokens = cleanChars.includes(' ') ? cleanChars.split(/\s+/) : Array.from(cleanChars);
     }
@@ -316,6 +341,8 @@ class SafeStorageService {
   }
 
   public resetSentencesToDefaults(): void {
+    this.memoryCache.delete(STORAGE_KEYS.DELETED_SENTENCES);
+    this.memoryCache.delete(STORAGE_KEYS.SENTENCES);
     if (this.isLocalStorageAvailable()) {
       try {
         window.localStorage.removeItem(STORAGE_KEYS.DELETED_SENTENCES);
@@ -334,6 +361,7 @@ class SafeStorageService {
   }
 
   public resetLessonConfig(): void {
+    this.memoryCache.delete(STORAGE_KEYS.LESSON_CONFIG);
     if (this.isLocalStorageAvailable()) {
       try {
         window.localStorage.removeItem(STORAGE_KEYS.LESSON_CONFIG);
@@ -342,6 +370,7 @@ class SafeStorageService {
   }
 
   public resetToDefaults(): void {
+    this.clearMemoryCache();
     if (this.isLocalStorageAvailable()) {
       try {
         window.localStorage.removeItem(STORAGE_KEYS.WORDS);
@@ -372,6 +401,7 @@ class SafeStorageService {
   public importBackup(jsonString: string): boolean {
     try {
       const parsed = JSON.parse(jsonString);
+      this.clearMemoryCache();
       if (Array.isArray(parsed.words)) {
         this.saveWords(parsed.words);
       }

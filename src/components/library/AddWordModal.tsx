@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { X, Search, Plus, Check, Volume2, Sparkles, BookOpen, PenLine, AlertCircle } from 'lucide-react';
+import React, { useState, useMemo, useEffect, useDeferredValue } from 'react';
+import { X, Search, Plus, Check, Volume2, Sparkles, BookOpen, PenLine, AlertCircle, ChevronDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
@@ -88,16 +88,30 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
     return storageService.getDictionaryWords();
   }, [isOpen, activeMode, savedWords]);
 
-  // Filter dictionary words
+  // Filter dictionary words using deferredSearchQuery for responsive typing
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const [displayLimit, setDisplayLimit] = useState(35);
+
   const searchResults = useMemo(() => {
     return dictionaryWords.filter((item) => {
       // Level filter
       if (selectedLevel !== 'ALL' && item.level !== selectedLevel) {
         return false;
       }
-      return matchesWordSearch(item, searchQuery);
+      return matchesWordSearch(item, deferredSearchQuery);
     });
-  }, [dictionaryWords, searchQuery, selectedLevel]);
+  }, [dictionaryWords, deferredSearchQuery, selectedLevel]);
+
+  // Reset display chunk when search query or level changes
+  useEffect(() => {
+    setDisplayLimit(35);
+  }, [deferredSearchQuery, selectedLevel]);
+
+  const visibleResults = useMemo(() => {
+    return searchResults.slice(0, displayLimit);
+  }, [searchResults, displayLimit]);
+
+  const hasMore = displayLimit < searchResults.length;
 
   if (!isOpen) return null;
 
@@ -305,71 +319,90 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
                     </button>
                   </div>
                 ) : (
-                  searchResults.map((item) => {
-                    const isSaved = savedHanziSet.has(item.hanzi.trim());
-                    return (
-                      <div
-                        key={item.id}
-                        className="p-3 rounded-2xl bg-slate-800/80 border border-slate-750 flex items-center justify-between gap-3 hover:border-slate-700 transition-colors"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                            <span className="text-xl font-bold text-slate-100 whitespace-nowrap shrink-0">{item.hanzi}</span>
-                            <span className="text-xs text-rose-400 font-medium pinyin-text whitespace-nowrap shrink-0">
-                              {item.pinyin}
-                            </span>
-                            {item.hanviet && (
-                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 whitespace-nowrap shrink-0">
-                                {item.hanviet}
+                  <>
+                    {visibleResults.map((item) => {
+                      const isSaved = savedHanziSet.has(item.hanzi.trim());
+                      return (
+                        <div
+                          key={item.id}
+                          className="p-3 rounded-2xl bg-slate-800/80 border border-slate-750 flex items-center justify-between gap-3 hover:border-slate-700 transition-colors"
+                          style={{
+                            contentVisibility: 'auto',
+                            containIntrinsicSize: '0 80px',
+                          }}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                              <span className="text-xl font-bold text-slate-100 whitespace-nowrap shrink-0">{item.hanzi}</span>
+                              <span className="text-xs text-rose-400 font-medium pinyin-text whitespace-nowrap shrink-0">
+                                {item.pinyin}
                               </span>
-                            )}
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/80 text-slate-300 whitespace-nowrap shrink-0">
-                              {item.level}
-                            </span>
-                            {item.id.startsWith('dict_') && (
-                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 whitespace-nowrap shrink-0">
-                                User DB
+                              {item.hanviet && (
+                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 whitespace-nowrap shrink-0">
+                                  {item.hanviet}
+                                </span>
+                              )}
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/80 text-slate-300 whitespace-nowrap shrink-0">
+                                {item.level}
                               </span>
+                              {item.id.startsWith('dict_') && (
+                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 whitespace-nowrap shrink-0">
+                                  User DB
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-300 mt-1 line-clamp-2 leading-relaxed">{item.meaning}</p>
+                            {item.examples && item.examples.length > 0 && (
+                              <p className="text-[11px] text-slate-400 mt-0.5 italic truncate">
+                                Ví dụ: {item.examples[0].zh} ({item.examples[0].vi})
+                              </p>
                             )}
                           </div>
-                          <p className="text-xs text-slate-300 mt-1 line-clamp-2 leading-relaxed">{item.meaning}</p>
-                          {item.examples && item.examples.length > 0 && (
-                            <p className="text-[11px] text-slate-400 mt-0.5 italic truncate">
-                              Ví dụ: {item.examples[0].zh} ({item.examples[0].vi})
-                            </p>
-                          )}
-                        </div>
 
-                        {/* Actions */}
-                        <div className="flex items-center space-x-1.5 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => audioService.speakChinese(item.hanzi)}
-                            className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
-                            title="Phát âm"
-                          >
-                            <Volume2 className="w-4 h-4" />
-                          </button>
-
-                          {isSaved ? (
-                            <span className="px-2.5 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-medium flex items-center space-x-1">
-                              <Check className="w-3.5 h-3.5" />
-                              <span>Đã có</span>
-                            </span>
-                          ) : (
+                          {/* Actions */}
+                          <div className="flex items-center space-x-1.5 shrink-0">
                             <button
                               type="button"
-                              onClick={() => handleAddFromDictionary(item)}
-                              className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold flex items-center space-x-1 transition-all active:scale-95 shadow-sm shadow-rose-900/30"
+                              onClick={() => audioService.speakChinese(item.hanzi)}
+                              className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
+                              title="Phát âm"
                             >
-                              <Plus className="w-3.5 h-3.5" />
-                              <span>Thêm</span>
+                              <Volume2 className="w-4 h-4" />
                             </button>
-                          )}
+
+                            {isSaved ? (
+                              <span className="px-2.5 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-medium flex items-center space-x-1">
+                                <Check className="w-3.5 h-3.5" />
+                                <span>Đã có</span>
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleAddFromDictionary(item)}
+                                className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold flex items-center space-x-1 transition-all active:scale-95 shadow-sm shadow-rose-900/30"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                <span>Thêm</span>
+                              </button>
+                            )}
+                          </div>
                         </div>
+                      );
+                    })}
+
+                    {hasMore && (
+                      <div className="pt-2 text-center">
+                        <button
+                          type="button"
+                          onClick={() => setDisplayLimit((prev) => Math.min(searchResults.length, prev + 35))}
+                          className="py-2.5 px-5 rounded-2xl bg-slate-850 hover:bg-slate-800 text-slate-300 border border-slate-750 text-xs font-semibold inline-flex items-center space-x-2 transition-all active:scale-95 shadow-sm"
+                        >
+                          <span>Xem thêm từ ({displayLimit} / {searchResults.length})</span>
+                          <ChevronDown className="w-3.5 h-3.5 text-rose-400" />
+                        </button>
                       </div>
-                    );
-                  })
+                    )}
+                  </>
                 )}
               </div>
             </div>

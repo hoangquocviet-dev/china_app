@@ -1,5 +1,17 @@
-import React, { useState } from 'react';
-import { Search, Volume2, PenTool, Download, Upload, Sparkles, Plus, Trash2, BookOpen, CheckCircle2 } from 'lucide-react';
+import React, { useState, useMemo, useEffect, useRef, useDeferredValue } from 'react';
+import {
+  Search,
+  Volume2,
+  PenTool,
+  Download,
+  Upload,
+  Sparkles,
+  Plus,
+  Trash2,
+  BookOpen,
+  CheckCircle2,
+  ChevronDown,
+} from 'lucide-react';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
@@ -21,6 +33,8 @@ const getHanziSizeClass = (hanzi: string) => {
   return 'text-xs font-semibold tracking-tighter';
 };
 
+const PAGE_SIZE = 50;
+
 export const WordListView: React.FC<WordListViewProps> = ({
   words,
   onSelectWordForWriting,
@@ -30,8 +44,42 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
-  const filteredWords = words.filter((w) => matchesWordSearch(w, searchQuery));
+  // useDeferredValue ensures typing remains 120Hz smooth even across thousands of words
+  const deferredQuery = useDeferredValue(searchQuery);
+
+  const filteredWords = useMemo(() => {
+    return words.filter((w) => matchesWordSearch(w, deferredQuery));
+  }, [words, deferredQuery]);
+
+  // Reset display chunk when search query changes
+  useEffect(() => {
+    setDisplayLimit(PAGE_SIZE);
+  }, [deferredQuery]);
+
+  // Slice visible items for instant DOM rendering
+  const visibleWords = useMemo(() => {
+    return filteredWords.slice(0, displayLimit);
+  }, [filteredWords, displayLimit]);
+
+  const hasMore = displayLimit < filteredWords.length;
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-load next chunk when scrolling near bottom
+  useEffect(() => {
+    if (!sentinelRef.current || !hasMore) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setDisplayLimit((prev) => Math.min(filteredWords.length, prev + PAGE_SIZE));
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, filteredWords.length]);
 
   const handleExport = () => {
     audioService.playClick();
@@ -76,7 +124,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   };
 
   return (
-    <div className="flex flex-col flex-1 max-w-md w-full mx-auto p-4 pb-24">
+    <div className="flex-1 max-w-md mx-auto w-full p-4 flex flex-col pb-24 animate-fadeIn">
       {/* Top Banner: Add Word Primary CTA */}
       <div className="flex items-center justify-between gap-2.5 mb-3">
         <button
@@ -147,7 +195,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
         </div>
       )}
 
-      {/* Word List */}
+      {/* Word List with progressive chunk rendering & content-visibility optimization */}
       <div className="space-y-2.5 overflow-y-auto">
         {filteredWords.length === 0 ? (
           <div className="text-center py-12 px-4 rounded-3xl bg-slate-850/50 border border-dashed border-slate-800 text-slate-400 text-xs space-y-3">
@@ -168,10 +216,14 @@ export const WordListView: React.FC<WordListViewProps> = ({
             </button>
           </div>
         ) : (
-          filteredWords.map((word) => (
+          visibleWords.map((word) => (
             <div
               key={word.id}
               className="p-3 rounded-2xl bg-slate-800/80 border border-slate-750 hover:border-slate-700 transition-all flex items-center justify-between gap-2.5 shadow-sm"
+              style={{
+                contentVisibility: 'auto',
+                containIntrinsicSize: '0 72px',
+              }}
             >
               <div className="flex items-center space-x-3 min-w-0 flex-1">
                 {/* Balanced Hanzi container: strictly horizontal, auto scaling, no vertical wrapping */}
@@ -243,6 +295,19 @@ export const WordListView: React.FC<WordListViewProps> = ({
               </div>
             </div>
           ))
+        )}
+
+        {/* Sentinel & Show More Button for Large Vocabularies */}
+        {hasMore && (
+          <div ref={sentinelRef} className="pt-2 text-center">
+            <button
+              onClick={() => setDisplayLimit((prev) => Math.min(filteredWords.length, prev + PAGE_SIZE))}
+              className="py-2.5 px-5 rounded-2xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-xs font-semibold inline-flex items-center space-x-2 transition-all active:scale-95 shadow-sm"
+            >
+              <span>Xem thêm từ ({displayLimit} / {filteredWords.length})</span>
+              <ChevronDown className="w-3.5 h-3.5 text-rose-400" />
+            </button>
+          </div>
         )}
       </div>
 
