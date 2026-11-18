@@ -1,0 +1,191 @@
+[
+  {
+    "name": "Supabase GET Leaderboard (Top 10)",
+    "samples": 30,
+    "successRate": "100.0%",
+    "duration": {
+      "min": 92,
+      "p50": 110,
+      "p75": 121,
+      "p90": 126,
+      "p95": 128,
+      "p99": 128,
+      "max": 128,
+      "mean": 110,
+      "stdDev": 11
+    },
+    "ttfb": {
+      "min": 92,
+      "p50": 110,
+      "p75": 121,
+      "p90": 126,
+      "p95": 127,
+      "p99": 128,
+      "max": 128,
+      "mean": 110,
+      "stdDev": 11
+    }
+  },
+  {
+    "name": "Supabase GET Community Words",
+    "samples": 30,
+    "successRate": "100.0%",
+    "duration": {
+      "min": 94,
+      "p50": 101,
+      "p75": 108,
+      "p90": 111,
+      "p95": 121,
+      "p99": 126,
+      "max": 126,
+      "mean": 104,
+      "stdDev": 8
+    },
+    "ttfb": {
+      "min": 94,
+      "p50": 101,
+      "p75": 108,
+      "p90": 111,
+      "p95": 121,
+      "p99": 126,
+      "max": 126,
+      "mean": 103,
+      "stdDev": 8
+    }
+  },
+  {
+    "name": "Supabase GET Profile (Zero-auth Sync)",
+    "samples": 30,
+    "successRate": "100.0%",
+    "duration": {
+      "min": 95,
+      "p50": 100,
+      "p75": 104,
+      "p90": 107,
+      "p95": 110,
+      "p99": 117,
+      "max": 117,
+      "mean": 101,
+      "stdDev": 5
+    },
+    "ttfb": {
+      "min": 95,
+      "p50": 100,
+      "p75": 104,
+      "p90": 107,
+      "p95": 110,
+      "p99": 116,
+      "max": 116,
+      "mean": 101,
+      "stdDev": 5
+    }
+  },
+  {
+    "name": "Supabase POST Profile Upsert",
+    "samples": 25,
+    "successRate": "100.0%",
+    "duration": {
+      "min": 97,
+      "p50": 104,
+      "p75": 108,
+      "p90": 114,
+      "p95": 117,
+      "p99": 127,
+      "max": 127,
+      "mean": 105,
+      "stdDev": 7
+    },
+    "ttfb": {
+      "min": 97,
+      "p50": 104,
+      "p75": 108,
+      "p90": 114,
+      "p95": 117,
+      "p99": 127,
+      "max": 127,
+      "mean": 105,
+      "stdDev": 7
+    }
+  },
+  {
+    "name": "Vercel CDN GET Main Index (HTML/TTFB)",
+    "samples": 25,
+    "successRate": "100.0%",
+    "duration": {
+      "min": 34,
+      "p50": 38,
+      "p75": 41,
+      "p90": 46,
+      "p95": 47,
+      "p99": 50,
+      "max": 50,
+      "mean": 39,
+      "stdDev": 4
+    },
+    "ttfb": {
+      "min": 34,
+      "p50": 38,
+      "p75": 41,
+      "p90": 46,
+      "p95": 47,
+      "p99": 49,
+      "max": 49,
+      "mean": 39,
+      "stdDev": 4
+    }
+  },
+  {
+    "name": "Vercel CDN GET Manifest.webmanifest",
+    "samples": 25,
+    "successRate": "100.0%",
+    "duration": {
+      "min": 35,
+      "p50": 38,
+      "p75": 41,
+      "p90": 44,
+      "p95": 45,
+      "p99": 50,
+      "max": 50,
+      "mean": 39,
+      "stdDev": 3
+    },
+    "ttfb": {
+      "min": 35,
+      "p50": 38,
+      "p75": 41,
+      "p90": 43,
+      "p95": 45,
+      "p99": 50,
+      "max": 50,
+      "mean": 39,
+      "stdDev": 3
+    }
+  },
+  {
+    "name": "JSDelivr CDN GET Stroke Data (字: 我)",
+    "samples": 25,
+    "successRate": "100.0%",
+    "duration": {
+      "min": 32,
+      "p50": 34,
+      "p75": 35,
+      "p90": 38,
+      "p95": 40,
+      "p99": 41,
+      "max": 41,
+      "mean": 35,
+      "stdDev": 2
+    },
+    "ttfb": {
+      "min": 32,
+      "p50": 34,
+      "p75": 35,
+      "p90": 37,
+      "p95": 40,
+      "p99": 41,
+      "max": 41,
+      "mean": 34,
+      "stdDev": 2
+    }
+  }
+]
