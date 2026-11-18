@@ -52,18 +52,90 @@ export function App() {
 
   const handleAddWord = (word: Omit<ChineseWord, 'id'>) => {
     const res = storageService.addWord(word);
-    if (res.success) {
+    if (res.success && res.word) {
       loadWords();
+      // Auto-sync newly added word into active lessons immediately!
+      const wordId = res.word.id;
+      const updatedConfig: LessonCustomConfig = {
+        ...lessonConfig,
+        flashcardWordIds: lessonConfig.flashcardWordIds
+          ? [wordId, ...lessonConfig.flashcardWordIds.filter((id) => id !== wordId)]
+          : undefined,
+        writingWordIds: lessonConfig.writingWordIds
+          ? [wordId, ...lessonConfig.writingWordIds.filter((id) => id !== wordId)]
+          : undefined,
+      };
+      handleSaveLessonConfig(updatedConfig);
     }
     return res;
   };
 
   const handleAddSentence = (sentence: Omit<SentenceExercise, 'id'>) => {
     const res = storageService.addSentence(sentence);
-    if (res.success) {
+    if (res.success && res.sentence) {
       loadSentences();
+      // Auto-sync newly added sentence into active lessons immediately!
+      const sentenceId = res.sentence.id;
+      const updatedConfig: LessonCustomConfig = {
+        ...lessonConfig,
+        assemblySentenceIds: lessonConfig.assemblySentenceIds
+          ? [sentenceId, ...lessonConfig.assemblySentenceIds.filter((id) => id !== sentenceId)]
+          : undefined,
+        speakingSentenceIds: lessonConfig.speakingSentenceIds
+          ? [sentenceId, ...lessonConfig.speakingSentenceIds.filter((id) => id !== sentenceId)]
+          : undefined,
+      };
+      handleSaveLessonConfig(updatedConfig);
     }
     return res;
+  };
+
+  const handleAddBatchWords = (batchWords: Omit<ChineseWord, 'id'>[]) => {
+    const addedIds: string[] = [];
+    for (const w of batchWords) {
+      const res = storageService.addWord(w);
+      if (res.success && res.word) {
+        addedIds.push(res.word.id);
+      }
+    }
+    if (addedIds.length > 0) {
+      loadWords();
+      const updatedConfig: LessonCustomConfig = {
+        ...lessonConfig,
+        flashcardWordIds: lessonConfig.flashcardWordIds
+          ? [...addedIds, ...lessonConfig.flashcardWordIds]
+          : undefined,
+        writingWordIds: lessonConfig.writingWordIds
+          ? [...addedIds, ...lessonConfig.writingWordIds]
+          : undefined,
+      };
+      handleSaveLessonConfig(updatedConfig);
+    }
+    return addedIds.length;
+  };
+
+  const handleAddBatchSentences = (batchSentences: Omit<SentenceExercise, 'id'>[]) => {
+    const addedIds: string[] = [];
+    for (const s of batchSentences) {
+      const res = storageService.addSentence(s);
+      if (res.success && res.sentence) {
+        addedIds.push(res.sentence.id);
+      }
+    }
+    if (addedIds.length > 0) {
+      loadSentences();
+      const updatedConfig: LessonCustomConfig = {
+        ...lessonConfig,
+        assemblySentenceIds: lessonConfig.assemblySentenceIds
+          ? [...addedIds, ...lessonConfig.assemblySentenceIds]
+          : undefined,
+        speakingSentenceIds: lessonConfig.speakingSentenceIds
+          ? [...addedIds, ...lessonConfig.speakingSentenceIds]
+          : undefined,
+      };
+      handleSaveLessonConfig(updatedConfig);
+    }
+    return addedIds.length;
   };
 
   const handleDeleteSentence = (sentenceId: string) => {
@@ -265,6 +337,8 @@ export function App() {
         onSaveConfig={handleSaveLessonConfig}
         onAddWord={handleAddWord}
         onAddSentence={handleAddSentence}
+        onAddBatchWords={handleAddBatchWords}
+        onAddBatchSentences={handleAddBatchSentences}
         onDeleteSentence={handleDeleteSentence}
         onResetAll={handleResetAllLessons}
       />

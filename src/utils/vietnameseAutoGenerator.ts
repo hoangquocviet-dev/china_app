@@ -1,5 +1,6 @@
-import type { ChineseWord } from '../types';
+import type { ChineseWord, SentenceExercise } from '../types';
 import { DICTIONARY_WORDS } from '../data/dictionaryData';
+import { pinyin } from 'pinyin-pro';
 
 // Common Character Map for Pinyin and Han-Viet synthesis
 const CHAR_MAP: Record<string, { pinyin: string; hanviet: string }> = {
@@ -542,33 +543,35 @@ function removeVietnameseTones(str: string): string {
     .trim();
 }
 
-// Generate Pinyin and Han-Viet from Hanzi characters
+// Generate 100% accurate Pinyin (via pinyin-pro) and Han-Viet from any Hanzi characters
 export function synthesizePinyinAndHanviet(hanzi: string): { pinyin: string; hanviet: string } {
+  let generatedPinyin = '';
+  try {
+    generatedPinyin = pinyin(hanzi, { toneType: 'symbol' });
+  } catch {
+    generatedPinyin = '';
+  }
+
   const chars = Array.from(hanzi.trim());
-  const pinyins: string[] = [];
   const hanviets: string[] = [];
 
   for (const char of chars) {
-    if (CHAR_MAP[char]) {
-      pinyins.push(CHAR_MAP[char].pinyin);
+    if (CHAR_MAP[char]?.hanviet) {
       hanviets.push(CHAR_MAP[char].hanviet);
     } else {
-      // Look up in DICTIONARY_WORDS for this char
       const dictMatch = DICTIONARY_WORDS.find((w) => w.hanzi.includes(char));
-      if (dictMatch) {
+      if (dictMatch && dictMatch.hanviet) {
         const charIdx = Array.from(dictMatch.hanzi).indexOf(char);
-        const pinyinTokens = dictMatch.pinyin.split(/\s+/);
-        const hanvietTokens = dictMatch.hanviet ? dictMatch.hanviet.split(/\s+/) : [];
-        pinyins.push(pinyinTokens[charIdx] || pinyinTokens[0] || char);
-        hanviets.push(hanvietTokens[charIdx] || hanvietTokens[0] || '');
-      } else {
-        pinyins.push(char);
+        const hanvietTokens = dictMatch.hanviet.split(/\s+/);
+        if (hanvietTokens[charIdx]) {
+          hanviets.push(hanvietTokens[charIdx]);
+        }
       }
     }
   }
 
   return {
-    pinyin: pinyins.join(' ').trim(),
+    pinyin: generatedPinyin || hanzi,
     hanviet: hanviets.filter(Boolean).join(' ').trim().toUpperCase(),
   };
 }
@@ -941,4 +944,69 @@ export async function autoGenerateSentenceFromVietnamese(raw: string): Promise<{
     success: false,
     message: `Chưa thể tự động tạo câu cho "${raw}". Bạn hãy chọn câu gợi ý hoặc tự nhập nhé!`,
   };
+}
+
+/**
+ * Batch generate multiple Chinese words from a list of Vietnamese lines
+ */
+export async function batchGenerateWordsFromVietnamese(
+  lines: string[],
+  onProgress?: (current: number, total: number, lastWord?: string) => void
+): Promise<{ words: Omit<ChineseWord, 'id'>[]; failed: string[] }> {
+  const cleanLines = lines.map((l) => l.trim()).filter(Boolean);
+  const words: Omit<ChineseWord, 'id'>[] = [];
+  const failed: string[] = [];
+
+  for (let i = 0; i < cleanLines.length; i++) {
+    const line = cleanLines[i];
+    try {
+      const res = await autoGenerateWordFromVietnamese(line);
+      if (res.success && res.word) {
+        words.push(res.word);
+        onProgress?.(i + 1, cleanLines.length, res.word.hanzi);
+      } else {
+        failed.push(line);
+        onProgress?.(i + 1, cleanLines.length);
+      }
+    } catch {
+      failed.push(line);
+      onProgress?.(i + 1, cleanLines.length);
+    }
+  }
+
+  return { words, failed };
+}
+
+/**
+ * Batch generate multiple SentenceExercises from a list of Vietnamese lines
+ */
+export async function batchGenerateSentencesFromVietnamese(
+  lines: string[],
+  onProgress?: (current: number, total: number, lastSentence?: string) => void
+): Promise<{
+  sentences: Omit<SentenceExercise, 'id'>[];
+  failed: string[];
+}> {
+  const cleanLines = lines.map((l) => l.trim()).filter(Boolean);
+  const sentences: Omit<SentenceExercise, 'id'>[] = [];
+  const failed: string[] = [];
+
+  for (let i = 0; i < cleanLines.length; i++) {
+    const line = cleanLines[i];
+    try {
+      const res = await autoGenerateSentenceFromVietnamese(line);
+      if (res.success && res.sentence) {
+        sentences.push(res.sentence);
+        onProgress?.(i + 1, cleanLines.length, res.sentence.targetSentence);
+      } else {
+        failed.push(line);
+        onProgress?.(i + 1, cleanLines.length);
+      }
+    } catch {
+      failed.push(line);
+      onProgress?.(i + 1, cleanLines.length);
+    }
+  }
+
+  return { sentences, failed };
 }

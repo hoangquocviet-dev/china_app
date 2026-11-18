@@ -17,7 +17,12 @@ import {
 } from 'lucide-react';
 import type { ChineseWord, SentenceExercise, LessonCustomConfig } from '../../types';
 import { audioService } from '../../utils/audio';
-import { autoGenerateWordFromVietnamese, autoGenerateSentenceFromVietnamese } from '../../utils/vietnameseAutoGenerator';
+import {
+  autoGenerateWordFromVietnamese,
+  autoGenerateSentenceFromVietnamese,
+  batchGenerateWordsFromVietnamese,
+  batchGenerateSentencesFromVietnamese,
+} from '../../utils/vietnameseAutoGenerator';
 
 interface CustomLessonModalProps {
   isOpen: boolean;
@@ -28,6 +33,8 @@ interface CustomLessonModalProps {
   onSaveConfig: (config: LessonCustomConfig) => void;
   onAddWord: (word: Omit<ChineseWord, 'id'>) => { success: boolean; message: string; word?: ChineseWord };
   onAddSentence: (sentence: Omit<SentenceExercise, 'id'>) => { success: boolean; message: string; sentence?: SentenceExercise };
+  onAddBatchWords?: (words: Omit<ChineseWord, 'id'>[]) => number;
+  onAddBatchSentences?: (sentences: Omit<SentenceExercise, 'id'>[]) => number;
   onDeleteSentence: (sentenceId: string) => void;
   onResetAll: () => void;
 }
@@ -43,6 +50,8 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
   onSaveConfig,
   onAddWord,
   onAddSentence,
+  onAddBatchWords,
+  onAddBatchSentences,
   onDeleteSentence,
   onResetAll,
 }) => {
@@ -55,9 +64,12 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
   const [isSentenceFormOpen, setIsSentenceFormOpen] = useState(false);
 
   // Vietnamese Auto-Generation State
-  const [addWordMode, setAddWordMode] = useState<'vietnamese' | 'manual'>('vietnamese');
+  const [addWordMode, setAddWordMode] = useState<'vietnamese' | 'batch' | 'manual'>('vietnamese');
   const [vietnameseInput, setVietnameseInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [batchWordsInput, setBatchWordsInput] = useState('');
+  const [batchWordProgress, setBatchWordProgress] = useState<{ current: number; total: number; last?: string } | null>(null);
+  const [isBatchGeneratingWords, setIsBatchGeneratingWords] = useState(false);
 
   // Word Form State
   const [wordHanzi, setWordHanzi] = useState('');
@@ -66,9 +78,12 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
   const [wordMeaning, setWordMeaning] = useState('');
 
   // Sentence Form State (for Assembly & Speaking)
-  const [addSentenceMode, setAddSentenceMode] = useState<'vietnamese' | 'manual'>('vietnamese');
+  const [addSentenceMode, setAddSentenceMode] = useState<'vietnamese' | 'batch' | 'manual'>('vietnamese');
   const [vietnameseSentenceInput, setVietnameseSentenceInput] = useState('');
   const [isGeneratingSentence, setIsGeneratingSentence] = useState(false);
+  const [batchSentencesInput, setBatchSentencesInput] = useState('');
+  const [batchSentenceProgress, setBatchSentenceProgress] = useState<{ current: number; total: number; last?: string } | null>(null);
+  const [isBatchGeneratingSentences, setIsBatchGeneratingSentences] = useState(false);
   const [sentenceTarget, setSentenceTarget] = useState('');
   const [sentencePinyin, setSentencePinyin] = useState('');
   const [sentenceMeaning, setSentenceMeaning] = useState('');
@@ -235,6 +250,49 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
     }
   };
 
+  // Handle Batch Generate Words from Multi-line Vietnamese
+  const handleBatchGenerateWords = async () => {
+    const lines = batchWordsInput.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (lines.length === 0) {
+      showToast('Vui lòng dán danh sách từ tiếng Việt (mỗi dòng 1 từ).', 'error');
+      return;
+    }
+    setIsBatchGeneratingWords(true);
+    setBatchWordProgress({ current: 0, total: lines.length });
+    audioService.playClick();
+
+    try {
+      const res = await batchGenerateWordsFromVietnamese(lines, (current, total, lastWord) => {
+        setBatchWordProgress({ current, total, last: lastWord });
+      });
+
+      if (res.words.length > 0) {
+        if (onAddBatchWords) {
+          const addedCount = onAddBatchWords(res.words);
+          audioService.playSuccessChime();
+          showToast(`Đã tự động tạo và đồng bộ ${addedCount} từ vựng vào bài học!`);
+        } else {
+          for (const w of res.words) {
+            onAddWord(w);
+          }
+          audioService.playSuccessChime();
+          showToast(`Đã tạo thành công ${res.words.length} từ vựng!`);
+        }
+        setBatchWordsInput('');
+        setIsWordFormOpen(false);
+      } else {
+        audioService.playErrorBuzz();
+        showToast('Không thể tạo từ vựng từ danh sách đã nhập.', 'error');
+      }
+    } catch {
+      audioService.playErrorBuzz();
+      showToast('Có lỗi xảy ra khi tạo bộ từ vựng.', 'error');
+    } finally {
+      setIsBatchGeneratingWords(false);
+      setBatchWordProgress(null);
+    }
+  };
+
   // Helper to auto-fill manual form from Vietnamese meaning
   const handleAutoFillManualFromVietnamese = async () => {
     const input = wordMeaning.trim() || vietnameseInput.trim();
@@ -256,6 +314,49 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
       }
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  // Handle Batch Generate Sentences from Multi-line Vietnamese
+  const handleBatchGenerateSentences = async () => {
+    const lines = batchSentencesInput.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (lines.length === 0) {
+      showToast('Vui lòng dán danh sách câu tiếng Việt (mỗi dòng 1 câu).', 'error');
+      return;
+    }
+    setIsBatchGeneratingSentences(true);
+    setBatchSentenceProgress({ current: 0, total: lines.length });
+    audioService.playClick();
+
+    try {
+      const res = await batchGenerateSentencesFromVietnamese(lines, (current, total, lastSentence) => {
+        setBatchSentenceProgress({ current, total, last: lastSentence });
+      });
+
+      if (res.sentences.length > 0) {
+        if (onAddBatchSentences) {
+          const addedCount = onAddBatchSentences(res.sentences);
+          audioService.playSuccessChime();
+          showToast(`Đã tự động tạo và đồng bộ ${addedCount} câu vào Ghép câu & Luyện nói!`);
+        } else {
+          for (const s of res.sentences) {
+            onAddSentence(s);
+          }
+          audioService.playSuccessChime();
+          showToast(`Đã tạo thành công ${res.sentences.length} câu bài tập!`);
+        }
+        setBatchSentencesInput('');
+        setIsSentenceFormOpen(false);
+      } else {
+        audioService.playErrorBuzz();
+        showToast('Không thể tạo câu từ danh sách đã nhập.', 'error');
+      }
+    } catch {
+      audioService.playErrorBuzz();
+      showToast('Có lỗi xảy ra khi tạo bộ câu.', 'error');
+    } finally {
+      setIsBatchGeneratingSentences(false);
+      setBatchSentenceProgress(null);
     }
   };
 
@@ -617,7 +718,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
               {isWordFormOpen && (
                 <div className="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 space-y-3 animate-fadeIn">
                   {/* Mode switcher */}
-                  <div className="grid grid-cols-2 p-1 bg-slate-900 rounded-xl border border-slate-750 gap-1 text-xs">
+                  <div className="grid grid-cols-3 p-1 bg-slate-900 rounded-xl border border-slate-750 gap-1 text-[11px]">
                     <button
                       type="button"
                       onClick={() => {
@@ -631,7 +732,23 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                       }`}
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Nhập tiếng Việt (Tự tạo AI)</span>
+                      <span>Nhập 1 từ (AI)</span>
+                    </button>
+                    <button
+                      type="button"
+                      data-testid="mode-batch-word-btn"
+                      onClick={() => {
+                        audioService.playClick();
+                        setAddWordMode('batch');
+                      }}
+                      className={`py-1.5 px-2 rounded-lg font-semibold flex items-center justify-center space-x-1 transition-all ${
+                        addWordMode === 'batch'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <Layers className="w-3.5 h-3.5 text-rose-300" />
+                      <span>Nhập cả bộ</span>
                     </button>
                     <button
                       type="button"
@@ -649,8 +766,8 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                     </button>
                   </div>
 
-                  {/* Mode 1: Auto-generate from Vietnamese */}
-                  {addWordMode === 'vietnamese' ? (
+                  {/* Mode 1: Auto-generate single word from Vietnamese */}
+                  {addWordMode === 'vietnamese' && (
                     <div className="space-y-2.5">
                       <div>
                         <label className="text-[11px] text-slate-300 font-semibold block mb-1">
@@ -693,8 +810,59 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                         </p>
                       </div>
                     </div>
-                  ) : (
-                    /* Mode 2: Manual fill */
+                  )}
+
+                  {/* Mode 2: Batch import multiple words */}
+                  {addWordMode === 'batch' && (
+                    <div className="space-y-2.5">
+                      <div>
+                        <label className="text-[11px] text-slate-300 font-semibold block mb-1">
+                          Dán danh sách từ tiếng Việt (mỗi dòng 1 từ):
+                        </label>
+                        <textarea
+                          data-testid="batch-words-input"
+                          rows={4}
+                          value={batchWordsInput}
+                          onChange={(e) => setBatchWordsInput(e.target.value)}
+                          placeholder="cà phê&#10;trà sữa&#10;bác sĩ&#10;bạn bè&#10;yêu thích&#10;chúc mừng năm mới"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500 font-mono"
+                        />
+                      </div>
+                      {batchWordProgress && (
+                        <div className="space-y-1 bg-slate-900 p-2.5 rounded-xl border border-slate-750">
+                          <div className="flex justify-between text-[11px] text-slate-300">
+                            <span>Đang tạo AI: {batchWordProgress.last || '...'}</span>
+                            <span className="font-semibold text-rose-400">
+                              {batchWordProgress.current} / {batchWordProgress.total}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                            <div
+                              className="bg-rose-500 h-1.5 rounded-full transition-all duration-300"
+                              style={{
+                                width: `${(batchWordProgress.current / batchWordProgress.total) * 100}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        data-testid="batch-generate-words-btn"
+                        disabled={isBatchGeneratingWords || !batchWordsInput.trim()}
+                        onClick={handleBatchGenerateWords}
+                        className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-rose-900/30 flex items-center justify-center space-x-1.5 active:scale-95"
+                      >
+                        <Sparkles className="w-4 h-4 text-amber-300" />
+                        <span>
+                          {isBatchGeneratingWords ? 'Đang tự tạo bộ từ...' : 'Tự tạo & Đồng bộ cả bộ vào bài học'}
+                        </span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Mode 3: Manual fill */}
+                  {addWordMode === 'manual' && (
                     <form onSubmit={handleAddNewWord} className="space-y-2.5">
                       <div className="grid grid-cols-2 gap-2">
                         <div>
@@ -896,7 +1064,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
               {isSentenceFormOpen && (
                 <div className="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 space-y-3 animate-fadeIn">
                   {/* Mode switcher */}
-                  <div className="grid grid-cols-2 p-1 bg-slate-900 rounded-xl border border-slate-750 gap-1 text-xs">
+                  <div className="grid grid-cols-3 p-1 bg-slate-900 rounded-xl border border-slate-750 gap-1 text-[11px]">
                     <button
                       type="button"
                       onClick={() => {
@@ -910,7 +1078,23 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                       }`}
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Nhập tiếng Việt (Tự tạo AI)</span>
+                      <span>Nhập 1 câu (AI)</span>
+                    </button>
+                    <button
+                      type="button"
+                      data-testid="mode-batch-sentence-btn"
+                      onClick={() => {
+                        audioService.playClick();
+                        setAddSentenceMode('batch');
+                      }}
+                      className={`py-1.5 px-2 rounded-lg font-semibold flex items-center justify-center space-x-1 transition-all ${
+                        addSentenceMode === 'batch'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <Layers className="w-3.5 h-3.5 text-rose-300" />
+                      <span>Nhập cả bộ</span>
                     </button>
                     <button
                       type="button"
@@ -929,7 +1113,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                   </div>
 
                   {/* Mode 1: Auto-generate sentence from Vietnamese */}
-                  {addSentenceMode === 'vietnamese' ? (
+                  {addSentenceMode === 'vietnamese' && (
                     <div className="space-y-2.5">
                       <div>
                         <label className="text-[11px] text-slate-300 font-semibold block mb-1">
@@ -1002,8 +1186,61 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                         </p>
                       </div>
                     </div>
-                  ) : (
-                    /* Mode 2: Manual Sentence Fill */
+                  )}
+
+                  {/* Mode 2: Batch import multiple sentences */}
+                  {addSentenceMode === 'batch' && (
+                    <div className="space-y-2.5">
+                      <div>
+                        <label className="text-[11px] text-slate-300 font-semibold block mb-1">
+                          Dán danh sách câu tiếng Việt (mỗi dòng 1 câu):
+                        </label>
+                        <textarea
+                          data-testid="batch-sentences-input"
+                          rows={4}
+                          value={batchSentencesInput}
+                          onChange={(e) => setBatchSentencesInput(e.target.value)}
+                          placeholder="Hôm nay tôi rất vui&#10;Bạn muốn uống gì?&#10;Tôi thích học tiếng Trung&#10;Thời tiết hôm nay rất đẹp"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500 font-mono"
+                        />
+                      </div>
+                      {batchSentenceProgress && (
+                        <div className="space-y-1 bg-slate-900 p-2.5 rounded-xl border border-slate-750">
+                          <div className="flex justify-between text-[11px] text-slate-300">
+                            <span>Đang tạo AI: {batchSentenceProgress.last || '...'}</span>
+                            <span className="font-semibold text-rose-400">
+                              {batchSentenceProgress.current} / {batchSentenceProgress.total}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                            <div
+                              className="bg-rose-500 h-1.5 rounded-full transition-all duration-300"
+                              style={{
+                                width: `${(batchSentenceProgress.current / batchSentenceProgress.total) * 100}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        data-testid="batch-generate-sentences-btn"
+                        disabled={isBatchGeneratingSentences || !batchSentencesInput.trim()}
+                        onClick={handleBatchGenerateSentences}
+                        className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-rose-900/30 flex items-center justify-center space-x-1.5 active:scale-95"
+                      >
+                        <Sparkles className="w-4 h-4 text-amber-300" />
+                        <span>
+                          {isBatchGeneratingSentences
+                            ? 'Đang tự tạo bộ câu...'
+                            : 'Tự tạo & Đồng bộ cả bộ câu vào bài học'}
+                        </span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Mode 3: Manual Sentence Fill */}
+                  {addSentenceMode === 'manual' && (
                     <form onSubmit={handleAddNewSentence} className="space-y-2.5">
                       <div>
                         <label className="text-[10px] text-slate-400 font-semibold block mb-1">

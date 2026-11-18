@@ -16,8 +16,8 @@ const getHanziSizeClass = (hanzi: string) => {
   const len = hanzi ? hanzi.length : 0;
   if (len <= 1) return 'text-2xl';
   if (len === 2) return 'text-lg';
-  if (len === 3) return 'text-xs sm:text-[13px] tracking-tight';
-  return 'text-[11px] tracking-tighter';
+  if (len === 3) return 'text-[15px] font-bold tracking-tight';
+  return 'text-xs font-semibold tracking-tighter';
 };
 
 export const WordListView: React.FC<WordListViewProps> = ({
@@ -183,7 +183,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               <div className="flex items-center space-x-3 min-w-0 flex-1">
                 {/* Balanced Hanzi container: auto horizontal scaling, no vertical wrapping */}
                 <div
-                  className={`w-16 h-12 rounded-xl bg-slate-850/90 border border-slate-700/80 flex items-center justify-center font-bold text-slate-100 shrink-0 select-all whitespace-nowrap overflow-hidden shadow-xs px-1.5 ${getHanziSizeClass(
+                  className={`w-[4.25rem] h-12 rounded-xl bg-slate-850/90 border border-slate-700/80 flex items-center justify-center font-bold text-slate-100 shrink-0 select-all whitespace-nowrap overflow-hidden shadow-xs px-2 text-center ${getHanziSizeClass(
                     word.hanzi
                   )}`}
                   title={word.hanzi}
