@@ -303,6 +303,9 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
       spawnExplosion(laneCenterNorm, 0.78, true);
       audioService.playComboChime(nextCombo);
       audioService.speakChinese(activeWave.word.hanzi, 1.05);
+      try {
+        navigator.vibrate?.(25);
+      } catch {}
 
       if (leveledUp) {
         const nextLv = levelRef.current + 1;
@@ -342,6 +345,9 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
       spawnExplosion(laneCenterNorm, 0.78, false);
       audioService.playErrorBuzz();
       audioService.speakChinese(activeWave.word.hanzi, 0.95);
+      try {
+        navigator.vibrate?.([40, 50, 40]);
+      } catch {}
       showQuickToast(
         'wrong',
         `Va cổng! ${activeWave.word.hanzi} (${activeWave.word.pinyin}) = ${activeWave.word.meaning}`,
@@ -694,6 +700,9 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
     }
     isTurboRef.current = true;
     audioService.playLaserDash();
+    try {
+      navigator.vibrate?.([20, 25, 30]);
+    } catch {}
   }, [phase]);
 
   // Keyboard navigation: Left/Right switches lanes, Up/Space activates Turbo Dash, 1/2/3 picks lane

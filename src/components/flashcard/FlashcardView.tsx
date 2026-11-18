@@ -20,6 +20,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   const [isFlipped, setIsFlipped] = useState(false);
   const [hidePinyin, setHidePinyin] = useState(false);
   const [hideHanviet, setHideHanviet] = useState(false);
+  const [lastMasteredWord, setLastMasteredWord] = useState<ChineseWord | null>(null);
+  const undoTimerRef = useRef<number | null>(null);
 
   // Swipe gesture state
   const [dragOffset, setDragOffset] = useState(0);
@@ -87,6 +89,27 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
     setMasteredWordIds(storageService.getMasteredFlashcardIds());
   }, [words]);
 
+  useEffect(() => {
+    return () => {
+      if (undoTimerRef.current) window.clearTimeout(undoTimerRef.current);
+    };
+  }, []);
+
+  const handleUndoMastered = () => {
+    if (!lastMasteredWord) return;
+    audioService.playClick();
+    if (undoTimerRef.current) {
+      window.clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = null;
+    }
+    const restoredId = lastMasteredWord.id;
+    const newMastered = masteredWordIds.filter((id) => id !== restoredId);
+    setMasteredWordIds(newMastered);
+    storageService.saveMasteredFlashcardIds(newMastered);
+    setLastMasteredWord(null);
+    setIsFlipped(false);
+  };
+
   const handleNext = () => {
     if (unmasteredWords.length === 0) return;
     setIsFlipped(false);
@@ -109,11 +132,19 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
 
     if (isCorrect) {
       audioService.playSuccessChime();
+      try {
+        navigator.vibrate?.(15);
+      } catch {}
       confetti({
         particleCount: 25,
         spread: 60,
         origin: { y: 0.8 },
       });
+
+      // Track last mastered word for instant Undo
+      setLastMasteredWord(currentWord);
+      if (undoTimerRef.current) window.clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = window.setTimeout(() => setLastMasteredWord(null), 5000);
 
       // Mark this card as mastered (deduplicated) so it won't appear anymore!
       const newMastered = Array.from(new Set([...masteredWordIds, currentWord.id]));
@@ -144,6 +175,10 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
       }
     } else {
       audioService.playErrorBuzz();
+      try {
+        navigator.vibrate?.([20, 30, 20]);
+      } catch {}
+      setLastMasteredWord(null);
       onUpdateWordSRS(currentWord.id, false);
 
       // Card remains in unmastered queue for further review
@@ -257,13 +292,24 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
         <p className="text-[11px] text-slate-500 mb-6">
           Các thẻ đã thuộc được ẩn đi. Khi muốn ôn tập lại từ đầu, bạn chỉ cần bấm nút bên dưới.
         </p>
-        <button
-          onClick={handleResetMastered}
-          className="flex items-center justify-center space-x-2 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-sm shadow-lg shadow-rose-900/40 active:scale-95 transition-all"
-        >
-          <RotateCcw className="w-4 h-4" />
-          <span>Học lại từ đầu (Reset)</span>
-        </button>
+        <div className="flex items-center gap-2 flex-wrap justify-center">
+          {lastMasteredWord && (
+            <button
+              onClick={handleUndoMastered}
+              className="flex items-center space-x-1.5 py-3 px-4 rounded-2xl bg-slate-800 hover:bg-slate-750 text-emerald-300 font-bold text-xs border border-emerald-500/30 transition-all active:scale-95 shadow-md"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Hoàn tác ({lastMasteredWord.hanzi})</span>
+            </button>
+          )}
+          <button
+            onClick={handleResetMastered}
+            className="flex items-center justify-center space-x-2 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-sm shadow-lg shadow-rose-900/40 active:scale-95 transition-all"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>Học lại từ đầu (Reset)</span>
+          </button>
+        </div>
       </div>
     );
   }
@@ -543,6 +589,22 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
           <div className="text-center text-[11px] text-slate-500 mt-2.5 select-none">
             Mẹo: Vuốt lên để lật • Vuốt sang phải (Đã thuộc) • Vuốt sang trái (Chưa nhớ)
           </div>
+
+          {/* Floating Undo Pill */}
+          {lastMasteredWord && (
+            <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 max-w-xs w-[90%] flex items-center justify-between px-3.5 py-2 rounded-2xl bg-slate-850/95 border border-emerald-500/50 shadow-2xl backdrop-blur-md text-xs animate-in fade-in slide-in-from-bottom-2 duration-200">
+              <span className="text-slate-300 truncate mr-2">
+                Đã thuộc: <span className="font-bold text-emerald-400">{lastMasteredWord.hanzi}</span> ({lastMasteredWord.pinyin})
+              </span>
+              <button
+                onClick={handleUndoMastered}
+                className="px-2.5 py-1 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-bold text-xs shrink-0 flex items-center gap-1 transition-colors active:scale-95"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Hoàn tác</span>
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>

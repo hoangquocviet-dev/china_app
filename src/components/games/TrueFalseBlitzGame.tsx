@@ -271,6 +271,15 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
         setFeedback({ type: 'correct', points: pointsEarned });
         audioService.playComboChime(nextCombo);
         audioService.speakChinese(question.word.hanzi, 1.05);
+        try {
+          if (nextCombo >= 10) {
+            navigator.vibrate?.([20, 30, 20, 30, 30]);
+          } else if (nextCombo >= 5) {
+            navigator.vibrate?.([15, 30, 15]);
+          } else {
+            navigator.vibrate?.(15);
+          }
+        } catch {}
 
         nextTimerRef.current = window.setTimeout(() => {
           startNextQuestion(roundCount + 1, nextCombo, lives, nextScore, nextMaxCombo);
@@ -288,6 +297,9 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
         });
         audioService.playErrorBuzz();
         audioService.speakChinese(question.word.hanzi, 0.95);
+        try {
+          navigator.vibrate?.([40, 30, 40]);
+        } catch {}
 
         nextTimerRef.current = window.setTimeout(() => {
           startNextQuestion(roundCount + 1, 0, nextLives, score, maxCombo);

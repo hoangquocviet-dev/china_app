@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useDeferredValue } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useDeferredValue } from 'react';
 import { X, Search, Plus, Check, Volume2, Sparkles, BookOpen, PenLine, AlertCircle, ChevronDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
@@ -113,6 +113,32 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
       return matchesWordSearch(item, deferredSearchQuery);
     });
   }, [dictionaryWords, deferredSearchQuery, selectedLevel]);
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  // Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCloseRef.current();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
+  // Autofocus search input when dictionary mode is opened
+  useEffect(() => {
+    if (isOpen && activeMode === 'dictionary') {
+      const timer = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 120);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, activeMode]);
 
   // Reset display chunk when search query or level changes
   useEffect(() => {
@@ -279,6 +305,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
               <div className="relative">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
+                  ref={searchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}

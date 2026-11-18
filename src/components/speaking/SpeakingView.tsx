@@ -450,6 +450,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
 
         {/* Target Text */}
         <div
+          data-testid="speaking-target-text"
           className={`font-bold text-slate-100 tracking-wide select-all mb-2 ${
             practiceType === 'word' ? 'text-5xl sm:text-6xl my-2' : 'text-2xl sm:text-3xl leading-relaxed my-3'
           }`}
