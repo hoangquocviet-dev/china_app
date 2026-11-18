@@ -9,6 +9,7 @@ interface WordListViewProps {
   words: ChineseWord[];
   onSelectWordForWriting?: (word: ChineseWord) => void;
   onRefreshWords: () => void;
+  onWordAdded?: (newWord: ChineseWord) => void;
 }
 
 const getHanziSizeClass = (hanzi: string) => {
@@ -23,6 +24,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   words,
   onSelectWordForWriting,
   onRefreshWords,
+  onWordAdded,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [importMessage, setImportMessage] = useState<string | null>(null);
@@ -257,8 +259,9 @@ export const WordListView: React.FC<WordListViewProps> = ({
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         savedWords={words}
-        onWordAdded={() => {
+        onWordAdded={(newWord) => {
           onRefreshWords();
+          onWordAdded?.(newWord);
         }}
       />
     </div>

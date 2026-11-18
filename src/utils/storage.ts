@@ -13,6 +13,8 @@ const STORAGE_KEYS = {
   LESSON_CONFIG: 'hanziflow_lesson_config',
   CUSTOM_DICTIONARY: 'hanziflow_custom_dictionary',
   MASTERED_FLASHCARDS: 'hanziflow_flashcard_mastered_ids',
+  DELETED_WORDS: 'hanziflow_deleted_words',
+  DELETED_SENTENCES: 'hanziflow_deleted_sentences',
 };
 
 class SafeStorageService {
@@ -63,9 +65,12 @@ class SafeStorageService {
       this.set(STORAGE_KEYS.WORDS, INITIAL_WORDS);
       return INITIAL_WORDS;
     }
-    // Auto-merge newly added official words if missing from user's notebook
+    // Auto-merge newly added official words if missing from user's notebook (unless intentionally deleted)
     const existingHanzis = new Set(words.map((w) => w.hanzi.trim()));
-    const missingDefaults = INITIAL_WORDS.filter((w) => !existingHanzis.has(w.hanzi.trim()));
+    const deletedHanzis = new Set(this.get<string[]>(STORAGE_KEYS.DELETED_WORDS, []));
+    const missingDefaults = INITIAL_WORDS.filter(
+      (w) => !existingHanzis.has(w.hanzi.trim()) && !deletedHanzis.has(w.hanzi.trim())
+    );
     if (missingDefaults.length > 0) {
       const merged = [...words, ...missingDefaults];
       this.saveWords(merged);
@@ -84,6 +89,15 @@ class SafeStorageService {
     const exists = words.some((w) => w.hanzi.trim() === cleanHanzi);
     if (exists) {
       return { success: false, message: `Từ "${cleanHanzi}" đã có trong sổ từ vựng của bạn.` };
+    }
+
+    // If previously deleted, unmark it
+    const deletedHanzis = this.get<string[]>(STORAGE_KEYS.DELETED_WORDS, []);
+    if (deletedHanzis.includes(cleanHanzi)) {
+      this.set(
+        STORAGE_KEYS.DELETED_WORDS,
+        deletedHanzis.filter((h) => h !== cleanHanzi)
+      );
     }
 
     const newWord: ChineseWord = {
@@ -161,8 +175,22 @@ class SafeStorageService {
 
   public deleteWord(wordId: string): boolean {
     const words = this.getWords();
+    const wordToDelete = words.find((w) => w.id === wordId);
+    if (wordToDelete) {
+      const cleanHanzi = wordToDelete.hanzi.trim();
+      const deletedHanzis = this.get<string[]>(STORAGE_KEYS.DELETED_WORDS, []);
+      if (!deletedHanzis.includes(cleanHanzi)) {
+        this.set(STORAGE_KEYS.DELETED_WORDS, [...deletedHanzis, cleanHanzi]);
+      }
+    }
     const updated = words.filter((w) => w.id !== wordId);
     this.saveWords(updated);
+
+    // Clean up from mastered flashcard IDs if present
+    const mastered = this.getMasteredFlashcardIds();
+    if (mastered.includes(wordId)) {
+      this.saveMasteredFlashcardIds(mastered.filter((id) => id !== wordId));
+    }
     return true;
   }
 
@@ -200,7 +228,10 @@ class SafeStorageService {
       return INITIAL_SENTENCES;
     }
     const existingTargets = new Set(sentences.map((s) => s.targetSentence.trim()));
-    const missingDefaults = INITIAL_SENTENCES.filter((s) => !existingTargets.has(s.targetSentence.trim()));
+    const deletedTargets = new Set(this.get<string[]>(STORAGE_KEYS.DELETED_SENTENCES, []));
+    const missingDefaults = INITIAL_SENTENCES.filter(
+      (s) => !existingTargets.has(s.targetSentence.trim()) && !deletedTargets.has(s.targetSentence.trim())
+    );
     if (missingDefaults.length > 0) {
       const merged = [...sentences, ...missingDefaults];
       this.saveSentences(merged);
@@ -234,6 +265,15 @@ class SafeStorageService {
       return { success: false, message: `Câu "${cleanTarget}" đã tồn tại trong danh sách bài học.` };
     }
 
+    // If previously deleted, unmark it
+    const deletedTargets = this.get<string[]>(STORAGE_KEYS.DELETED_SENTENCES, []);
+    if (deletedTargets.includes(cleanTarget)) {
+      this.set(
+        STORAGE_KEYS.DELETED_SENTENCES,
+        deletedTargets.filter((t) => t !== cleanTarget)
+      );
+    }
+
     // Auto-generate tokens if not provided
     let tokens = sentence.tokens && sentence.tokens.length > 0 ? sentence.tokens : [];
     if (tokens.length === 0) {
@@ -262,12 +302,25 @@ class SafeStorageService {
 
   public deleteSentence(sentenceId: string): boolean {
     const sentences = this.getSentences();
+    const sentToDelete = sentences.find((s) => s.id === sentenceId);
+    if (sentToDelete) {
+      const cleanTarget = sentToDelete.targetSentence.trim();
+      const deletedTargets = this.get<string[]>(STORAGE_KEYS.DELETED_SENTENCES, []);
+      if (!deletedTargets.includes(cleanTarget)) {
+        this.set(STORAGE_KEYS.DELETED_SENTENCES, [...deletedTargets, cleanTarget]);
+      }
+    }
     const updated = sentences.filter((s) => s.id !== sentenceId);
     this.saveSentences(updated);
     return true;
   }
 
   public resetSentencesToDefaults(): void {
+    if (this.isLocalStorageAvailable()) {
+      try {
+        window.localStorage.removeItem(STORAGE_KEYS.DELETED_SENTENCES);
+      } catch {}
+    }
     this.saveSentences(INITIAL_SENTENCES);
   }
 
@@ -298,6 +351,8 @@ class SafeStorageService {
         window.localStorage.removeItem(STORAGE_KEYS.LESSON_CONFIG);
         window.localStorage.removeItem(STORAGE_KEYS.CUSTOM_DICTIONARY);
         window.localStorage.removeItem(STORAGE_KEYS.MASTERED_FLASHCARDS);
+        window.localStorage.removeItem(STORAGE_KEYS.DELETED_WORDS);
+        window.localStorage.removeItem(STORAGE_KEYS.DELETED_SENTENCES);
       } catch {}
     }
   }

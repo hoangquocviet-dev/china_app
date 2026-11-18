@@ -91,6 +91,23 @@ export function App() {
     return res;
   };
 
+  const handleWordAdded = (newWord: ChineseWord) => {
+    loadWords();
+    const wordId = newWord.id;
+    if (lessonConfig.flashcardWordIds || lessonConfig.writingWordIds) {
+      const updatedConfig: LessonCustomConfig = {
+        ...lessonConfig,
+        flashcardWordIds: lessonConfig.flashcardWordIds
+          ? [wordId, ...lessonConfig.flashcardWordIds.filter((id) => id !== wordId)]
+          : undefined,
+        writingWordIds: lessonConfig.writingWordIds
+          ? [wordId, ...lessonConfig.writingWordIds.filter((id) => id !== wordId)]
+          : undefined,
+      };
+      handleSaveLessonConfig(updatedConfig);
+    }
+  };
+
   const handleAddSentence = (sentence: Omit<SentenceExercise, 'id'>) => {
     const res = storageService.addSentence(sentence);
     if (res.success && res.sentence) {
@@ -346,6 +363,7 @@ export function App() {
               words={words}
               onSelectWordForWriting={handleSelectWordForWriting}
               onRefreshWords={loadWords}
+              onWordAdded={handleWordAdded}
             />
           )}
         </Suspense>

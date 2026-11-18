@@ -35,6 +35,10 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
     return words.filter((w) => !masteredSet.has(w.id));
   }, [words, masteredWordIds]);
 
+  const deckMasteredCount = useMemo(() => {
+    return words.length - unmasteredWords.length;
+  }, [words, unmasteredWords]);
+
   const hasWords = Boolean(words && words.length > 0);
   const isDeckCompleted = hasWords && unmasteredWords.length === 0;
 
@@ -42,12 +46,15 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   const safeIndex = unmasteredWords.length > 0 ? Math.min(currentIndex, unmasteredWords.length - 1) : 0;
   const currentWord = unmasteredWords.length > 0 ? unmasteredWords[safeIndex] : null;
 
-  // Reset mastered cards so the user can study all cards again
+  // Reset mastered cards so the user can study cards in this deck again
   const handleResetMastered = () => {
     audioService.playClick();
     audioService.playSuccessChime();
-    storageService.resetMasteredFlashcards();
-    setMasteredWordIds([]);
+    // Only reset mastered status for words in the current deck
+    const currentWordIds = new Set(words.map((w) => w.id));
+    const remainingMastered = masteredWordIds.filter((id) => !currentWordIds.has(id));
+    storageService.saveMasteredFlashcardIds(remainingMastered);
+    setMasteredWordIds(remainingMastered);
     setCurrentIndex(0);
     setIsFlipped(false);
     setDragOffset(0);
@@ -262,7 +269,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
             Còn {unmasteredWords.length} thẻ
           </span>
           <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px] font-semibold">
-            Đã thuộc: {masteredWordIds.length}/{words.length}
+            Đã thuộc: {deckMasteredCount}/{words.length}
           </span>
           {currentWord && (
             <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px]">
@@ -273,11 +280,11 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
 
         {/* Peek Mask Toggles & Reset CTA */}
         <div className="flex items-center space-x-1.5">
-          {masteredWordIds.length > 0 && (
+          {deckMasteredCount > 0 && (
             <button
               onClick={handleResetMastered}
               className="flex items-center space-x-1 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-[11px] font-semibold transition-colors"
-              title="Xóa danh sách đã thuộc, học lại tất cả thẻ từ đầu"
+              title="Xóa danh sách đã thuộc, học lại các thẻ này từ đầu"
             >
               <RotateCcw className="w-3 h-3 text-rose-400" />
               <span>Reset</span>

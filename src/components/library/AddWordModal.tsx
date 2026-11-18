@@ -338,7 +338,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-slate-300 mt-1 truncate">{item.meaning}</p>
+                          <p className="text-xs text-slate-300 mt-1 line-clamp-2 leading-relaxed">{item.meaning}</p>
                           {item.examples && item.examples.length > 0 && (
                             <p className="text-[11px] text-slate-400 mt-0.5 italic truncate">
                               Ví dụ: {item.examples[0].zh} ({item.examples[0].vi})
