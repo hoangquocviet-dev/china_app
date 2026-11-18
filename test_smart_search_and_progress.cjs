@@ -25,6 +25,18 @@ async function runTest(targetUrl) {
   try {
     console.log(`1. Navigating to ${targetUrl}...`);
     await page.goto(targetUrl, { waitUntil: 'networkidle0' });
+    await new Promise(r => setTimeout(r, 1000));
+
+    // Ensure SW updates if running on live PWA
+    await page.evaluate(async () => {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for (const r of regs) {
+          await r.update();
+        }
+      }
+    });
+    await page.reload({ waitUntil: 'networkidle0' });
     await new Promise(r => setTimeout(r, 1200));
 
     // --- TEST 1: Flashcard Progress Bar calculation ---
