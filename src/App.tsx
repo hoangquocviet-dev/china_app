@@ -20,6 +20,9 @@ const SpeakingView = lazy(() =>
 const WordListView = lazy(() =>
   import('./components/library/WordListView').then((m) => ({ default: m.WordListView }))
 );
+const GamesHubView = lazy(() =>
+  import('./components/games/GamesHubView').then((m) => ({ default: m.GamesHubView }))
+);
 const CustomLessonModal = lazy(() =>
   import('./components/custom/CustomLessonModal').then((m) => ({ default: m.CustomLessonModal }))
 );
@@ -37,7 +40,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.replace('#', '') as ActiveTab;
-      if (['flashcard', 'writing', 'assembly', 'speaking', 'library'].includes(hash)) {
+      if (['flashcard', 'writing', 'assembly', 'speaking', 'games', 'library'].includes(hash)) {
         return hash;
       }
     }
@@ -212,7 +215,7 @@ export function App() {
     const handleHashChange = () => {
       if (typeof window !== 'undefined') {
         const hash = window.location.hash.replace('#', '') as ActiveTab;
-        if (['flashcard', 'writing', 'assembly', 'speaking', 'library'].includes(hash)) {
+        if (['flashcard', 'writing', 'assembly', 'speaking', 'games', 'library'].includes(hash)) {
           setActiveTab(hash);
         }
       }
@@ -250,6 +253,8 @@ export function App() {
         return { title: 'Ghép Câu', subtitle: 'Tư duy cấu trúc ngữ pháp tiếng Trung' };
       case 'speaking':
         return { title: 'Luyện Nói', subtitle: 'Phát âm chuẩn thanh điệu & nhận diện giọng nói AI' };
+      case 'games':
+        return { title: 'Trò Chơi', subtitle: 'Phản xạ chữ Hán qua 3 mini-game 60fps' };
       case 'library':
         return { title: 'Kho Từ Vựng', subtitle: 'Tra cứu & quản lý bộ từ HSK' };
     }
@@ -263,7 +268,7 @@ export function App() {
   const touchStartY = useRef(0);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (window.scrollY <= 0 && activeTab !== 'writing') {
+    if (window.scrollY <= 0 && activeTab !== 'writing' && activeTab !== 'games') {
       touchStartY.current = e.touches[0].clientY;
       setIsPulling(true);
     }
@@ -355,6 +360,14 @@ export function App() {
             <SpeakingView
               words={activeFlashcardWords.length > 0 ? activeFlashcardWords : words}
               sentences={activeSpeakingSentences.length > 0 ? activeSpeakingSentences : sentences}
+            />
+          )}
+
+          {activeTab === 'games' && (
+            <GamesHubView
+              activeWords={activeFlashcardWords.length > 0 ? activeFlashcardWords : words}
+              allWords={words}
+              onRefreshWords={loadWords}
             />
           )}
 

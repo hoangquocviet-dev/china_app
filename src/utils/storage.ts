@@ -1,7 +1,7 @@
 import { INITIAL_WORDS } from '../data/hsk1Words';
 import { INITIAL_SENTENCES } from '../data/hsk1Sentences';
 import { DICTIONARY_WORDS } from '../data/dictionaryData';
-import type { ChineseWord, SentenceExercise, LessonCustomConfig } from '../types';
+import type { ChineseWord, SentenceExercise, LessonCustomConfig, GameScores } from '../types';
 
 const STORAGE_KEYS = {
   WORDS: 'hanziflow_words',
@@ -15,6 +15,17 @@ const STORAGE_KEYS = {
   MASTERED_FLASHCARDS: 'hanziflow_flashcard_mastered_ids',
   DELETED_WORDS: 'hanziflow_deleted_words',
   DELETED_SENTENCES: 'hanziflow_deleted_sentences',
+  GAME_SCORES: 'hanziflow_game_scores',
+};
+
+const DEFAULT_GAME_SCORES: GameScores = {
+  blitzBestScore: 0,
+  blitzBestCombo: 0,
+  matchBestScore: 0,
+  matchBestWaves: 0,
+  runnerBestScore: 0,
+  runnerBestDistance: 0,
+  totalGamesPlayed: 0,
 };
 
 class SafeStorageService {
@@ -360,6 +371,29 @@ class SafeStorageService {
     this.set(STORAGE_KEYS.LESSON_CONFIG, config);
   }
 
+  public getGameScores(): GameScores {
+    const raw = this.get<Partial<GameScores>>(STORAGE_KEYS.GAME_SCORES, DEFAULT_GAME_SCORES);
+    return {
+      ...DEFAULT_GAME_SCORES,
+      ...raw,
+    };
+  }
+
+  public updateGameScores(partial: Partial<GameScores>): GameScores {
+    const current = this.getGameScores();
+    const next: GameScores = {
+      blitzBestScore: Math.max(current.blitzBestScore, partial.blitzBestScore ?? 0),
+      blitzBestCombo: Math.max(current.blitzBestCombo, partial.blitzBestCombo ?? 0),
+      matchBestScore: Math.max(current.matchBestScore, partial.matchBestScore ?? 0),
+      matchBestWaves: Math.max(current.matchBestWaves, partial.matchBestWaves ?? 0),
+      runnerBestScore: Math.max(current.runnerBestScore, partial.runnerBestScore ?? 0),
+      runnerBestDistance: Math.max(current.runnerBestDistance, partial.runnerBestDistance ?? 0),
+      totalGamesPlayed: current.totalGamesPlayed + (partial.totalGamesPlayed ?? 1),
+    };
+    this.set(STORAGE_KEYS.GAME_SCORES, next);
+    return next;
+  }
+
   public resetLessonConfig(): void {
     this.memoryCache.delete(STORAGE_KEYS.LESSON_CONFIG);
     if (this.isLocalStorageAvailable()) {
@@ -382,6 +416,7 @@ class SafeStorageService {
         window.localStorage.removeItem(STORAGE_KEYS.MASTERED_FLASHCARDS);
         window.localStorage.removeItem(STORAGE_KEYS.DELETED_WORDS);
         window.localStorage.removeItem(STORAGE_KEYS.DELETED_SENTENCES);
+        window.localStorage.removeItem(STORAGE_KEYS.GAME_SCORES);
       } catch {}
     }
   }

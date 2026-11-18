@@ -43,4 +43,16 @@ export interface LessonCustomConfig {
   speakingSentenceIds?: string[]; // IDs của câu hiển thị trong Luyện nói
 }
 
-export type ActiveTab = 'flashcard' | 'writing' | 'assembly' | 'speaking' | 'library';
+export type ActiveTab = 'flashcard' | 'writing' | 'assembly' | 'speaking' | 'games' | 'library';
+
+export type MiniGameId = 'blitz' | 'match' | 'runner';
+
+export interface GameScores {
+  blitzBestScore: number;
+  blitzBestCombo: number;
+  matchBestScore: number;
+  matchBestWaves: number;
+  runnerBestScore: number;
+  runnerBestDistance: number;
+  totalGamesPlayed: number;
+}
