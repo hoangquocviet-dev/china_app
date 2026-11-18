@@ -74,7 +74,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
     resetEvalState();
   }, [sentences]);
 
-  // Check Web Speech API support
+  // Check Web Speech API support & cleanup on unmount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition =
@@ -83,6 +83,19 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
         setIsSpeechSupported(false);
       }
     }
+
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch {}
+      }
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        try {
+          mediaRecorderRef.current.stop();
+        } catch {}
+      }
+    };
   }, []);
 
   const resetEvalState = () => {

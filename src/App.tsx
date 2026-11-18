@@ -1,16 +1,37 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { RotateCw } from 'lucide-react';
 import type { ActiveTab, ChineseWord, SentenceExercise, LessonCustomConfig } from './types';
 import { Header } from './components/common/Header';
 import { BottomNav } from './components/common/BottomNav';
 import { FlashcardView } from './components/flashcard/FlashcardView';
-import { HanziWriterView } from './components/writer/HanziWriterView';
-import { AssemblyView } from './components/assembly/AssemblyView';
-import { SpeakingView } from './components/speaking/SpeakingView';
-import { WordListView } from './components/library/WordListView';
-import { CustomLessonModal } from './components/custom/CustomLessonModal';
 import { storageService } from './utils/storage';
 import { audioService } from './utils/audio';
+
+// Lazy-load secondary views to dramatically reduce initial bundle size & speed up initial load
+const HanziWriterView = lazy(() =>
+  import('./components/writer/HanziWriterView').then((m) => ({ default: m.HanziWriterView }))
+);
+const AssemblyView = lazy(() =>
+  import('./components/assembly/AssemblyView').then((m) => ({ default: m.AssemblyView }))
+);
+const SpeakingView = lazy(() =>
+  import('./components/speaking/SpeakingView').then((m) => ({ default: m.SpeakingView }))
+);
+const WordListView = lazy(() =>
+  import('./components/library/WordListView').then((m) => ({ default: m.WordListView }))
+);
+const CustomLessonModal = lazy(() =>
+  import('./components/custom/CustomLessonModal').then((m) => ({ default: m.CustomLessonModal }))
+);
+
+const ViewLoadingFallback = () => (
+  <div className="flex-1 flex items-center justify-center p-8 text-slate-400 text-xs">
+    <div className="flex flex-col items-center gap-2.5">
+      <div className="w-7 h-7 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+      <span className="font-medium text-slate-300">Đang tải bài học...</span>
+    </div>
+  </div>
+);
 
 export function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
@@ -299,49 +320,55 @@ export function App() {
           />
         )}
 
-        {activeTab === 'writing' && (
-          <HanziWriterView
-            words={activeWritingWords.length > 0 ? activeWritingWords : words}
-            initialWordId={selectedWordIdForWriting}
-          />
-        )}
+        <Suspense fallback={<ViewLoadingFallback />}>
+          {activeTab === 'writing' && (
+            <HanziWriterView
+              words={activeWritingWords.length > 0 ? activeWritingWords : words}
+              initialWordId={selectedWordIdForWriting}
+            />
+          )}
 
-        {activeTab === 'assembly' && (
-          <AssemblyView
-            sentences={activeAssemblySentences.length > 0 ? activeAssemblySentences : sentences}
-          />
-        )}
+          {activeTab === 'assembly' && (
+            <AssemblyView
+              sentences={activeAssemblySentences.length > 0 ? activeAssemblySentences : sentences}
+            />
+          )}
 
-        {activeTab === 'speaking' && (
-          <SpeakingView
-            words={activeFlashcardWords.length > 0 ? activeFlashcardWords : words}
-            sentences={activeSpeakingSentences.length > 0 ? activeSpeakingSentences : sentences}
-          />
-        )}
+          {activeTab === 'speaking' && (
+            <SpeakingView
+              words={activeFlashcardWords.length > 0 ? activeFlashcardWords : words}
+              sentences={activeSpeakingSentences.length > 0 ? activeSpeakingSentences : sentences}
+            />
+          )}
 
-        {activeTab === 'library' && (
-          <WordListView
-            words={words}
-            onSelectWordForWriting={handleSelectWordForWriting}
-            onRefreshWords={loadWords}
-          />
-        )}
+          {activeTab === 'library' && (
+            <WordListView
+              words={words}
+              onSelectWordForWriting={handleSelectWordForWriting}
+              onRefreshWords={loadWords}
+            />
+          )}
+        </Suspense>
       </main>
 
-      <CustomLessonModal
-        isOpen={isCustomLessonModalOpen}
-        onClose={() => setIsCustomLessonModalOpen(false)}
-        words={words}
-        sentences={sentences}
-        lessonConfig={lessonConfig}
-        onSaveConfig={handleSaveLessonConfig}
-        onAddWord={handleAddWord}
-        onAddSentence={handleAddSentence}
-        onAddBatchWords={handleAddBatchWords}
-        onAddBatchSentences={handleAddBatchSentences}
-        onDeleteSentence={handleDeleteSentence}
-        onResetAll={handleResetAllLessons}
-      />
+      {isCustomLessonModalOpen && (
+        <Suspense fallback={null}>
+          <CustomLessonModal
+            isOpen={isCustomLessonModalOpen}
+            onClose={() => setIsCustomLessonModalOpen(false)}
+            words={words}
+            sentences={sentences}
+            lessonConfig={lessonConfig}
+            onSaveConfig={handleSaveLessonConfig}
+            onAddWord={handleAddWord}
+            onAddSentence={handleAddSentence}
+            onAddBatchWords={handleAddBatchWords}
+            onAddBatchSentences={handleAddBatchSentences}
+            onDeleteSentence={handleDeleteSentence}
+            onResetAll={handleResetAllLessons}
+          />
+        </Suspense>
+      )}
 
       <BottomNav activeTab={activeTab} onChangeTab={handleTabChange} />
     </div>
