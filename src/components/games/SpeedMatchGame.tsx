@@ -331,10 +331,16 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
       audioService.playMatchPop();
       audioService.playComboChime(nextCombo);
       audioService.speakChinese(clickedCard.hanzi, 1.05);
+      try {
+        navigator.vibrate?.(18);
+      } catch {}
 
       const allCleared = updatedCards.every((c) => c.matched);
       if (allCleared) {
         waveLockedRef.current = true;
+        try {
+          navigator.vibrate?.([20, 30, 40]);
+        } catch {}
         const waveBonus = 150;
         const nextTotalScore = scoreRef.current + earned + waveBonus;
         scoreRef.current = nextTotalScore;
@@ -377,6 +383,9 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
       setCombo(0);
       setMismatchPair([firstCard.id, clickedCard.id]);
       audioService.playErrorBuzz();
+      try {
+        navigator.vibrate?.([30, 40, 30]);
+      } catch {}
 
       mismatchTimeoutRef.current = window.setTimeout(() => {
         setMismatchPair([]);

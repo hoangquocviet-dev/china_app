@@ -503,7 +503,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
                 </div>
 
                 {/* Meaning & Details */}
-                <div className="flex-1 flex flex-col justify-center my-3 space-y-3">
+                <div className="flex-1 flex flex-col justify-center my-2 space-y-2.5 overflow-y-auto pr-1">
                   <div>
                     <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Định nghĩa</span>
                     <p className="text-lg sm:text-xl font-bold text-slate-100 mt-0.5 leading-snug">

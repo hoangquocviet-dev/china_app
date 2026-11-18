@@ -331,7 +331,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
         </div>
 
         {/* Character tabs if multi-char word */}
-        <div className="flex items-center space-x-1.5">
+        <div className="flex items-center space-x-1.5 shrink-0 overflow-x-auto max-w-[48%] py-0.5">
           {characters.map((char, cIdx) => (
             <button
               key={cIdx}
