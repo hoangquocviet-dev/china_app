@@ -296,6 +296,8 @@ class SafeStorageService {
         window.localStorage.removeItem(STORAGE_KEYS.STREAK);
         window.localStorage.removeItem(STORAGE_KEYS.SENTENCES);
         window.localStorage.removeItem(STORAGE_KEYS.LESSON_CONFIG);
+        window.localStorage.removeItem(STORAGE_KEYS.CUSTOM_DICTIONARY);
+        window.localStorage.removeItem(STORAGE_KEYS.MASTERED_FLASHCARDS);
       } catch {}
     }
   }
