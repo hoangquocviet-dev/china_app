@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Zap,
   Puzzle,
@@ -10,10 +10,14 @@ import {
   Flame,
   Sparkles,
   BookOpen,
+  Crown,
+  RefreshCw,
+  Cloud,
 } from 'lucide-react';
-import type { ChineseWord, MiniGameId, GameScores } from '../../types';
+import type { ChineseWord, MiniGameId, GameScores, HanziLeaderboardEntry } from '../../types';
 import { storageService } from '../../utils/storage';
 import { audioService } from '../../utils/audio';
+import { cloudSyncService, computePlayerTag } from '../../utils/cloudSync';
 import { INITIAL_WORDS } from '../../data/hsk1Words';
 import { TrueFalseBlitzGame } from './TrueFalseBlitzGame';
 import { SpeedMatchGame } from './SpeedMatchGame';
@@ -23,6 +27,7 @@ interface GamesHubViewProps {
   activeWords: ChineseWord[];
   allWords: ChineseWord[];
   onRefreshWords?: () => void;
+  onOpenCloudSync?: () => void;
 }
 
 type WordPoolSource = 'active' | 'notebook' | 'dictionary';
@@ -31,13 +36,55 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   activeWords,
   allWords,
   onRefreshWords,
+  onOpenCloudSync,
 }) => {
   const [selectedGame, setSelectedGame] = useState<MiniGameId | null>(null);
   const [poolSource, setPoolSource] = useState<WordPoolSource>('active');
   const [showPinyinHint, setShowPinyinHint] = useState<boolean>(true);
   const [scores, setScores] = useState<GameScores>(() => storageService.getGameScores());
+  const [leaderboard, setLeaderboard] = useState<HanziLeaderboardEntry[]>([]);
+  const [loadingBoard, setLoadingBoard] = useState<boolean>(true);
+  const [myPlayerTag, setMyPlayerTag] = useState<string>('');
+  const [myNickname, setMyNickname] = useState<string>(() => cloudSyncService.getNickname());
+  const [dictTick, setDictTick] = useState(0);
 
-  const dictionaryWords = useMemo(() => storageService.getDictionaryWords(), [allWords]);
+  const refreshLeaderboard = useCallback(async () => {
+    setLoadingBoard(true);
+    try {
+      const [rows, tag] = await Promise.all([
+        cloudSyncService.fetchLeaderboard(10),
+        computePlayerTag(cloudSyncService.getSyncCode()),
+      ]);
+      setLeaderboard(rows);
+      setMyPlayerTag(tag);
+      setMyNickname(cloudSyncService.getNickname());
+    } finally {
+      setLoadingBoard(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    setScores(storageService.getGameScores());
+  }, [allWords]);
+
+  useEffect(() => {
+    void refreshLeaderboard();
+    const unsub = cloudSyncService.subscribe(() => {
+      const snap = cloudSyncService.getSnapshot();
+      setScores(storageService.getGameScores());
+      setMyNickname(snap.nickname);
+      setDictTick((t) => t + 1);
+      if (snap.status === 'synced') {
+        void refreshLeaderboard();
+      }
+    });
+    return unsub;
+  }, [refreshLeaderboard]);
+
+  const dictionaryWords = useMemo(
+    () => storageService.getDictionaryWords(),
+    [allWords, dictTick]
+  );
 
   // Ensure at least 8 words with distinct Hanzi AND distinct Meaning so 6-pair Speed Match & 3-lane Runner never have duplicate options
   const effectivePlayWords = useMemo(() => {
@@ -411,6 +458,132 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* LIVE CLOUD ARCADE LEADERBOARD */}
+      <div
+        data-testid="arcade-leaderboard-section"
+        className="p-4 rounded-3xl bg-slate-800/80 border border-slate-750 shadow-md space-y-3"
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center space-x-2 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+              <Crown className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-sm font-extrabold text-slate-100 truncate">
+                Bảng Phong Thần
+              </h3>
+              <p className="text-[11px] text-slate-400 truncate">
+                {myNickname ? `Bạn: ${myNickname}` : 'Xếp hạng Cloud trực tiếp'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-1.5 shrink-0">
+            <button
+              type="button"
+              data-testid="refresh-leaderboard-btn"
+              onClick={() => {
+                audioService.playClick();
+                void refreshLeaderboard();
+              }}
+              className="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors"
+              title="Làm mới Bảng xếp hạng"
+              aria-label="Làm mới Bảng xếp hạng"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingBoard ? 'animate-spin text-amber-400' : ''}`} />
+            </button>
+
+            {onOpenCloudSync && (
+              <button
+                type="button"
+                data-testid="leaderboard-open-cloud-btn"
+                onClick={() => {
+                  audioService.playClick();
+                  onOpenCloudSync();
+                }}
+                className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/30 text-rose-300 text-[11px] font-bold transition-colors"
+              >
+                <Cloud className="w-3.5 h-3.5 text-rose-400" />
+                <span>{myNickname ? 'Đổi tên' : 'Đặt tên'}</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {loadingBoard && leaderboard.length === 0 ? (
+          <div className="py-6 text-center text-xs text-slate-400">
+            Đang tải Bảng Phong Thần từ Cloud...
+          </div>
+        ) : leaderboard.length === 0 ? (
+          <div className="py-5 px-3 rounded-2xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
+            <p className="text-xs text-slate-300 font-medium">
+              Chưa có cao thủ nào ghi danh trên Bảng Phong Thần!
+            </p>
+            <p className="text-[11px] text-slate-400">
+              Hãy chơi 1 ván bất kỳ hoặc đặt biệt danh để chiếm ngôi Quán Quân #1 đầu tiên.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {leaderboard.map((entry, idx) => {
+              const rank = idx + 1;
+              const isMe = Boolean(myPlayerTag && entry.player_tag === myPlayerTag);
+              const badgeStyle =
+                rank === 1
+                  ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 font-black shadow-sm shadow-amber-500/30'
+                  : rank === 2
+                  ? 'bg-gradient-to-br from-slate-200 to-slate-400 text-slate-950 font-black'
+                  : rank === 3
+                  ? 'bg-gradient-to-br from-orange-400 to-amber-700 text-white font-black'
+                  : 'bg-slate-900 border border-slate-700 text-slate-400 font-bold';
+
+              return (
+                <div
+                  key={entry.player_tag}
+                  data-testid={`leaderboard-row-${rank}`}
+                  className={`p-2.5 rounded-2xl border flex items-center justify-between gap-2.5 transition-colors ${
+                    isMe
+                      ? 'bg-rose-950/35 border-rose-500/40'
+                      : 'bg-slate-900/70 border-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2.5 min-w-0 flex-1">
+                    <div
+                      className={`w-7 h-7 rounded-xl text-xs flex items-center justify-center shrink-0 tabular-nums ${badgeStyle}`}
+                    >
+                      {rank}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-extrabold text-slate-100 truncate">
+                          {entry.nickname}
+                        </span>
+                        {isMe && (
+                          <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold shrink-0">
+                            Bạn
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-slate-400 truncate mt-0.5 tabular-nums">
+                        ⚡{entry.blitz_score} • 🧩{entry.match_score} • 🚀{entry.runner_score}
+                        {entry.mastered_count > 0 ? ` • ${entry.mastered_count} từ thuộc` : ''}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <div className="text-xs sm:text-sm font-black text-amber-400 tabular-nums">
+                      {entry.total_score.toLocaleString('vi-VN')}
+                    </div>
+                    <div className="text-[10px] text-slate-500">tổng điểm</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

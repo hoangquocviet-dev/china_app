@@ -1,7 +1,14 @@
 import { INITIAL_WORDS } from '../data/hsk1Words';
 import { INITIAL_SENTENCES } from '../data/hsk1Sentences';
 import { DICTIONARY_WORDS } from '../data/dictionaryData';
-import type { ChineseWord, SentenceExercise, LessonCustomConfig, GameScores } from '../types';
+import type {
+  ChineseWord,
+  SentenceExercise,
+  LessonCustomConfig,
+  GameScores,
+  BuiltInSrsProgress,
+  CommunityWordRow,
+} from '../types';
 
 const STORAGE_KEYS = {
   WORDS: 'hanziflow_words',
@@ -12,11 +19,24 @@ const STORAGE_KEYS = {
   SENTENCES: 'hanziflow_sentences',
   LESSON_CONFIG: 'hanziflow_lesson_config',
   CUSTOM_DICTIONARY: 'hanziflow_custom_dictionary',
+  CLOUD_COMMUNITY_WORDS: 'hanziflow_cloud_community_words',
   MASTERED_FLASHCARDS: 'hanziflow_flashcard_mastered_ids',
   DELETED_WORDS: 'hanziflow_deleted_words',
   DELETED_SENTENCES: 'hanziflow_deleted_sentences',
   GAME_SCORES: 'hanziflow_game_scores',
 };
+
+const SYNCED_MUTATION_KEYS = new Set<string>([
+  STORAGE_KEYS.WORDS,
+  STORAGE_KEYS.SENTENCES,
+  STORAGE_KEYS.LESSON_CONFIG,
+  STORAGE_KEYS.CUSTOM_DICTIONARY,
+  STORAGE_KEYS.MASTERED_FLASHCARDS,
+  STORAGE_KEYS.DELETED_WORDS,
+  STORAGE_KEYS.DELETED_SENTENCES,
+  STORAGE_KEYS.GAME_SCORES,
+  STORAGE_KEYS.STREAK,
+]);
 
 const DEFAULT_GAME_SCORES: GameScores = {
   blitzBestScore: 0,
@@ -32,6 +52,29 @@ class SafeStorageService {
   // In-memory cache for high-frequency reads (avoids repeated JSON.parse overhead on massive datasets)
   private memoryCache: Map<string, any> = new Map();
   private cachedMergedDictionary: ChineseWord[] | null = null;
+  private mutationListeners: Set<() => void> = new Set();
+  private suppressMutationNotify: boolean = false;
+  private communityWordHook: ((word: ChineseWord) => void) | null = null;
+
+  public subscribeMutations(listener: () => void): () => void {
+    this.mutationListeners.add(listener);
+    return () => {
+      this.mutationListeners.delete(listener);
+    };
+  }
+
+  public registerCommunityWordHook(hook: (word: ChineseWord) => void): void {
+    this.communityWordHook = hook;
+  }
+
+  private notifyMutations(): void {
+    if (this.suppressMutationNotify) return;
+    for (const fn of this.mutationListeners) {
+      try {
+        fn();
+      } catch {}
+    }
+  }
 
   private isLocalStorageAvailable(): boolean {
     try {
@@ -73,11 +116,14 @@ class SafeStorageService {
     }
   }
 
-  private set<T>(key: string, value: T): boolean {
+  private set<T>(key: string, value: T, notify: boolean = true): boolean {
     this.memoryCache.set(key, value);
     if (!this.isLocalStorageAvailable()) return false;
     try {
       window.localStorage.setItem(key, JSON.stringify(value));
+      if (notify && SYNCED_MUTATION_KEYS.has(key)) {
+        this.notifyMutations();
+      }
       return true;
     } catch (e) {
       console.error(`[Storage] Failed to save key: ${key}`, e);
@@ -93,7 +139,7 @@ class SafeStorageService {
   public getWords(): ChineseWord[] {
     const words = this.get<ChineseWord[]>(STORAGE_KEYS.WORDS, []);
     if (!words || words.length === 0) {
-      this.set(STORAGE_KEYS.WORDS, INITIAL_WORDS);
+      this.set(STORAGE_KEYS.WORDS, INITIAL_WORDS, false);
       return INITIAL_WORDS;
     }
     // Auto-merge newly added official words if missing from user's notebook (unless intentionally deleted)
@@ -154,9 +200,31 @@ class SafeStorageService {
     return { success: true, message: `Đã thêm thành công "${cleanHanzi}" vào sổ từ!`, word: newWord };
   }
 
-  // --- Dictionary Database Management (Kho từ điển dùng chung) ---
+  // --- Dictionary Database Management (Kho từ điển dùng chung Local + Cloud Community DB) ---
   public getCustomDictionaryWords(): ChineseWord[] {
     return this.get<ChineseWord[]>(STORAGE_KEYS.CUSTOM_DICTIONARY, []);
+  }
+
+  public getCommunityDictionaryWords(): ChineseWord[] {
+    return this.get<ChineseWord[]>(STORAGE_KEYS.CLOUD_COMMUNITY_WORDS, []);
+  }
+
+  public mergeCommunityWordsIntoDictionary(rows: CommunityWordRow[]): boolean {
+    if (!Array.isArray(rows) || rows.length === 0) return false;
+    const mapped: ChineseWord[] = rows.map((r) => ({
+      id: `comm_${r.id}`,
+      hanzi: r.hanzi.trim(),
+      pinyin: r.pinyin.trim(),
+      hanviet: (r.hanviet || '').trim().toUpperCase(),
+      meaning: r.meaning.trim(),
+      pos: r.pos || 'Danh từ',
+      level: r.level || 'HSK1',
+      examples: Array.isArray(r.examples) ? r.examples : [],
+      box: 1,
+    }));
+    this.set(STORAGE_KEYS.CLOUD_COMMUNITY_WORDS, mapped, false);
+    this.cachedMergedDictionary = null;
+    return true;
   }
 
   public getDictionaryWords(): ChineseWord[] {
@@ -164,9 +232,33 @@ class SafeStorageService {
       return this.cachedMergedDictionary;
     }
     const customWords = this.getCustomDictionaryWords();
-    const customHanziSet = new Set(customWords.map((w) => w.hanzi.trim()));
-    const defaultWords = DICTIONARY_WORDS.filter((w) => !customHanziSet.has(w.hanzi.trim()));
-    this.cachedMergedDictionary = [...customWords, ...defaultWords];
+    const communityWords = this.getCommunityDictionaryWords();
+    const seenHanzis = new Set<string>();
+    const combined: ChineseWord[] = [];
+
+    for (const w of customWords) {
+      const h = w.hanzi.trim();
+      if (h && !seenHanzis.has(h)) {
+        seenHanzis.add(h);
+        combined.push(w);
+      }
+    }
+    for (const w of communityWords) {
+      const h = w.hanzi.trim();
+      if (h && !seenHanzis.has(h)) {
+        seenHanzis.add(h);
+        combined.push(w);
+      }
+    }
+    for (const w of DICTIONARY_WORDS) {
+      const h = w.hanzi.trim();
+      if (h && !seenHanzis.has(h)) {
+        seenHanzis.add(h);
+        combined.push(w);
+      }
+    }
+
+    this.cachedMergedDictionary = combined;
     return this.cachedMergedDictionary;
   }
 
@@ -178,7 +270,10 @@ class SafeStorageService {
     const alreadyInCustom = customWords.some((w) => w.hanzi.trim() === cleanHanzi);
     if (!alreadyInCustom) {
       const alreadyInDefault = DICTIONARY_WORDS.some((w) => w.hanzi.trim() === cleanHanzi);
-      if (!alreadyInDefault) {
+      const alreadyInCommunity = this.getCommunityDictionaryWords().some(
+        (w) => w.hanzi.trim() === cleanHanzi
+      );
+      if (!alreadyInDefault && !alreadyInCommunity) {
         const dictWord: ChineseWord = {
           ...word,
           id: `dict_${word.id || Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
@@ -188,6 +283,7 @@ class SafeStorageService {
         const updated = [dictWord, ...customWords];
         this.set(STORAGE_KEYS.CUSTOM_DICTIONARY, updated);
         this.cachedMergedDictionary = null; // Invalidate dictionary cache
+        this.communityWordHook?.(dictWord);
       }
     }
   }
@@ -208,6 +304,7 @@ class SafeStorageService {
         window.localStorage.removeItem(STORAGE_KEYS.MASTERED_FLASHCARDS);
       } catch {}
     }
+    this.notifyMutations();
   }
 
   public deleteWord(wordId: string): boolean {
@@ -273,7 +370,7 @@ class SafeStorageService {
   public getSentences(): SentenceExercise[] {
     const sentences = this.get<SentenceExercise[]>(STORAGE_KEYS.SENTENCES, []);
     if (!sentences || sentences.length === 0) {
-      this.set(STORAGE_KEYS.SENTENCES, INITIAL_SENTENCES);
+      this.set(STORAGE_KEYS.SENTENCES, INITIAL_SENTENCES, false);
       return INITIAL_SENTENCES;
     }
     const existingTargets = new Set(sentences.map((s) => s.targetSentence.trim()));
@@ -455,6 +552,224 @@ class SafeStorageService {
       lessonConfig: this.getLessonConfig(),
     };
     return JSON.stringify(data, null, 2);
+  }
+
+  public getDeletedWords(): string[] {
+    return this.get<string[]>(STORAGE_KEYS.DELETED_WORDS, []);
+  }
+
+  public getDeletedSentences(): string[] {
+    return this.get<string[]>(STORAGE_KEYS.DELETED_SENTENCES, []);
+  }
+
+  public getStreak(): number {
+    const val = this.get<number>(STORAGE_KEYS.STREAK, 1);
+    return typeof val === 'number' && val >= 0 ? val : 1;
+  }
+
+  public applyCloudProfile(remote: any, mode: 'merge' | 'replace'): void {
+    if (!remote || typeof remote !== 'object') return;
+    this.suppressMutationNotify = true;
+
+    try {
+      const builtInIdSet = new Set(INITIAL_WORDS.map((w) => w.id));
+      const builtInSentIdSet = new Set(INITIAL_SENTENCES.map((s) => s.id));
+
+      // 1. Deleted built-in tombstones
+      const remoteDelWords: string[] = Array.isArray(remote.deleted_builtins?.words)
+        ? remote.deleted_builtins.words
+        : [];
+      const remoteDelSents: string[] = Array.isArray(remote.deleted_builtins?.sentences)
+        ? remote.deleted_builtins.sentences
+        : [];
+
+      const finalDelWords =
+        mode === 'replace'
+          ? Array.from(new Set(remoteDelWords))
+          : Array.from(new Set([...this.getDeletedWords(), ...remoteDelWords]));
+      const finalDelSents =
+        mode === 'replace'
+          ? Array.from(new Set(remoteDelSents))
+          : Array.from(new Set([...this.getDeletedSentences(), ...remoteDelSents]));
+
+      this.set(STORAGE_KEYS.DELETED_WORDS, finalDelWords, false);
+      this.set(STORAGE_KEYS.DELETED_SENTENCES, finalDelSents, false);
+
+      const delWordSet = new Set(finalDelWords.map((h) => h.trim()));
+      const delSentSet = new Set(finalDelSents.map((t) => t.trim()));
+
+      // 2. Hydrate built-in HSK1 words + SRS progress + Custom words
+      const localWords = this.getWords();
+      const localById = new Map(localWords.map((w) => [w.id, w]));
+      const srsMap: Record<string, BuiltInSrsProgress> =
+        remote.srs_progress && typeof remote.srs_progress === 'object' ? remote.srs_progress : {};
+
+      const hydratedBuiltIns: ChineseWord[] = [];
+      for (const bw of INITIAL_WORDS) {
+        if (delWordSet.has(bw.hanzi.trim())) continue;
+        const loc = localById.get(bw.id);
+        const rem = srsMap[bw.id];
+
+        if (mode === 'replace') {
+          hydratedBuiltIns.push({
+            ...bw,
+            box: rem?.box ?? 1,
+            lastReviewed: rem?.t,
+          });
+        } else {
+          const locBox = loc?.box ?? 1;
+          const remBox = rem?.box ?? 1;
+          const locTime = loc?.lastReviewed ?? 0;
+          const remTime = rem?.t ?? 0;
+          hydratedBuiltIns.push({
+            ...bw,
+            box: Math.max(locBox, remBox),
+            lastReviewed: Math.max(locTime, remTime) || undefined,
+          });
+        }
+      }
+
+      const remoteCustomWords: ChineseWord[] = Array.isArray(remote.custom_words)
+        ? remote.custom_words
+        : [];
+      const localCustomWords =
+        mode === 'merge' ? localWords.filter((w) => !builtInIdSet.has(w.id)) : [];
+
+      const customWordByHanzi = new Map<string, ChineseWord>();
+      const builtInHanziSet = new Set(hydratedBuiltIns.map((w) => w.hanzi.trim()));
+
+      for (const cw of [...remoteCustomWords, ...localCustomWords]) {
+        if (!cw || !cw.hanzi) continue;
+        const h = cw.hanzi.trim();
+        if (!h || builtInHanziSet.has(h) || delWordSet.has(h)) continue;
+        if (!customWordByHanzi.has(h)) {
+          customWordByHanzi.set(h, cw);
+        }
+      }
+
+      const finalWords = [...customWordByHanzi.values(), ...hydratedBuiltIns];
+      this.set(STORAGE_KEYS.WORDS, finalWords, false);
+
+      // 3. Mastered Flashcards
+      const validWordIds = new Set(finalWords.map((w) => w.id));
+      const remoteMastered: string[] = Array.isArray(remote.mastered_flashcard_ids)
+        ? remote.mastered_flashcard_ids
+        : [];
+      const mergedMastered =
+        mode === 'replace'
+          ? remoteMastered.filter((id) => validWordIds.has(id))
+          : Array.from(
+              new Set([...this.getMasteredFlashcardIds(), ...remoteMastered])
+            ).filter((id) => validWordIds.has(id));
+      this.set(STORAGE_KEYS.MASTERED_FLASHCARDS, mergedMastered, false);
+
+      // 4. Custom Dictionary
+      const remoteCustomDict: ChineseWord[] = Array.isArray(remote.custom_dictionary)
+        ? remote.custom_dictionary
+        : [];
+      const localCustomDict = mode === 'merge' ? this.getCustomDictionaryWords() : [];
+      const dictByHanzi = new Map<string, ChineseWord>();
+      for (const dw of [...remoteCustomDict, ...localCustomDict]) {
+        if (!dw || !dw.hanzi) continue;
+        const h = dw.hanzi.trim();
+        if (h && !dictByHanzi.has(h)) {
+          dictByHanzi.set(h, dw);
+        }
+      }
+      this.set(STORAGE_KEYS.CUSTOM_DICTIONARY, Array.from(dictByHanzi.values()), false);
+      this.cachedMergedDictionary = null;
+
+      // 5. Sentences (built-ins + custom sentences)
+      const localSentences = this.getSentences();
+      const remoteCustomSents: SentenceExercise[] = Array.isArray(remote.custom_sentences)
+        ? remote.custom_sentences
+        : [];
+      const localCustomSents =
+        mode === 'merge' ? localSentences.filter((s) => !builtInSentIdSet.has(s.id)) : [];
+
+      const hydratedBuiltInSents = INITIAL_SENTENCES.filter(
+        (s) => !delSentSet.has(s.targetSentence.trim())
+      );
+      const builtInSentTargets = new Set(hydratedBuiltInSents.map((s) => s.targetSentence.trim()));
+      const customSentByTarget = new Map<string, SentenceExercise>();
+
+      for (const cs of [...remoteCustomSents, ...localCustomSents]) {
+        if (!cs || !cs.targetSentence) continue;
+        const t = cs.targetSentence.trim();
+        if (!t || builtInSentTargets.has(t) || delSentSet.has(t)) continue;
+        if (!customSentByTarget.has(t)) {
+          customSentByTarget.set(t, cs);
+        }
+      }
+
+      const finalSentences = [...customSentByTarget.values(), ...hydratedBuiltInSents];
+      this.set(STORAGE_KEYS.SENTENCES, finalSentences, false);
+      const validSentIds = new Set(finalSentences.map((s) => s.id));
+
+      // 6. Lesson Config
+      const remoteCfg: LessonCustomConfig =
+        remote.lesson_config && typeof remote.lesson_config === 'object'
+          ? remote.lesson_config
+          : {};
+      const localCfg = this.getLessonConfig();
+      const chosenCfg =
+        mode === 'replace'
+          ? remoteCfg
+          : Object.keys(localCfg).length > 0
+          ? localCfg
+          : remoteCfg;
+
+      const sanitizeIds = (arr: string[] | undefined, validSet: Set<string>) => {
+        if (!Array.isArray(arr) || arr.length === 0) return undefined;
+        const clean = arr.filter((id) => validSet.has(id));
+        return clean.length > 0 ? clean : undefined;
+      };
+
+      this.set(
+        STORAGE_KEYS.LESSON_CONFIG,
+        {
+          flashcardWordIds: sanitizeIds(chosenCfg.flashcardWordIds, validWordIds),
+          writingWordIds: sanitizeIds(chosenCfg.writingWordIds, validWordIds),
+          assemblySentenceIds: sanitizeIds(chosenCfg.assemblySentenceIds, validSentIds),
+          speakingSentenceIds: sanitizeIds(chosenCfg.speakingSentenceIds, validSentIds),
+        },
+        false
+      );
+
+      // 7. Game High Scores & Streak
+      const localGs = this.getGameScores();
+      const remGs: Partial<GameScores> =
+        remote.high_scores && typeof remote.high_scores === 'object' ? remote.high_scores : {};
+      const nextGs: GameScores =
+        mode === 'replace'
+          ? {
+              blitzBestScore: remGs.blitzBestScore ?? 0,
+              blitzBestCombo: remGs.blitzBestCombo ?? 0,
+              matchBestScore: remGs.matchBestScore ?? 0,
+              matchBestWaves: remGs.matchBestWaves ?? 0,
+              runnerBestScore: remGs.runnerBestScore ?? 0,
+              runnerBestDistance: remGs.runnerBestDistance ?? 0,
+              totalGamesPlayed: remGs.totalGamesPlayed ?? 0,
+            }
+          : {
+              blitzBestScore: Math.max(localGs.blitzBestScore, remGs.blitzBestScore ?? 0),
+              blitzBestCombo: Math.max(localGs.blitzBestCombo, remGs.blitzBestCombo ?? 0),
+              matchBestScore: Math.max(localGs.matchBestScore, remGs.matchBestScore ?? 0),
+              matchBestWaves: Math.max(localGs.matchBestWaves, remGs.matchBestWaves ?? 0),
+              runnerBestScore: Math.max(localGs.runnerBestScore, remGs.runnerBestScore ?? 0),
+              runnerBestDistance: Math.max(localGs.runnerBestDistance, remGs.runnerBestDistance ?? 0),
+              totalGamesPlayed: Math.max(localGs.totalGamesPlayed, remGs.totalGamesPlayed ?? 0),
+            };
+      this.set(STORAGE_KEYS.GAME_SCORES, nextGs, false);
+
+      if (typeof remote.streak === 'number') {
+        const nextStreak =
+          mode === 'replace' ? remote.streak : Math.max(this.getStreak(), remote.streak);
+        this.set(STORAGE_KEYS.STREAK, nextStreak, false);
+      }
+    } finally {
+      this.suppressMutationNotify = false;
+    }
   }
 
   public importBackup(jsonString: string): boolean {

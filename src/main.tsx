@@ -4,10 +4,13 @@ import App from './App';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import './index.css';
 
-// Auto-reload immediately when a new Service Worker takes over so users get the latest assets
+// Auto-reload on Service Worker update ONLY if already controlled (avoids reloading on first-time install)
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  const hadController = Boolean(navigator.serviceWorker.controller);
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    window.location.reload();
+    if (hadController) {
+      window.location.reload();
+    }
   });
 }
 

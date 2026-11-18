@@ -56,3 +56,34 @@ export interface GameScores {
   runnerBestDistance: number;
   totalGamesPlayed: number;
 }
+
+export interface BuiltInSrsProgress {
+  box: number;
+  t?: number;
+}
+
+export interface HanziLeaderboardEntry {
+  player_tag: string;
+  nickname: string;
+  blitz_score: number;
+  match_score: number;
+  runner_score: number;
+  runner_distance: number;
+  total_score: number;
+  mastered_count: number;
+  updated_at: string;
+}
+
+export interface CommunityWordRow {
+  id: string;
+  author_tag: string;
+  author_name: string;
+  hanzi: string;
+  pinyin: string;
+  hanviet: string;
+  meaning: string;
+  pos: string;
+  level: 'HSK1' | 'HSK2' | 'HSK3' | 'TOPIC';
+  examples: ExampleSentence[];
+  updated_at: string;
+}

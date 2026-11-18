@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
-import { RotateCw } from 'lucide-react';
+import { RotateCw, Sparkles, AlertCircle, X } from 'lucide-react';
 import type { ActiveTab, ChineseWord, SentenceExercise, LessonCustomConfig } from './types';
 import { Header } from './components/common/Header';
 import { BottomNav } from './components/common/BottomNav';
 import { FlashcardView } from './components/flashcard/FlashcardView';
 import { storageService } from './utils/storage';
 import { audioService } from './utils/audio';
+import { cloudSyncService } from './utils/cloudSync';
 
 // Lazy-load secondary views to dramatically reduce initial bundle size & speed up initial load
 const HanziWriterView = lazy(() =>
@@ -25,6 +26,9 @@ const GamesHubView = lazy(() =>
 );
 const CustomLessonModal = lazy(() =>
   import('./components/custom/CustomLessonModal').then((m) => ({ default: m.CustomLessonModal }))
+);
+const CloudSyncModal = lazy(() =>
+  import('./components/common/CloudSyncModal').then((m) => ({ default: m.CloudSyncModal }))
 );
 
 const ViewLoadingFallback = () => (
@@ -50,6 +54,8 @@ export function App() {
   const [sentences, setSentences] = useState<SentenceExercise[]>(() => storageService.getSentences());
   const [lessonConfig, setLessonConfig] = useState<LessonCustomConfig>(() => storageService.getLessonConfig());
   const [isCustomLessonModalOpen, setIsCustomLessonModalOpen] = useState(false);
+  const [isCloudSyncModalOpen, setIsCloudSyncModalOpen] = useState(false);
+  const [syncToast, setSyncToast] = useState<{ ok: boolean; text: string } | null>(null);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
   const handleTabChange = (tab: ActiveTab) => {
@@ -60,9 +66,9 @@ export function App() {
   };
 
   const loadWords = () => {
-    setWords(storageService.getWords());
-    setSentences(storageService.getSentences());
-    setLessonConfig(storageService.getLessonConfig());
+    setWords([...storageService.getWords()]);
+    setSentences([...storageService.getSentences()]);
+    setLessonConfig({ ...storageService.getLessonConfig() });
   };
 
   const loadSentences = () => {
@@ -223,7 +229,28 @@ export function App() {
   }, [sentences, lessonConfig.speakingSentenceIds]);
 
   useEffect(() => {
+    if (!syncToast) return;
+    const timer = window.setTimeout(() => {
+      setSyncToast(null);
+    }, 7000);
+    return () => window.clearTimeout(timer);
+  }, [syncToast]);
+
+  useEffect(() => {
     loadWords();
+
+    void cloudSyncService
+      .init(() => {
+        loadWords();
+      })
+      .then((outcome) => {
+        if (outcome) {
+          setSyncToast({ ok: outcome.ok, text: outcome.message });
+          if (outcome.ok) {
+            audioService.playSuccessChime();
+          }
+        }
+      });
 
     const handleHashChange = () => {
       if (typeof window !== 'undefined') {
@@ -328,7 +355,38 @@ export function App() {
         onToggleSound={handleToggleSound}
         onReload={() => window.location.reload()}
         onOpenCustomModal={() => setIsCustomLessonModalOpen(true)}
+        onOpenCloudSync={() => setIsCloudSyncModalOpen(true)}
       />
+
+      {syncToast && (
+        <div className="max-w-md mx-auto w-full px-4 pt-2.5">
+          <div
+            data-testid="sync-magic-toast"
+            className={`p-3 rounded-2xl border text-xs font-semibold flex items-start justify-between gap-2 shadow-lg ${
+              syncToast.ok
+                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
+                : 'bg-rose-500/15 border-rose-500/30 text-rose-300'
+            }`}
+          >
+            <div className="flex items-start gap-2">
+              {syncToast.ok ? (
+                <Sparkles className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+              ) : (
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+              )}
+              <span>{syncToast.text}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSyncToast(null)}
+              className="p-1 rounded-lg hover:bg-slate-800/60 text-slate-300 shrink-0"
+              aria-label="Đóng thông báo"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Pull to refresh visual indicator */}
       {pullDistance > 0 && (
@@ -385,6 +443,7 @@ export function App() {
               activeWords={activeFlashcardWords}
               allWords={words}
               onRefreshWords={loadWords}
+              onOpenCloudSync={() => setIsCloudSyncModalOpen(true)}
             />
           )}
 
@@ -414,6 +473,16 @@ export function App() {
             onAddBatchSentences={handleAddBatchSentences}
             onDeleteSentence={handleDeleteSentence}
             onResetAll={handleResetAllLessons}
+          />
+        </Suspense>
+      )}
+
+      {isCloudSyncModalOpen && (
+        <Suspense fallback={null}>
+          <CloudSyncModal
+            isOpen={isCloudSyncModalOpen}
+            onClose={() => setIsCloudSyncModalOpen(false)}
+            onDataRestored={loadWords}
           />
         </Suspense>
       )}

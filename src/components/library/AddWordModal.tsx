@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
+import { cloudSyncService } from '../../utils/cloudSync';
 import { matchesWordSearch } from '../../utils/pinyinHelper';
 import { autoGenerateWordFromVietnamese } from '../../utils/vietnameseAutoGenerator';
 
@@ -83,10 +84,21 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
     return new Set(savedWords.map((w) => w.hanzi.trim()));
   }, [savedWords]);
 
-  // Dynamic dictionary pool: merges built-in dictionary with all user-added words in DB
+  const [dictRefreshKey, setDictRefreshKey] = useState(0);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    void cloudSyncService.pullCommunityWords().then((updated) => {
+      if (updated) {
+        setDictRefreshKey((k) => k + 1);
+      }
+    });
+  }, [isOpen]);
+
+  // Dynamic dictionary pool: merges built-in dictionary with local & Cloud Community DB words
   const dictionaryWords = useMemo(() => {
     return storageService.getDictionaryWords();
-  }, [isOpen, activeMode, savedWords]);
+  }, [isOpen, activeMode, savedWords, dictRefreshKey]);
 
   // Filter dictionary words using deferredSearchQuery for responsive typing
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -348,6 +360,11 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
                               {item.id.startsWith('dict_') && (
                                 <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 whitespace-nowrap shrink-0">
                                   User DB
+                                </span>
+                              )}
+                              {item.id.startsWith('comm_') && (
+                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-300 border border-sky-500/20 whitespace-nowrap shrink-0">
+                                  Cloud DB
                                 </span>
                               )}
                             </div>
