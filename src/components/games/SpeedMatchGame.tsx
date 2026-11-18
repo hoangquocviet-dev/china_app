@@ -63,15 +63,24 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [mismatchPair, setMismatchPair] = useState<string[]>([]);
   const [waveBanner, setWaveBanner] = useState<string | null>(null);
-  const [timeLeftSec, setTimeLeftSec] = useState('60.0');
+  const [isNewRecord, setIsNewRecord] = useState(false);
 
   const timerBarRef = useRef<HTMLDivElement | null>(null);
+  const timerTextRef = useRef<HTMLSpanElement | null>(null);
+  const lastTimerStrRef = useRef<string>('60.0s');
   const deadlineRef = useRef<number>(0);
   const rafRef = useRef<number | null>(null);
   const mismatchTimeoutRef = useRef<number | null>(null);
   const waveTransitionTimeoutRef = useRef<number | null>(null);
   const lastWholeSecondRef = useRef<number>(60);
   const masteredSetRef = useRef<Set<string>>(new Set());
+  const matchedCardIdsRef = useRef<Set<string>>(new Set());
+  const selectedCardIdRef = useRef<string | null>(null);
+  const cardsRef = useRef<MatchCard[]>([]);
+  const comboRef = useRef<number>(0);
+  const maxComboRef = useRef<number>(0);
+  const waveLockedRef = useRef<boolean>(false);
+  const waveNumRef = useRef<number>(1);
   const scoreRef = useRef<number>(0);
   const wavesClearedRef = useRef<number>(0);
 
@@ -137,12 +146,14 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
 
   const endSession = useCallback(() => {
     clearAllTimers();
-    setPhase('gameover');
     const finalScore = scoreRef.current;
     const finalWaves = wavesClearedRef.current;
+    const beatRecord = finalScore > bestScore && finalScore > 0;
+    setIsNewRecord(beatRecord);
+    setPhase('gameover');
     onFinishGame(finalScore, finalWaves, Array.from(masteredSetRef.current));
 
-    if (finalScore >= 300 || finalScore > bestScore) {
+    if (finalScore >= 300 || beatRecord) {
       audioService.playLevelUp();
       confetti({
         particleCount: 60,
@@ -171,11 +182,20 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
       }
 
       const wholeSec = Math.ceil(remaining / 1000);
-      if (wholeSec <= 5 && wholeSec > 0 && wholeSec !== lastWholeSecondRef.current) {
+      if (wholeSec !== lastWholeSecondRef.current) {
         lastWholeSecondRef.current = wholeSec;
-        audioService.playTick();
+        if (wholeSec <= 5 && wholeSec > 0) {
+          audioService.playTick();
+        }
       }
-      setTimeLeftSec((remaining / 1000).toFixed(1));
+
+      const formatted = `${(remaining / 1000).toFixed(1)}s`;
+      if (formatted !== lastTimerStrRef.current) {
+        lastTimerStrRef.current = formatted;
+        if (timerTextRef.current) {
+          timerTextRef.current.textContent = formatted;
+        }
+      }
 
       if (remaining <= 0) {
         endSession();
@@ -193,10 +213,18 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
     audioService.playClick();
     clearAllTimers();
     masteredSetRef.current = new Set();
+    matchedCardIdsRef.current = new Set();
+    selectedCardIdRef.current = null;
+    comboRef.current = 0;
+    maxComboRef.current = 0;
+    waveLockedRef.current = false;
+    waveNumRef.current = 1;
     scoreRef.current = 0;
     wavesClearedRef.current = 0;
     lastWholeSecondRef.current = 60;
+    lastTimerStrRef.current = '60.0s';
 
+    setIsNewRecord(false);
     setWave(1);
     setWavesCleared(0);
     setScore(0);
@@ -208,6 +236,7 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
     setWaveBanner(null);
 
     const firstCards = generateWaveCards(1);
+    cardsRef.current = firstCards;
     setCards(firstCards);
     setPhase('playing');
 
@@ -216,7 +245,14 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
   };
 
   const handleCardClick = (clickedCard: MatchCard) => {
-    if (phase !== 'playing' || clickedCard.matched) return;
+    if (
+      phase !== 'playing' ||
+      waveLockedRef.current ||
+      clickedCard.matched ||
+      matchedCardIdsRef.current.has(clickedCard.id)
+    ) {
+      return;
+    }
 
     // Clear any active mismatch shake immediately for snappy response
     if (mismatchPair.length > 0) {
@@ -227,7 +263,10 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
       setMismatchPair([]);
     }
 
-    if (!selectedCardId) {
+    const activeSelectedId = selectedCardIdRef.current;
+
+    if (!activeSelectedId) {
+      selectedCardIdRef.current = clickedCard.id;
       setSelectedCardId(clickedCard.id);
       audioService.playClick();
       if (clickedCard.type === 'hanzi') {
@@ -236,20 +275,23 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
       return;
     }
 
-    if (selectedCardId === clickedCard.id) {
+    if (activeSelectedId === clickedCard.id) {
+      selectedCardIdRef.current = null;
       setSelectedCardId(null);
       audioService.playClick();
       return;
     }
 
-    const firstCard = cards.find((c) => c.id === selectedCardId);
-    if (!firstCard) {
+    const firstCard = cardsRef.current.find((c) => c.id === activeSelectedId);
+    if (!firstCard || matchedCardIdsRef.current.has(firstCard.id)) {
+      selectedCardIdRef.current = clickedCard.id;
       setSelectedCardId(clickedCard.id);
       return;
     }
 
     // If user tapped another card of the SAME type (e.g. Hanzi -> Hanzi), switch selection smoothly
     if (firstCard.type === clickedCard.type) {
+      selectedCardIdRef.current = clickedCard.id;
       setSelectedCardId(clickedCard.id);
       audioService.playClick();
       if (clickedCard.type === 'hanzi') {
@@ -260,16 +302,27 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
 
     // Opposite types: check match!
     if (firstCard.wordId === clickedCard.wordId) {
-      const nextCombo = combo + 1;
-      const nextMaxCombo = Math.max(maxCombo, nextCombo);
+      // Synchronously lock both card IDs & clear selection to support instant two-thumb simultaneous taps!
+      matchedCardIdsRef.current.add(firstCard.id);
+      matchedCardIdsRef.current.add(clickedCard.id);
+      selectedCardIdRef.current = null;
+      setSelectedCardId(null);
+
+      const nextCombo = comboRef.current + 1;
+      const nextMaxCombo = Math.max(maxComboRef.current, nextCombo);
+      comboRef.current = nextCombo;
+      maxComboRef.current = nextMaxCombo;
+
       const multiplier = nextCombo >= 8 ? 3 : nextCombo >= 4 ? 2 : 1;
       const earned = 60 * multiplier;
-      const updatedCards = cards.map((c) =>
-        c.id === firstCard.id || c.id === clickedCard.id ? { ...c, matched: true } : c
+      const updatedCards = cardsRef.current.map((c) =>
+        c.id === firstCard.id || c.id === clickedCard.id || matchedCardIdsRef.current.has(c.id)
+          ? { ...c, matched: true }
+          : c
       );
 
+      cardsRef.current = updatedCards;
       setCards(updatedCards);
-      setSelectedCardId(null);
       setCombo(nextCombo);
       setMaxCombo(nextMaxCombo);
       setPairsMatched((p) => p + 1);
@@ -281,6 +334,7 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
 
       const allCleared = updatedCards.every((c) => c.matched);
       if (allCleared) {
+        waveLockedRef.current = true;
         const waveBonus = 150;
         const nextTotalScore = scoreRef.current + earned + waveBonus;
         scoreRef.current = nextTotalScore;
@@ -294,13 +348,20 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
         const now = performance.now();
         deadlineRef.current = Math.min(now + INITIAL_TIME_MS, deadlineRef.current + WAVE_BONUS_MS);
 
-        setWaveBanner(`Sạch Bàn #${wave}! +150đ & +4 giây ⏱️`);
+        const currentWaveNum = waveNumRef.current;
+        setWaveBanner(`Sạch Bàn #${currentWaveNum}! +150đ & +4 giây ⏱️`);
         audioService.playLevelUp();
 
         waveTransitionTimeoutRef.current = window.setTimeout(() => {
-          const nextWaveNum = wave + 1;
+          const nextWaveNum = currentWaveNum + 1;
+          waveNumRef.current = nextWaveNum;
+          matchedCardIdsRef.current = new Set();
+          selectedCardIdRef.current = null;
+          waveLockedRef.current = false;
+          const nextCards = generateWaveCards(nextWaveNum);
+          cardsRef.current = nextCards;
           setWave(nextWaveNum);
-          setCards(generateWaveCards(nextWaveNum));
+          setCards(nextCards);
           setWaveBanner(null);
         }, 480);
       } else {
@@ -310,6 +371,8 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
       }
     } else {
       // Mismatch!
+      selectedCardIdRef.current = null;
+      comboRef.current = 0;
       setSelectedCardId(null);
       setCombo(0);
       setMismatchPair([firstCard.id, clickedCard.id]);
@@ -322,7 +385,10 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
   };
 
   useEffect(() => {
-    return () => clearAllTimers();
+    return () => {
+      clearAllTimers();
+      audioService.stopSpeech();
+    };
   }, [clearAllTimers]);
 
   const starsEarned = score >= 1200 ? 3 : score >= 650 ? 2 : score >= 250 ? 1 : 0;
@@ -335,6 +401,7 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
           onClick={() => {
             audioService.playClick();
             clearAllTimers();
+            audioService.stopSpeech();
             onBack();
           }}
           className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-xs font-semibold transition-colors active:scale-95"
@@ -397,8 +464,11 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
           <div className="flex items-center justify-between px-3.5 py-2 rounded-2xl bg-slate-800/90 border border-slate-750 text-xs">
             <div className="flex items-center space-x-1.5 font-bold text-slate-200">
               <Clock className="w-4 h-4 text-emerald-400" />
-              <span className="tabular-nums text-sm font-extrabold text-white">
-                {timeLeftSec}s
+              <span
+                ref={timerTextRef}
+                className="tabular-nums text-sm font-extrabold text-white"
+              >
+                60.0s
               </span>
             </div>
 
@@ -421,8 +491,7 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
           <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden border border-slate-700/80 p-0.5">
             <div
               ref={timerBarRef}
-              className="h-full rounded-full transition-none"
-              style={{ width: '100%', backgroundColor: '#10b981' }}
+              className="w-full h-full rounded-full bg-emerald-500 transition-none"
             />
           </div>
 
@@ -530,6 +599,11 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
           <div>
             <h2 className="text-xl font-extrabold text-white">Hết 60 Giây Tốc Độ!</h2>
             <p className="text-3xl font-black text-amber-400 mt-1 tabular-nums">{score} điểm</p>
+            {isNewRecord && (
+              <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-[11px] font-extrabold text-amber-300">
+                🎉 KỶ LỤC MỚI!
+              </span>
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-2 w-full text-xs">

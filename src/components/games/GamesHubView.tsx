@@ -39,7 +39,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
 
   const dictionaryWords = useMemo(() => storageService.getDictionaryWords(), [allWords]);
 
-  // Ensure at least 8 distinct words so 6-pair Speed Match and 3-lane Runner always have rich distractors
+  // Ensure at least 8 words with distinct Hanzi AND distinct Meaning so 6-pair Speed Match & 3-lane Runner never have duplicate options
   const effectivePlayWords = useMemo(() => {
     let base: ChineseWord[] = [];
     if (poolSource === 'active') {
@@ -50,20 +50,34 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
       base = dictionaryWords;
     }
 
-    if (base.length >= 8) return base;
+    const uniqueValid: ChineseWord[] = [];
+    const seenHanzis = new Set<string>();
+    const seenMeanings = new Set<string>();
 
-    const merged = [...base];
-    const seenHanzis = new Set(base.map((w) => w.hanzi.trim()));
-    const fallbackSource = allWords.length >= 8 ? allWords : INITIAL_WORDS;
-
-    for (const item of fallbackSource) {
-      if (!seenHanzis.has(item.hanzi.trim())) {
-        seenHanzis.add(item.hanzi.trim());
-        merged.push(item);
+    for (const item of base) {
+      const hKey = item.hanzi.trim();
+      const mKey = item.meaning.trim().toLowerCase();
+      if (hKey && mKey && !seenHanzis.has(hKey) && !seenMeanings.has(mKey)) {
+        seenHanzis.add(hKey);
+        seenMeanings.add(mKey);
+        uniqueValid.push(item);
       }
-      if (merged.length >= 10) break;
     }
-    return merged;
+
+    if (uniqueValid.length >= 8) return uniqueValid;
+
+    const fallbackSource = allWords.length >= 8 ? [...allWords, ...INITIAL_WORDS] : INITIAL_WORDS;
+    for (const item of fallbackSource) {
+      const hKey = item.hanzi.trim();
+      const mKey = item.meaning.trim().toLowerCase();
+      if (hKey && mKey && !seenHanzis.has(hKey) && !seenMeanings.has(mKey)) {
+        seenHanzis.add(hKey);
+        seenMeanings.add(mKey);
+        uniqueValid.push(item);
+      }
+      if (uniqueValid.length >= 10) break;
+    }
+    return uniqueValid;
   }, [activeWords, allWords, dictionaryWords, poolSource]);
 
   const batchRewardSRS = (masteredIds: string[]) => {

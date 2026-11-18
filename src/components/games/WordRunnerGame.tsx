@@ -56,6 +56,25 @@ function shuffle<T>(arr: T[]): T[] {
   return copy;
 }
 
+// Universal rounded-rect canvas helper (supports iOS Safari < 16 where ctx.roundRect is absent)
+function drawRoundedRectPath(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + w, y, x + w, y + h, radius);
+  ctx.arcTo(x + w, y + h, x, y + h, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
+  ctx.arcTo(x, y, x + w, y, radius);
+  ctx.closePath();
+}
+
 export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
   words,
   showPinyinHint,
@@ -78,9 +97,12 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
     text: string;
   } | null>(null);
   const [missedWords, setMissedWords] = useState<ChineseWord[]>([]);
+  const [isNewRecord, setIsNewRecord] = useState(false);
 
   // Mutable simulation refs for 60fps canvas loop without React re-render overhead
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const distanceTextRef = useRef<HTMLSpanElement | null>(null);
+  const lastDisplayedMetersRef = useRef<number>(0);
   const rafRef = useRef<number | null>(null);
   const lastFrameRef = useRef<number>(0);
 
@@ -96,7 +118,7 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
 
   const livesRef = useRef<number>(3);
   const scoreRef = useRef<number>(0);
-  const distanceRef = useRef<number>(0);
+  const distanceRef = useRef<number>(0); // float accumulator so 60Hz/120Hz never truncates to 0
   const levelRef = useRef<number>(1);
   const comboRef = useRef<number>(0);
   const maxComboRef = useRef<number>(0);
@@ -104,6 +126,7 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
   const lastWordIdRef = useRef<string | null>(null);
   const masteredSetRef = useRef<Set<string>>(new Set());
   const toastTimerRef = useRef<number | null>(null);
+  const gameOverTimerRef = useRef<number | null>(null);
 
   // Touch swipe tracking on canvas
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -116,6 +139,10 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
     if (toastTimerRef.current !== null) {
       window.clearTimeout(toastTimerRef.current);
       toastTimerRef.current = null;
+    }
+    if (gameOverTimerRef.current !== null) {
+      window.clearTimeout(gameOverTimerRef.current);
+      gameOverTimerRef.current = null;
     }
   }, []);
 
@@ -211,12 +238,17 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
 
   const triggerGameOver = useCallback(() => {
     stopLoop();
-    setPhase('gameover');
     const finalScore = scoreRef.current;
-    const finalDist = distanceRef.current;
+    const finalDist = Math.round(distanceRef.current);
+    const beatRecord =
+      (finalScore > bestScore && finalScore > 0) ||
+      (finalDist > bestDistance && finalDist > 0);
+    setDistance(finalDist);
+    setIsNewRecord(beatRecord);
+    setPhase('gameover');
     onFinishGame(finalScore, finalDist, Array.from(masteredSetRef.current));
 
-    if ((finalScore > bestScore && finalScore > 0) || finalDist > bestDistance) {
+    if (beatRecord) {
       audioService.playLevelUp();
       confetti({
         particleCount: 65,
@@ -259,8 +291,13 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
       const nextDist = distanceRef.current + 50;
       scoreRef.current = nextScore;
       distanceRef.current = nextDist;
+      const roundedDist = Math.round(nextDist);
+      lastDisplayedMetersRef.current = roundedDist;
+      if (distanceTextRef.current) {
+        distanceTextRef.current.textContent = `${roundedDist}m`;
+      }
       setScore(nextScore);
-      setDistance(nextDist);
+      setDistance(roundedDist);
       masteredSetRef.current.add(activeWave.word.id);
 
       spawnExplosion(laneCenterNorm, 0.78, true);
@@ -312,7 +349,11 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
       );
 
       if (nextLives <= 0) {
-        window.setTimeout(() => {
+        if (gameOverTimerRef.current !== null) {
+          window.clearTimeout(gameOverTimerRef.current);
+        }
+        gameOverTimerRef.current = window.setTimeout(() => {
+          gameOverTimerRef.current = null;
           triggerGameOver();
         }, 420);
         return;
@@ -333,14 +374,21 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
       lastFrameRef.current = now;
 
       // 1. Advance gate down the bridge
-      // Base speed scales gently with level (0.27/s = ~3.7s at Lv1 -> ~2.1s at Lv6), or 3.6/s on Turbo Dash!
       const baseSpeed = Math.min(0.48, 0.27 + (levelRef.current - 1) * 0.035);
       const currentSpeed = isTurboRef.current ? 3.8 : baseSpeed;
 
       if (!resolvingRef.current) {
         gateProgressRef.current += currentSpeed * dt;
         roadScrollRef.current = (roadScrollRef.current + currentSpeed * 260 * dt) % 48;
-        distanceRef.current += Math.round(currentSpeed * 12 * dt);
+        distanceRef.current += currentSpeed * 22 * dt;
+
+        const wholeMeters = Math.round(distanceRef.current);
+        if (wholeMeters !== lastDisplayedMetersRef.current) {
+          lastDisplayedMetersRef.current = wholeMeters;
+          if (distanceTextRef.current) {
+            distanceTextRef.current.textContent = `${wholeMeters}m`;
+          }
+        }
       }
 
       // Smoothly interpolate racer X position to target lane
@@ -484,8 +532,7 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
               ctx.strokeStyle = isSelectedLane ? '#38bdf8' : '#818cf8';
               ctx.lineWidth = isSelectedLane ? 2 : 1.3;
 
-              ctx.beginPath();
-              ctx.roundRect(gx, gy, gw, gateH, 7);
+              drawRoundedRectPath(ctx, gx, gy, gw, gateH, 7);
               ctx.fill();
               ctx.stroke();
 
@@ -591,6 +638,7 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
     livesRef.current = 3;
     scoreRef.current = 0;
     distanceRef.current = 0;
+    lastDisplayedMetersRef.current = 0;
     levelRef.current = 1;
     comboRef.current = 0;
     maxComboRef.current = 0;
@@ -603,6 +651,7 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
     particlesRef.current = [];
     masteredSetRef.current = new Set();
 
+    setIsNewRecord(false);
     setLives(3);
     setScore(0);
     setDistance(0);
@@ -623,7 +672,7 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
 
   const handleSelectLane = useCallback(
     (lane: 0 | 1 | 2, autoDashIfSame: boolean = true) => {
-      if (phase !== 'playing') return;
+      if (phase !== 'playing' || livesRef.current <= 0 || resolvingRef.current) return;
       if (playerLaneRef.current === lane && autoDashIfSame) {
         // Tapping current lane triggers instant Turbo Dash through the gate!
         if (!isTurboRef.current) {
@@ -640,7 +689,9 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
   );
 
   const handleTriggerTurboDash = useCallback(() => {
-    if (phase !== 'playing' || isTurboRef.current) return;
+    if (phase !== 'playing' || isTurboRef.current || livesRef.current <= 0 || resolvingRef.current) {
+      return;
+    }
     isTurboRef.current = true;
     audioService.playLaserDash();
   }, [phase]);
@@ -648,7 +699,7 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
   // Keyboard navigation: Left/Right switches lanes, Up/Space activates Turbo Dash, 1/2/3 picks lane
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (phase === 'ready' && (e.code === 'Space' || e.code === 'Enter')) {
+      if ((phase === 'ready' || phase === 'gameover') && (e.code === 'Space' || e.code === 'Enter')) {
         e.preventDefault();
         handleStartGame();
         return;
@@ -678,7 +729,10 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
   }, [handleSelectLane, handleTriggerTurboDash, phase]);
 
   useEffect(() => {
-    return () => stopLoop();
+    return () => {
+      stopLoop();
+      audioService.stopSpeech();
+    };
   }, [stopLoop]);
 
   return (
@@ -689,6 +743,7 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
           onClick={() => {
             audioService.playClick();
             stopLoop();
+            audioService.stopSpeech();
             onBack();
           }}
           className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-xs font-semibold transition-colors active:scale-95"
@@ -766,7 +821,9 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
                 <Gauge className="w-3 h-3" />
                 <span>Lv.{level}</span>
               </span>
-              <span className="text-slate-400 font-semibold tabular-nums">{distance}m</span>
+              <span ref={distanceTextRef} className="text-slate-400 font-semibold tabular-nums">
+                {distance}m
+              </span>
               {combo >= 2 && (
                 <span className="inline-flex items-center space-x-0.5 px-1.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-extrabold text-[11px]">
                   <Flame className="w-3 h-3 text-amber-400" />
@@ -927,6 +984,11 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
             </div>
             <h2 className="text-xl font-extrabold text-white">Hoàn Thành Chặng Đua!</h2>
             <p className="text-3xl font-black text-amber-400 mt-1 tabular-nums">{score} điểm</p>
+            {isNewRecord && (
+              <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-[11px] font-extrabold text-amber-300">
+                🎉 KỶ LỤC MỚI!
+              </span>
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-2 text-center text-xs">

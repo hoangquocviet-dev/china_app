@@ -51,10 +51,12 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
     points?: number;
     trueMeaning?: string;
   } | null>(null);
-  const [timeRemainingDisplay, setTimeRemainingDisplay] = useState('2.0');
   const [missedWords, setMissedWords] = useState<ChineseWord[]>([]);
+  const [isNewRecord, setIsNewRecord] = useState(false);
 
   const progressBarRef = useRef<HTMLDivElement | null>(null);
+  const timerTextRef = useRef<HTMLSpanElement | null>(null);
+  const lastTimerStrRef = useRef<string>('2.4s');
   const rafRef = useRef<number | null>(null);
   const deadlineRef = useRef<number>(0);
   const durationRef = useRef<number>(2000);
@@ -116,10 +118,12 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
   const finishSession = useCallback(
     (finalScore: number, finalMaxCombo: number) => {
       clearTimers();
+      const beatRecord = finalScore > bestScore && finalScore > 0;
+      setIsNewRecord(beatRecord);
       setPhase('gameover');
       onFinishGame(finalScore, finalMaxCombo, Array.from(masteredSetRef.current));
 
-      if (finalScore > bestScore && finalScore > 0) {
+      if (beatRecord) {
         audioService.playLevelUp();
         confetti({
           particleCount: 65,
@@ -157,9 +161,13 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
 
       if (progressBarRef.current) {
         progressBarRef.current.style.width = '100%';
-        progressBarRef.current.style.backgroundColor = '#10b981'; // emerald-500
+        progressBarRef.current.style.backgroundColor = '#10b981';
       }
-      setTimeRemainingDisplay((nextQ.durationMs / 1000).toFixed(1));
+      const initStr = `${(nextQ.durationMs / 1000).toFixed(1)}s`;
+      lastTimerStrRef.current = initStr;
+      if (timerTextRef.current) {
+        timerTextRef.current.textContent = initStr;
+      }
 
       const tick = (now: number) => {
         if (lockedRef.current) return;
@@ -177,7 +185,13 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
           }
         }
 
-        setTimeRemainingDisplay((remaining / 1000).toFixed(1));
+        const formatted = `${(remaining / 1000).toFixed(1)}s`;
+        if (formatted !== lastTimerStrRef.current) {
+          lastTimerStrRef.current = formatted;
+          if (timerTextRef.current) {
+            timerTextRef.current.textContent = formatted;
+          }
+        }
 
         if (remaining <= 0) {
           // Timeout!
@@ -213,6 +227,7 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
     audioService.playClick();
     clearTimers();
     masteredSetRef.current = new Set();
+    setIsNewRecord(false);
     setLives(3);
     setScore(0);
     setCombo(0);
@@ -282,10 +297,10 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
     [combo, lives, maxCombo, phase, question, roundCount, score, startNextQuestion]
   );
 
-  // Keyboard shortcuts: Left / A = SAI, Right / D = ĐÚNG
+  // Keyboard shortcuts: Left / A = SAI, Right / D = ĐÚNG, Space / Enter = Start / Replay
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (phase === 'ready' && (e.code === 'Space' || e.code === 'Enter')) {
+      if ((phase === 'ready' || phase === 'gameover') && (e.code === 'Space' || e.code === 'Enter')) {
         e.preventDefault();
         handleStartGame();
         return;
@@ -304,7 +319,10 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
   }, [handleAnswer, phase]);
 
   useEffect(() => {
-    return () => clearTimers();
+    return () => {
+      clearTimers();
+      audioService.stopSpeech();
+    };
   }, [clearTimers]);
 
   const isFever = combo >= 5;
@@ -318,6 +336,7 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
           onClick={() => {
             audioService.playClick();
             clearTimers();
+            audioService.stopSpeech();
             onBack();
           }}
           className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-xs font-semibold transition-colors active:scale-95"
@@ -419,13 +438,14 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[11px] font-bold px-1">
               <span className="text-slate-400">Câu #{roundCount}</span>
-              <span className="text-amber-300 tabular-nums">{timeRemainingDisplay}s</span>
+              <span ref={timerTextRef} className="text-amber-300 tabular-nums">
+                2.4s
+              </span>
             </div>
             <div className="w-full h-3 rounded-full bg-slate-800 overflow-hidden border border-slate-700/80 p-0.5">
               <div
                 ref={progressBarRef}
-                className="h-full rounded-full transition-none"
-                style={{ width: '100%', backgroundColor: '#10b981' }}
+                className="w-full h-full rounded-full bg-emerald-500 transition-none"
               />
             </div>
           </div>
@@ -542,6 +562,11 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
             </div>
             <h2 className="text-xl font-extrabold text-white">Kết Thúc Lượt Phản Xạ!</h2>
             <p className="text-3xl font-black text-amber-400 mt-1 tabular-nums">{score} điểm</p>
+            {isNewRecord && (
+              <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-[11px] font-extrabold text-amber-300">
+                🎉 KỶ LỤC MỚI!
+              </span>
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-2 text-center text-xs">
