@@ -68,35 +68,42 @@ async function testThreeArcadeGames() {
     await page.click('[data-testid="game-card-blitz"]');
     await new Promise((r) => setTimeout(r, 500));
     await page.click('[data-testid="blitz-start-btn"]');
-    await new Promise((r) => setTimeout(r, 400));
+    await new Promise((r) => setTimeout(r, 180));
+
+    // Answer 3 questions right first (before taking slow disk screenshot so 2.0s timer doesn't expire during PNG write!)
+    for (let i = 0; i < 3; i++) {
+      const answered = await page.evaluate(() => {
+        const card = document.querySelector('[data-testid="blitz-card"]');
+        if (!card) return false;
+        const isMatch = card.getAttribute('data-is-match') === 'true';
+        const btn = document.querySelector(
+          isMatch ? '[data-testid="blitz-btn-true"]' : '[data-testid="blitz-btn-false"]'
+        );
+        if (btn) btn.click();
+        return true;
+      });
+      if (!answered) throw new Error('Blitz card not found');
+      await new Promise((r) => setTimeout(r, 420));
+    }
 
     await page.screenshot({ path: path.join(ARTIFACT_DIR, 'games_02_blitz_playing.png') });
 
-    // Answer 3 questions right!
-    for (let i = 0; i < 3; i++) {
-      const isMatch = await page.evaluate(() => {
-        const card = document.querySelector('[data-testid="blitz-card"]');
-        return card ? card.getAttribute('data-is-match') === 'true' : null;
-      });
-      if (isMatch === null) throw new Error('Blitz card not found');
-      await page.click(
-        isMatch ? '[data-testid="blitz-btn-true"]' : '[data-testid="blitz-btn-false"]'
+    // Intentionally miss until gameover screen appears
+    for (let i = 0; i < 4; i++) {
+      const hasGameOver = await page.evaluate(
+        () => !!document.querySelector('[data-testid="blitz-gameover"]')
       );
-      await new Promise((r) => setTimeout(r, 450));
-    }
-
-    // Intentionally miss 3 times to verify Game Over & score saving
-    for (let i = 0; i < 3; i++) {
-      const isMatch = await page.evaluate(() => {
+      if (hasGameOver) break;
+      await page.evaluate(() => {
         const card = document.querySelector('[data-testid="blitz-card"]');
-        return card ? card.getAttribute('data-is-match') === 'true' : null;
-      });
-      if (isMatch !== null) {
-        await page.click(
+        if (!card) return;
+        const isMatch = card.getAttribute('data-is-match') === 'true';
+        const wrongBtn = document.querySelector(
           isMatch ? '[data-testid="blitz-btn-false"]' : '[data-testid="blitz-btn-true"]'
         );
-        await new Promise((r) => setTimeout(r, 1100));
-      }
+        if (wrongBtn) wrongBtn.click();
+      });
+      await new Promise((r) => setTimeout(r, 1080));
     }
 
     const blitzGameOver = await page.evaluate(() => {
