@@ -318,7 +318,7 @@ async function runComprehensiveAudit() {
     await new Promise(r => setTimeout(r, 1500));
 
     const vocabBadges = await page.evaluate(() => {
-      const badges = Array.from(document.querySelectorAll('.select-all.whitespace-nowrap'));
+      const badges = Array.from(document.querySelectorAll('.hanzi-badge, .select-all.whitespace-nowrap'));
       let anyOverflow = false;
       badges.forEach(b => {
         if (b.scrollWidth > b.clientWidth || b.scrollHeight > b.clientHeight) {
