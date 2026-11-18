@@ -60,6 +60,14 @@ class SafeStorageService {
       this.set(STORAGE_KEYS.WORDS, INITIAL_WORDS);
       return INITIAL_WORDS;
     }
+    // Auto-merge newly added official words if missing from user's notebook
+    const existingHanzis = new Set(words.map((w) => w.hanzi.trim()));
+    const missingDefaults = INITIAL_WORDS.filter((w) => !existingHanzis.has(w.hanzi.trim()));
+    if (missingDefaults.length > 0) {
+      const merged = [...words, ...missingDefaults];
+      this.saveWords(merged);
+      return merged;
+    }
     return words;
   }
 
@@ -133,6 +141,13 @@ class SafeStorageService {
     if (!sentences || sentences.length === 0) {
       this.set(STORAGE_KEYS.SENTENCES, INITIAL_SENTENCES);
       return INITIAL_SENTENCES;
+    }
+    const existingTargets = new Set(sentences.map((s) => s.targetSentence.trim()));
+    const missingDefaults = INITIAL_SENTENCES.filter((s) => !existingTargets.has(s.targetSentence.trim()));
+    if (missingDefaults.length > 0) {
+      const merged = [...sentences, ...missingDefaults];
+      this.saveSentences(merged);
+      return merged;
     }
     return sentences;
   }
