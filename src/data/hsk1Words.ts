@@ -1560,5 +1560,515 @@ export const INITIAL_WORDS: ChineseWord[] = [
       { zh: '中午在食堂吃午饭。', pinyin: 'zhōng wǔ zài shí táng chī wǔ fàn 。', vi: 'Buổi trưa ăn cơm ở nhà ăn tập thể.' }
     ],
     box: 1
+  },
+  {
+    "id": "hsk1_121",
+    "hanzi": "下午",
+    "pinyin": "xià wǔ",
+    "hanviet": "HẠ NGỌ",
+    "meaning": "Buổi chiều",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "下午三点去图书馆。",
+        "pinyin": "xià wǔ sān diǎn qù tú shū guǎn 。",
+        "vi": "Ba giờ chiều đi thư viện."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_122",
+    "hanzi": "年",
+    "pinyin": "nián",
+    "hanviet": "NIÊN",
+    "meaning": "Năm",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "我今年十八岁。",
+        "pinyin": "wǒ jīn nián shí bā suì 。",
+        "vi": "Năm nay tôi mười tám tuổi."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_123",
+    "hanzi": "月",
+    "pinyin": "yuè",
+    "hanviet": "NGUYỆT",
+    "meaning": "Tháng, mặt trăng",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "下个月我去北京。",
+        "pinyin": "xià gè yuè wǒ qù běi jīng 。",
+        "vi": "Tháng sau tôi đi Bắc Kinh."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_124",
+    "hanzi": "日",
+    "pinyin": "rì",
+    "hanviet": "NHẬT",
+    "meaning": "Ngày, mặt trời",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "今天是八月八日。",
+        "pinyin": "jīn tiān shì bā yuè bā rì 。",
+        "vi": "Hôm nay là ngày 8 tháng 8."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_125",
+    "hanzi": "星期",
+    "pinyin": "xīng qī",
+    "hanviet": "TINH KỲ",
+    "meaning": "Tuần, thứ",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "这个星期我很忙。",
+        "pinyin": "zhè gè xīng qī wǒ hěn máng 。",
+        "vi": "Tuần này tôi rất bận."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_126",
+    "hanzi": "点",
+    "pinyin": "diǎn",
+    "hanviet": "ĐIỂM",
+    "meaning": "Giờ, điểm",
+    "pos": "Danh từ / Lượng từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "现在是上午十点。",
+        "pinyin": "xiàn zài shì shàng wǔ shí diǎn 。",
+        "vi": "Bây giờ là mười giờ sáng."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_127",
+    "hanzi": "分钟",
+    "pinyin": "fēn zhōng",
+    "hanviet": "PHÂN CHUNG",
+    "meaning": "Phút",
+    "pos": "Danh từ / Lượng từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "请等我五分钟。",
+        "pinyin": "qǐng děng wǒ wǔ fēn zhōng 。",
+        "vi": "Xin đợi tôi năm phút."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_128",
+    "hanzi": "现在",
+    "pinyin": "xiàn zài",
+    "hanviet": "HIỆN TẠI",
+    "meaning": "Bây giờ, hiện tại",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "你现在在哪儿？",
+        "pinyin": "nǐ xiàn zài zài nǎr ？",
+        "vi": "Bây giờ bạn đang ở đâu?"
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_129",
+    "hanzi": "时候",
+    "pinyin": "shí hou",
+    "hanviet": "THỜI HẬU",
+    "meaning": "Khi, lúc",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "吃饭的时候别看手机。",
+        "pinyin": "chī fàn de shí hou bié kàn shǒu jī 。",
+        "vi": "Lúc ăn cơm đừng xem điện thoại."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_130",
+    "hanzi": "前面",
+    "pinyin": "qián mian",
+    "hanviet": "TIỀN DIỆN",
+    "meaning": "Phía trước, đằng trước",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "学校前面有一家书店。",
+        "pinyin": "xué xiào qián mian yǒu yì jiā shū diàn 。",
+        "vi": "Phía trước trường học có một hiệu sách."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_131",
+    "hanzi": "后面",
+    "pinyin": "hòu mian",
+    "hanviet": "HẬU DIỆN",
+    "meaning": "Phía sau, đằng sau",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "商店后面是停车场。",
+        "pinyin": "shāng diàn hòu mian shì tíng chē chǎng 。",
+        "vi": "Phía sau cửa hàng là bãi đỗ xe."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_132",
+    "hanzi": "里",
+    "pinyin": "lǐ",
+    "hanviet": "LÝ",
+    "meaning": "Bên trong, trong",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "书包里有很多书。",
+        "pinyin": "shū bāo lǐ yǒu hěn duō shū 。",
+        "vi": "Trong cặp có rất nhiều sách."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_133",
+    "hanzi": "上",
+    "pinyin": "shàng",
+    "hanviet": "THƯỢNG",
+    "meaning": "Trên, lên, đi làm",
+    "pos": "Danh từ / Động từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "桌上有一杯热茶。",
+        "pinyin": "zhuō shàng yǒu yì bēi rè chá 。",
+        "vi": "Trên bàn có một ly trà nóng."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_134",
+    "hanzi": "下",
+    "pinyin": "xià",
+    "hanviet": "HẠ",
+    "meaning": "Dưới, xuống, tan sở",
+    "pos": "Danh từ / Động từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "他在楼下等你。",
+        "pinyin": "tā zài lóu xià děng nǐ 。",
+        "vi": "Anh ấy đang ở dưới lầu đợi bạn."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_135",
+    "hanzi": "桌子",
+    "pinyin": "zhuō zi",
+    "hanviet": "TRÁC TỬ",
+    "meaning": "Cái bàn",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "这张桌子很干净。",
+        "pinyin": "zhè zhāng zhuō zi hěn gān jìng 。",
+        "vi": "Cái bàn này rất sạch sẽ."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_136",
+    "hanzi": "椅子",
+    "pinyin": "yǐ zi",
+    "hanviet": "Ỷ TỬ",
+    "meaning": "Cái ghế",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "请坐在椅子上。",
+        "pinyin": "qǐng zuò zài yǐ zi shàng 。",
+        "vi": "Xin mời ngồi trên ghế."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_137",
+    "hanzi": "字",
+    "pinyin": "zì",
+    "hanviet": "TỰ",
+    "meaning": "Chữ, chữ viết",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "这个汉字怎么读？",
+        "pinyin": "zhè gè hàn zì zěn me dú ？",
+        "vi": "Chữ Hán này đọc như thế nào?"
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_138",
+    "hanzi": "名字",
+    "pinyin": "míng zi",
+    "hanviet": "DANH TỰ",
+    "meaning": "Tên, danh tính",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "你的名字真好听。",
+        "pinyin": "nǐ de míng zi zhēn hǎo tīng 。",
+        "vi": "Tên của bạn thật hay."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_139",
+    "hanzi": "请",
+    "pinyin": "qǐng",
+    "hanviet": "THỈNH",
+    "meaning": "Xin, mời, nhờ",
+    "pos": "Động từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "请进，请喝茶。",
+        "pinyin": "qǐng jìn ， qǐng hē chá 。",
+        "vi": "Mời vào, xin mời uống trà."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_140",
+    "hanzi": "对不起",
+    "pinyin": "duì bu qǐ",
+    "hanviet": "ĐỐI BẤT KHỞI",
+    "meaning": "Xin lỗi",
+    "pos": "Cụm từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "对不起，我来晚了。",
+        "pinyin": "duì bu qǐ ， wǒ lái wǎn le 。",
+        "vi": "Xin lỗi, tôi đến muộn rồi."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_141",
+    "hanzi": "没关系",
+    "pinyin": "méi guān xi",
+    "hanviet": "MỘI QUAN HỆ",
+    "meaning": "Không sao, không hề gì",
+    "pos": "Cụm từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "没关系，请坐吧。",
+        "pinyin": "méi guān xi ， qǐng zuò ba 。",
+        "vi": "Không sao đâu, xin mời ngồi."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_142",
+    "hanzi": "谢谢",
+    "pinyin": "xiè xie",
+    "hanviet": "TẠ TẠ",
+    "meaning": "Cảm ơn",
+    "pos": "Động từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "非常谢谢你的帮助。",
+        "pinyin": "fēi cháng xiè xie nǐ de bāng zhù 。",
+        "vi": "Rất cảm ơn sự giúp đỡ của bạn."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_143",
+    "hanzi": "不客气",
+    "pinyin": "bú kè qi",
+    "hanviet": "BẤT KHÁCH KHÍ",
+    "meaning": "Đừng khách sáo, không có chi",
+    "pos": "Cụm từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "不客气，这是我应该做的。",
+        "pinyin": "bú kè qi ， zhè shì wǒ yīng gāi zuò de 。",
+        "vi": "Đừng khách sáo, đây là việc tôi nên làm mà."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_144",
+    "hanzi": "再见",
+    "pinyin": "zài jiàn",
+    "hanviet": "TÁI KIẾN",
+    "meaning": "Tạm biệt, hẹn gặp lại",
+    "pos": "Cụm từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "明天见，再见！",
+        "pinyin": "míng tiān jiàn ， zài jiàn ！",
+        "vi": "Ngày mai gặp lại, tạm biệt!"
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_145",
+    "hanzi": "喂",
+    "pinyin": "wèi",
+    "hanviet": "UY",
+    "meaning": "A-lô (chào khi nghe máy)",
+    "pos": "Thán từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "喂，请问王老师在吗？",
+        "pinyin": "wèi ， qǐng wèn wáng lǎo shī zài ma ？",
+        "vi": "A-lô, xin hỏi thầy Vương có ở đó không ạ?"
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_146",
+    "hanzi": "下雨",
+    "pinyin": "xià yǔ",
+    "hanviet": "HẠ VŨ",
+    "meaning": "Trời mưa",
+    "pos": "Động từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "外面下雨了，记得带伞。",
+        "pinyin": "wài miàn xià yǔ le ， jì de dài sǎn 。",
+        "vi": "Bên ngoài trời mưa rồi, nhớ mang ô nhé."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_147",
+    "hanzi": "冷",
+    "pinyin": "lěng",
+    "hanviet": "LÃNH",
+    "meaning": "Lạnh, rét buốt",
+    "pos": "Tính từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "今天天气很冷，多穿衣服。",
+        "pinyin": "jīn tiān tiān qì hěn lěng ， duō chuān yī fu 。",
+        "vi": "Hôm nay trời rất lạnh, mặc thêm áo vào."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_148",
+    "hanzi": "热",
+    "pinyin": "rè",
+    "hanviet": "NHIỆT",
+    "meaning": "Nóng, nhiệt độ cao",
+    "pos": "Tính từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "夏天天气太热了。",
+        "pinyin": "xià tiān tiān qì tài rè le 。",
+        "vi": "Mùa hè thời tiết nóng quá."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_149",
+    "hanzi": "漂亮",
+    "pinyin": "piào liang",
+    "hanviet": "PHIÊU LƯỢNG",
+    "meaning": "Đẹp, xinh xắn",
+    "pos": "Tính từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "这件衣服真漂亮。",
+        "pinyin": "zhè jiàn yī fu zhēn piào liang 。",
+        "vi": "Bộ quần áo này thật là đẹp."
+      }
+    ],
+    "box": 1
+  },
+  {
+    "id": "hsk1_150",
+    "hanzi": "高兴",
+    "pinyin": "gāo xìng",
+    "hanviet": "CAO HỨNG",
+    "meaning": "Vui vẻ, vui mừng",
+    "pos": "Tính từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "认识你很高兴。",
+        "pinyin": "rèn shi nǐ hěn gāo xìng 。",
+        "vi": "Rất vui được quen biết bạn."
+      }
+    ],
+    "box": 1
   }
 ];

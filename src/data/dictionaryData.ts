@@ -4860,5 +4860,965 @@ export const DICTIONARY_WORDS: ChineseWord[] = [
     examples: [
       { zh: '德国以精工制造闻名世界。', pinyin: 'dé guó yǐ jīng gōng zhì zào wén míng shì jiè 。', vi: 'Nước Đức nổi tiếng thế giới nhờ nền sản xuất cơ khí tinh xảo.' }
     ]
+  },
+  {
+    "id": "dict_406",
+    "hanzi": "好吃",
+    "pinyin": "hǎo chī",
+    "hanviet": "HẢO CẬT",
+    "meaning": "Ngon, ngon miệng (thức ăn)",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "这道中国菜真好吃。",
+        "pinyin": "zhè dào zhōng guó cài zhēn hǎo chī 。",
+        "vi": "Món ăn Trung Quốc này thật ngon."
+      }
+    ]
+  },
+  {
+    "id": "dict_407",
+    "hanzi": "好喝",
+    "pinyin": "hǎo hē",
+    "hanviet": "HẢO HÁT",
+    "meaning": "Ngon (đồ uống)",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "珍珠奶茶很好喝。",
+        "pinyin": "zhēn zhū nǎi chá hěn hǎo hē 。",
+        "vi": "Trà sữa trân châu rất ngon."
+      }
+    ]
+  },
+  {
+    "id": "dict_408",
+    "hanzi": "打篮球",
+    "pinyin": "dǎ lán qiú",
+    "hanviet": "ĐẢ LAM CẦU",
+    "meaning": "Chơi bóng rổ",
+    "pos": "Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "周末我和朋友去打篮球。",
+        "pinyin": "zhōu mò wǒ hé péng yǒu qù dǎ lán qiú 。",
+        "vi": "Cuối tuần tôi cùng bạn đi chơi bóng rổ."
+      }
+    ]
+  },
+  {
+    "id": "dict_409",
+    "hanzi": "踢足球",
+    "pinyin": "tī zú qiú",
+    "hanviet": "THÍCH TÚC CẦU",
+    "meaning": "Đá bóng, chơi bóng đá",
+    "pos": "Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "操场上有很多学生在踢足球。",
+        "pinyin": "cāo chǎng shàng yǒu hěn duō xué sheng zài tī zú qiú 。",
+        "vi": "Trên sân vận động có rất nhiều học sinh đang đá bóng."
+      }
+    ]
+  },
+  {
+    "id": "dict_410",
+    "hanzi": "出差",
+    "pinyin": "chū chāi",
+    "hanviet": "XUẤT SAI",
+    "meaning": "Đi công tác",
+    "pos": "Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "经理明天要去上海出差。",
+        "pinyin": "jīng lǐ míng tiān yào qù shàng hǎi chū chāi 。",
+        "vi": "Giám đốc ngày mai phải đi công tác ở Thượng Hải."
+      }
+    ]
+  },
+  {
+    "id": "dict_411",
+    "hanzi": "时间",
+    "pinyin": "shí jiān",
+    "hanviet": "THỜI GIAN",
+    "meaning": "Thời gian, thời khắc",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "时间过得真快。",
+        "pinyin": "shí jiān guò de zhēn kuài 。",
+        "vi": "Thời gian trôi qua nhanh thật."
+      }
+    ]
+  },
+  {
+    "id": "dict_412",
+    "hanzi": "结束",
+    "pinyin": "jié shù",
+    "hanviet": "KẾT THÚC",
+    "meaning": "Kết thúc, chấm dứt",
+    "pos": "Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "会议下午五点结束。",
+        "pinyin": "huì yì xià wǔ wǔ diǎn jié shù 。",
+        "vi": "Cuộc họp kết thúc lúc năm giờ chiều."
+      }
+    ]
+  },
+  {
+    "id": "dict_413",
+    "hanzi": "生病",
+    "pinyin": "shēng bìng",
+    "hanviet": "SINH BỆNH",
+    "meaning": "Bị ốm, ngã bệnh",
+    "pos": "Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "他生病了，今天不能来上班。",
+        "pinyin": "tā shēng bìng le ， jīn tiān bù néng lái shàng bān 。",
+        "vi": "Anh ấy bị ốm rồi, hôm nay không thể đến đi làm."
+      }
+    ]
+  },
+  {
+    "id": "dict_414",
+    "hanzi": "下雪",
+    "pinyin": "xià xuě",
+    "hanviet": "HẠ TUYẾT",
+    "meaning": "Trời rơi tuyết, tuyết rơi",
+    "pos": "Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "北京冬天下雪很美。",
+        "pinyin": "běi jīng dōng tiān xià xuě hěn měi 。",
+        "vi": "Mùa đông Bắc Kinh tuyết rơi rất đẹp."
+      }
+    ]
+  },
+  {
+    "id": "dict_415",
+    "hanzi": "短",
+    "pinyin": "duǎn",
+    "hanviet": "ĐOẢN",
+    "meaning": "Ngắn",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "这篇课文很短，容易背。",
+        "pinyin": "zhè piān kè wén hěn duǎn ， róng yì bèi 。",
+        "vi": "Bài khóa này rất ngắn, dễ thuộc lòng."
+      }
+    ]
+  },
+  {
+    "id": "dict_416",
+    "hanzi": "矮",
+    "pinyin": "ǎi",
+    "hanviet": "NẢI",
+    "meaning": "Thấp, lùn",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "弟弟比哥哥矮一点儿。",
+        "pinyin": "dì di bǐ gē ge ǎi yì diǎnr 。",
+        "vi": "Em trai thấp hơn anh trai một chút."
+      }
+    ]
+  },
+  {
+    "id": "dict_417",
+    "hanzi": "胖",
+    "pinyin": "pàng",
+    "hanviet": "BÀNG",
+    "meaning": "Béo, mập mạp",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "小猫吃得很多，变胖了。",
+        "pinyin": "xiǎo māo chī de hěn duō ， biàn pàng le 。",
+        "vi": "Mèo con ăn rất nhiều nên béo lên rồi."
+      }
+    ]
+  },
+  {
+    "id": "dict_418",
+    "hanzi": "瘦",
+    "pinyin": "shòu",
+    "hanviet": "SẤU",
+    "meaning": "Gầy, mảnh khảnh",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "坚持运动会变瘦。",
+        "pinyin": "jiān chí yùn dòng huì biàn shòu 。",
+        "vi": "Kiên trì vận động sẽ gầy bớt đi."
+      }
+    ]
+  },
+  {
+    "id": "dict_419",
+    "hanzi": "聪明",
+    "pinyin": "cōng ming",
+    "hanviet": "THÔNG MINH",
+    "meaning": "Thông minh, sáng dạ",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "她是一个聪明的女孩。",
+        "pinyin": "tā shì yí gè cōng ming de nǚ hái 。",
+        "vi": "Cô ấy là một cô gái thông minh."
+      }
+    ]
+  },
+  {
+    "id": "dict_420",
+    "hanzi": "努力",
+    "pinyin": "nǔ lì",
+    "hanviet": "NỖ LỰC",
+    "meaning": "Nỗ lực, chăm chỉ",
+    "pos": "Tính từ / Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "只要努力，就会有进步。",
+        "pinyin": "zhǐ yào nǔ lì ， jiù huì yǒu jìn bù 。",
+        "vi": "Chỉ cần nỗ lực thì sẽ có tiến bộ."
+      }
+    ]
+  },
+  {
+    "id": "dict_421",
+    "hanzi": "热情",
+    "pinyin": "rè qíng",
+    "hanviet": "NHIỆT TÌNH",
+    "meaning": "Nhiệt tình, niềm nở",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "他们非常热情地欢迎我们。",
+        "pinyin": "tā men fēi cháng rè qíng de huān yíng wǒ men 。",
+        "vi": "Họ nhiệt tình chào đón chúng tôi."
+      }
+    ]
+  },
+  {
+    "id": "dict_422",
+    "hanzi": "认真",
+    "pinyin": "rèn zhēn",
+    "hanviet": "NHẬN CHÂN",
+    "meaning": "Chăm chỉ, nghiêm túc",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "老师讲课非常认真。",
+        "pinyin": "lǎo shī jiǎng kè fēi cháng rèn zhēn 。",
+        "vi": "Thầy giáo giảng bài rất nghiêm túc."
+      }
+    ]
+  },
+  {
+    "id": "dict_423",
+    "hanzi": "新鲜",
+    "pinyin": "xīn xiān",
+    "hanviet": "TÂN TIÊN",
+    "meaning": "Tươi ngon, tươi mới",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "早市上的水果都很新鲜。",
+        "pinyin": "zǎo shì shàng de shuǐ guǒ dōu hěn xīn xiān 。",
+        "vi": "Hoa quả ở chợ sớm đều rất tươi ngon."
+      }
+    ]
+  },
+  {
+    "id": "dict_424",
+    "hanzi": "安静",
+    "pinyin": "ān jìng",
+    "hanviet": "AN TĨNH",
+    "meaning": "Yên tĩnh, thanh tịnh",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "图书馆里请保持安静。",
+        "pinyin": "tú shū guǎn lǐ qǐng bǎo chí ān jìng 。",
+        "vi": "Trong thư viện xin giữ yên tĩnh."
+      }
+    ]
+  },
+  {
+    "id": "dict_425",
+    "hanzi": "干净",
+    "pinyin": "gān jìng",
+    "hanviet": "KIỀN TỊNH",
+    "meaning": "Sạch sẽ, tinh tươm",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "房间打扫得很干净。",
+        "pinyin": "fáng jiān dǎ sǎo de hěn gān jìng 。",
+        "vi": "Căn phòng được dọn dẹp rất sạch sẽ."
+      }
+    ]
+  },
+  {
+    "id": "dict_426",
+    "hanzi": "舒服",
+    "pinyin": "shū fu",
+    "hanviet": "THƯ PHỤC",
+    "meaning": "Thoải mái, dễ chịu",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "坐在沙发上看书真舒服。",
+        "pinyin": "zuò zài shā fā shàng kàn shū zhēn shū fu 。",
+        "vi": "Ngồi trên ghế sofa đọc sách thật thoải mái."
+      }
+    ]
+  },
+  {
+    "id": "dict_427",
+    "hanzi": "方便",
+    "pinyin": "fāng biàn",
+    "hanviet": "PHƯƠNG TIỆN",
+    "meaning": "Thuận tiện, tiện lợi",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "坐地铁上班非常方便。",
+        "pinyin": "zuò dì tiě shàng bān fēi cháng fāng biàn 。",
+        "vi": "Đi tàu điện ngầm đi làm rất thuận tiện."
+      }
+    ]
+  },
+  {
+    "id": "dict_428",
+    "hanzi": "简单",
+    "pinyin": "jiǎn dān",
+    "hanviet": "GIẢN ĐƠN",
+    "meaning": "Đơn giản, dễ làm",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "这个问题其实很简单。",
+        "pinyin": "zhè gè wèn tí qí shí hěn jiǎn dān 。",
+        "vi": "Vấn đề này thực ra rất đơn giản."
+      }
+    ]
+  },
+  {
+    "id": "dict_429",
+    "hanzi": "容易",
+    "pinyin": "róng yì",
+    "hanviet": "DUNG DỊCH",
+    "meaning": "Dễ dàng",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "学好中文并不容易。",
+        "pinyin": "xué hǎo zhōng wén bìng bù róng yì 。",
+        "vi": "Học giỏi tiếng Trung không hề dễ dàng."
+      }
+    ]
+  },
+  {
+    "id": "dict_430",
+    "hanzi": "难",
+    "pinyin": "nán",
+    "hanviet": "NAN",
+    "meaning": "Khó, khó khăn",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "考试的题目有一点儿难。",
+        "pinyin": "kǎo shì de tí mù yǒu yì diǎnr nán 。",
+        "vi": "Đề thi hơi khó một chút."
+      }
+    ]
+  },
+  {
+    "id": "dict_431",
+    "hanzi": "重要",
+    "pinyin": "zhòng yào",
+    "hanviet": "TRỌNG YẾU",
+    "meaning": "Quan trọng",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "身体健康是最重要的。",
+        "pinyin": "shēn tǐ jiàn kāng shì zuì zhòng yào de 。",
+        "vi": "Sức khỏe thể chất là điều quan trọng nhất."
+      }
+    ]
+  },
+  {
+    "id": "dict_432",
+    "hanzi": "清楚",
+    "pinyin": "qīng chu",
+    "hanviet": "THANH SỞ",
+    "meaning": "Rõ ràng, sáng tỏ",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "你听清楚我说的话了吗？",
+        "pinyin": "nǐ tīng qīng chu wǒ shuō de huà le ma ？",
+        "vi": "Bạn đã nghe rõ lời tôi nói chưa?"
+      }
+    ]
+  },
+  {
+    "id": "dict_433",
+    "hanzi": "奇怪",
+    "pinyin": "qí guài",
+    "hanviet": "KỲ QUÁI",
+    "meaning": "Kỳ lạ, kỳ quặc",
+    "pos": "Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "这件事听起来很奇怪。",
+        "pinyin": "zhè jiàn shì tīng qǐ lai hěn qí guài 。",
+        "vi": "Chuyện này nghe có vẻ rất kỳ lạ."
+      }
+    ]
+  },
+  {
+    "id": "dict_434",
+    "hanzi": "满意",
+    "pinyin": "mǎn yì",
+    "hanviet": "MÃN Ý",
+    "meaning": "Hài lòng, ưng ý",
+    "pos": "Tính từ / Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "客户对我们的服务很满意。",
+        "pinyin": "kè hù duì wǒ men de fú wù hěn mǎn yì 。",
+        "vi": "Khách hàng rất hài lòng với dịch vụ của chúng tôi."
+      }
+    ]
+  },
+  {
+    "id": "dict_435",
+    "hanzi": "特别",
+    "pinyin": "tè bié",
+    "hanviet": "ĐẶC BIỆT",
+    "meaning": "Đặc biệt, vô cùng",
+    "pos": "Phó từ / Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "他今天穿得特别帅。",
+        "pinyin": "tā jīn tiān chuān de tè bié shuài 。",
+        "vi": "Hôm nay anh ấy ăn mặc đặc biệt đẹp trai."
+      }
+    ]
+  },
+  {
+    "id": "dict_436",
+    "hanzi": "决定",
+    "pinyin": "jué dìng",
+    "hanviet": "QUYẾT ĐỊNH",
+    "meaning": "Quyết định",
+    "pos": "Động từ / Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "我决定明年去中国留学。",
+        "pinyin": "wǒ jué dìng míng nián qù zhōng guó liú xué 。",
+        "vi": "Tôi quyết định năm sau đi du học Trung Quốc."
+      }
+    ]
+  },
+  {
+    "id": "dict_437",
+    "hanzi": "选择",
+    "pinyin": "xuǎn zé",
+    "hanviet": "TUYỂN TRẠCH",
+    "meaning": "Lựa chọn, chọn lựa",
+    "pos": "Động từ / Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "每个人都要做出自己的选择。",
+        "pinyin": "měi gè rén dōu yào zuò chū zì jǐ de xuǎn zé 。",
+        "vi": "Mỗi người đều phải đưa ra lựa chọn của riêng mình."
+      }
+    ]
+  },
+  {
+    "id": "dict_438",
+    "hanzi": "机会",
+    "pinyin": "jī huì",
+    "hanviet": "CƠ HỘI",
+    "meaning": "Cơ hội, dịp tốt",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "不要错过这个好机会。",
+        "pinyin": "bú yào cuò guò zhè gè hǎo jī huì 。",
+        "vi": "Đừng bỏ lỡ cơ hội tốt này."
+      }
+    ]
+  },
+  {
+    "id": "dict_439",
+    "hanzi": "成功",
+    "pinyin": "chéng gōng",
+    "hanviet": "THÀNH CÔNG",
+    "meaning": "Thành công",
+    "pos": "Động từ / Tính từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "经过努力，项目终于成功了。",
+        "pinyin": "jīng guò nǔ lì ， xiàng mù zhōng yú chéng gōng le 。",
+        "vi": "Qua nỗ lực, dự án cuối cùng đã thành công."
+      }
+    ]
+  },
+  {
+    "id": "dict_440",
+    "hanzi": "环境",
+    "pinyin": "huán jìng",
+    "hanviet": "HOÀN CẢNH",
+    "meaning": "Môi trường, cảnh quan",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "我们要保护生活环境。",
+        "pinyin": "wǒ men yào bǎo hù shēng huó huán jìng 。",
+        "vi": "Chúng ta phải bảo vệ môi trường sống."
+      }
+    ]
+  },
+  {
+    "id": "dict_441",
+    "hanzi": "经验",
+    "pinyin": "jīng yàn",
+    "hanviet": "KINH NGHIỆM",
+    "meaning": "Kinh nghiệm",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "老员工有很丰富的工作经验。",
+        "pinyin": "lǎo yuán gōng yǒu hěn fēng fù de gōng zuò jīng yàn 。",
+        "vi": "Nhân viên lâu năm có kinh nghiệm làm việc rất phong phú."
+      }
+    ]
+  },
+  {
+    "id": "dict_442",
+    "hanzi": "水平",
+    "pinyin": "shuǐ píng",
+    "hanviet": "THỦY BÌNH",
+    "meaning": "Trình độ",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "她的汉语水平提高得很快。",
+        "pinyin": "tā de hàn yǔ shuǐ píng tí gāo de hěn kuài 。",
+        "vi": "Trình độ tiếng Trung của cô ấy nâng cao rất nhanh."
+      }
+    ]
+  },
+  {
+    "id": "dict_443",
+    "hanzi": "要求",
+    "pinyin": "yāo qiú",
+    "hanviet": "YÊU CẦU",
+    "meaning": "Yêu cầu, đòi hỏi",
+    "pos": "Động từ / Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "公司对员工的要求很严格。",
+        "pinyin": "gōng sī duì yuán gōng de yāo qiú hěn yán gé 。",
+        "vi": "Công ty yêu cầu rất nghiêm khắc với nhân viên."
+      }
+    ]
+  },
+  {
+    "id": "dict_444",
+    "hanzi": "影响",
+    "pinyin": "yǐng xiǎng",
+    "hanviet": "ẢNH HƯỞNG",
+    "meaning": "Ảnh hưởng, tác động",
+    "pos": "Động từ / Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "熬夜对身体健康有坏影响。",
+        "pinyin": "áo yè duì shēn tǐ jiàn kāng yǒu huài yǐng xiǎng 。",
+        "vi": "Thức khuya có ảnh hưởng xấu tới sức khỏe."
+      }
+    ]
+  },
+  {
+    "id": "dict_445",
+    "hanzi": "习惯",
+    "pinyin": "xí guàn",
+    "hanviet": "TẬP QUÁN",
+    "meaning": "Thói quen, quen với",
+    "pos": "Danh từ / Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "养成早睡早起的好习惯。",
+        "pinyin": "yǎng chéng zǎo shuì zǎo qǐ de hǎo xí guàn 。",
+        "vi": "Hình thành thói quen tốt ngủ sớm dậy sớm."
+      }
+    ]
+  },
+  {
+    "id": "dict_446",
+    "hanzi": "解决",
+    "pinyin": "jiě jué",
+    "hanviet": "GIẢI QUYẾT",
+    "meaning": "Giải quyết, xử lý",
+    "pos": "Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "我们一起想办法解决问题。",
+        "pinyin": "wǒ men yì qǐ xiǎng bàn fǎ jiě jué wèn tí 。",
+        "vi": "Chúng ta cùng nghĩ cách giải quyết vấn đề."
+      }
+    ]
+  },
+  {
+    "id": "dict_447",
+    "hanzi": "完成",
+    "pinyin": "wán chéng",
+    "hanviet": "HOÀN THÀNH",
+    "meaning": "Hoàn thành, xong",
+    "pos": "Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "我已经完成了今天的作业。",
+        "pinyin": "wǒ yǐ jīng wán chéng le jīn tiān de zuò yè 。",
+        "vi": "Tôi đã hoàn thành bài tập của ngày hôm nay rồi."
+      }
+    ]
+  },
+  {
+    "id": "dict_448",
+    "hanzi": "提高",
+    "pinyin": "tí gāo",
+    "hanviet": "ĐỀ CAO",
+    "meaning": "Nâng cao, cải thiện",
+    "pos": "Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "每天练习能提高听力能力。",
+        "pinyin": "měi tiān liàn xí néng tí gāo tīng lì néng lì 。",
+        "vi": "Mỗi ngày luyện tập có thể nâng cao năng lực nghe."
+      }
+    ]
+  },
+  {
+    "id": "dict_449",
+    "hanzi": "保护",
+    "pinyin": "bǎo hù",
+    "hanviet": "BẢO HỘ",
+    "meaning": "Bảo vệ, gìn giữ",
+    "pos": "Động từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "我们要保护动物和自然。",
+        "pinyin": "wǒ men yào bǎo hù dòng wù hé zì rán 。",
+        "vi": "Chúng ta cần bảo vệ động vật và thiên nhiên."
+      }
+    ]
+  },
+  {
+    "id": "dict_450",
+    "hanzi": "关系",
+    "pinyin": "guān xi",
+    "hanviet": "QUAN HỆ",
+    "meaning": "Quan hệ, mối liên hệ",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "他们俩的关系一直很好。",
+        "pinyin": "tā men liǎ de guān xi yì zhí hěn hǎo 。",
+        "vi": "Quan hệ của hai người họ luôn luôn rất tốt."
+      }
+    ]
+  },
+  {
+    "id": "dict_451",
+    "hanzi": "汉语",
+    "pinyin": "hàn yǔ",
+    "hanviet": "HÁN NGỮ",
+    "meaning": "Tiếng Trung, tiếng Hán",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "我在大学学习汉语。",
+        "pinyin": "wǒ zài dà xué xué xí hàn yǔ 。",
+        "vi": "Tôi học tiếng Trung ở trường đại học."
+      }
+    ]
+  },
+  {
+    "id": "dict_452",
+    "hanzi": "普通话",
+    "pinyin": "pǔ tōng huà",
+    "hanviet": "PHỔ THÔNG THOẠI",
+    "meaning": "Tiếng phổ thông (tiếng Trung tiêu chuẩn)",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "他的普通话非常标准。",
+        "pinyin": "tā de pǔ tōng huà fēi cháng biāo zhǔn 。",
+        "vi": "Tiếng phổ thông của anh ấy rất chuẩn."
+      }
+    ]
+  },
+  {
+    "id": "dict_453",
+    "hanzi": "书法",
+    "pinyin": "shū fǎ",
+    "hanviet": "THƯ PHÁP",
+    "meaning": "Thư pháp (chữ Hán)",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "中国书法是一种古老的艺术。",
+        "pinyin": "zhōng guó shū fǎ shì yì zhǒng gǔ lǎo de yì shù 。",
+        "vi": "Thư pháp Trung Quốc là một môn nghệ thuật cổ kính."
+      }
+    ]
+  },
+  {
+    "id": "dict_454",
+    "hanzi": "京剧",
+    "pinyin": "jīng jù",
+    "hanviet": "KINH KỊCH",
+    "meaning": "Kinh kịch (nghệ thuật hí kịch Bắc Kinh)",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "许多外国人喜欢看中国京剧。",
+        "pinyin": "xǔ duō wài guó rén xǐ huan kàn zhōng guó jīng jù 。",
+        "vi": "Rất nhiều người nước ngoài thích xem kinh kịch Trung Quốc."
+      }
+    ]
+  },
+  {
+    "id": "dict_455",
+    "hanzi": "春节",
+    "pinyin": "chūn jié",
+    "hanviet": "XUÂN TIẾT",
+    "meaning": "Tết Nguyên Đán, Tết cổ truyền",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "春节是中国最重要的传统节日。",
+        "pinyin": "chūn jié shì zhōng guó zuì zhòng yào de chuán tǒng jié rì 。",
+        "vi": "Tết Nguyên Đán là ngày lễ truyền thống quan trọng nhất của Trung Quốc."
+      }
+    ]
+  },
+  {
+    "id": "dict_456",
+    "hanzi": "中秋节",
+    "pinyin": "zhōng qiū jié",
+    "hanviet": "TRUNG THU TIẾT",
+    "meaning": "Tết Trung Thu",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "中秋节全家一起赏月吃月饼。",
+        "pinyin": "zhōng qiū jié quán jiā yì qǐ shǎng yuè chī yuè bǐng 。",
+        "vi": "Tết Trung Thu cả nhà cùng nhau ngắm trăng ăn bánh trung thu."
+      }
+    ]
+  },
+  {
+    "id": "dict_457",
+    "hanzi": "端午节",
+    "pinyin": "duān wǔ jié",
+    "hanviet": "ĐOAN NGỌ TIẾT",
+    "meaning": "Tết Đoan Ngọ (mùng 5 tháng 5)",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "端午节人们吃粽子赛龙舟。",
+        "pinyin": "duān wǔ jié rén men chī zòng zi sài lóng zhōu 。",
+        "vi": "Tết Đoan Ngọ mọi người ăn bánh ú và đua thuyền rồng."
+      }
+    ]
+  },
+  {
+    "id": "dict_458",
+    "hanzi": "饺子",
+    "pinyin": "jiǎo zi",
+    "hanviet": "GIÁO TỬ",
+    "meaning": "Bánh sủi cảo",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "北方人过年喜欢包饺子。",
+        "pinyin": "běi fāng rén guò nián xǐ huan bāo jiǎo zi 。",
+        "vi": "Người miền Bắc Trung Quốc đón Tết thích gói sủi cảo."
+      }
+    ]
+  },
+  {
+    "id": "dict_459",
+    "hanzi": "包子",
+    "pinyin": "bāo zi",
+    "hanviet": "BAO TỬ",
+    "meaning": "Bánh bao",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "早餐吃两个热乎乎的肉包子。",
+        "pinyin": "zǎo cān chī liǎng gè rè hū hū de ròu bāo zi 。",
+        "vi": "Bữa sáng ăn hai chiếc bánh bao thịt nóng hổi."
+      }
+    ]
+  },
+  {
+    "id": "dict_460",
+    "hanzi": "火锅",
+    "pinyin": "huǒ guō",
+    "hanviet": "HỎA OA",
+    "meaning": "Lẩu, món lẩu",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "冬天最适合大家围坐在一起吃火锅。",
+        "pinyin": "dōng tiān zuì shì hé dà jiā wéi zuò zài yì qǐ chī huǒ guō 。",
+        "vi": "Mùa đông thích hợp nhất là mọi người quây quần ăn lẩu cùng nhau."
+      }
+    ]
+  },
+  {
+    "id": "dict_461",
+    "hanzi": "烤鸭",
+    "pinyin": "kǎo yā",
+    "hanviet": "KHẢO ÁP",
+    "meaning": "Vịt quay (Bắc Kinh)",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "去北京一定要尝尝北京烤鸭。",
+        "pinyin": "qù běi jīng yí dìng yào cháng chang běi jīng kǎo yā 。",
+        "vi": "Đến Bắc Kinh nhất định phải thử món vịt quay Bắc Kinh."
+      }
+    ]
+  },
+  {
+    "id": "dict_462",
+    "hanzi": "奶茶",
+    "pinyin": "nǎi chá",
+    "hanviet": "NÃI TRÀ",
+    "meaning": "Trà sữa",
+    "pos": "Danh từ",
+    "level": "HSK1",
+    "examples": [
+      {
+        "zh": "下午买一杯半糖冰奶茶。",
+        "pinyin": "xià wǔ mǎi yì bēi bàn táng bīng nǎi chá 。",
+        "vi": "Buổi chiều mua một ly trà sữa đá nửa đường."
+      }
+    ]
+  },
+  {
+    "id": "dict_463",
+    "hanzi": "豆腐",
+    "pinyin": "dòu fu",
+    "hanviet": "ĐẬU HŨ",
+    "meaning": "Đậu phụ, đậu hũ",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "麻婆豆腐是一道著名的川菜。",
+        "pinyin": "má pó dòu fu shì yí dào zhù míng de chuān cài 。",
+        "vi": "Đậu phụ Ma Bà là món ăn nổi tiếng của Tứ Xuyên."
+      }
+    ]
+  },
+  {
+    "id": "dict_464",
+    "hanzi": "春卷",
+    "pinyin": "chūn juǎn",
+    "hanviet": "XUÂN QUYỂN",
+    "meaning": "Nem rán, chả giò",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "金黄酥脆的炸春卷特别美味。",
+        "pinyin": "jīn huáng sū cuì de zhà chūn juǎn tè bié měi wèi 。",
+        "vi": "Nem rán vàng ươm giòn rụm đặc biệt thơm ngon."
+      }
+    ]
+  },
+  {
+    "id": "dict_465",
+    "hanzi": "月饼",
+    "pinyin": "yuè bǐng",
+    "hanviet": "NGUYỆT BÍNH",
+    "meaning": "Bánh trung thu",
+    "pos": "Danh từ",
+    "level": "HSK2",
+    "examples": [
+      {
+        "zh": "中秋节吃月饼象征团团圆圆。",
+        "pinyin": "zhōng qiū jié chī yuè bǐng xiàng zhēng tuán tuán yuán yuán 。",
+        "vi": "Ăn bánh trung thu dịp Tết Trung Thu tượng trưng cho sự đoàn viên vẹn tròn."
+      }
+    ]
   }
 ];
