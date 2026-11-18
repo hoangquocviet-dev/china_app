@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Volume2, Eye, EyeOff, Check, RotateCcw, ChevronLeft, ChevronRight, ChevronUp, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
+import { storageService } from '../../utils/storage';
 
 interface FlashcardViewProps {
   words: ChineseWord[];
@@ -10,6 +11,11 @@ interface FlashcardViewProps {
 }
 
 export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWordSRS }) => {
+  // Track cards that have been swiped as "đã thuộc" (persisted in storage)
+  const [masteredWordIds, setMasteredWordIds] = useState<string[]>(() => {
+    return storageService.getMasteredFlashcardIds();
+  });
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [hidePinyin, setHidePinyin] = useState(false);
@@ -23,8 +29,35 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   const isHorizontalSwipeRef = useRef<boolean | null>(null);
   const lastTouchEndRef = useRef<number>(0);
 
+  // Filter out cards that the user has already mastered
+  const unmasteredWords = useMemo(() => {
+    const masteredSet = new Set(masteredWordIds);
+    return words.filter((w) => !masteredSet.has(w.id));
+  }, [words, masteredWordIds]);
+
   const hasWords = Boolean(words && words.length > 0);
-  const currentWord = hasWords ? (words[currentIndex] || words[0]) : null;
+  const isDeckCompleted = hasWords && unmasteredWords.length === 0;
+
+  // Safe index within the unmastered pool
+  const safeIndex = unmasteredWords.length > 0 ? Math.min(currentIndex, unmasteredWords.length - 1) : 0;
+  const currentWord = unmasteredWords.length > 0 ? unmasteredWords[safeIndex] : null;
+
+  // Reset mastered cards so the user can study all cards again
+  const handleResetMastered = () => {
+    audioService.playClick();
+    audioService.playSuccessChime();
+    storageService.resetMasteredFlashcards();
+    setMasteredWordIds([]);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setDragOffset(0);
+    setDragOffsetY(0);
+    confetti({
+      particleCount: 35,
+      spread: 60,
+      origin: { y: 0.7 },
+    });
+  };
 
   const handleFlip = () => {
     audioService.playClick();
@@ -43,24 +76,25 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   };
 
   const handleNext = () => {
-    if (!hasWords) return;
+    if (unmasteredWords.length === 0) return;
     setIsFlipped(false);
     setDragOffset(0);
     setDragOffsetY(0);
-    setCurrentIndex((prev) => (prev + 1) % words.length);
+    setCurrentIndex((prev) => (prev + 1) % unmasteredWords.length);
   };
 
   const handlePrev = () => {
-    if (!hasWords) return;
+    if (unmasteredWords.length === 0) return;
     setIsFlipped(false);
     setDragOffset(0);
     setDragOffsetY(0);
-    setCurrentIndex((prev) => (prev - 1 + words.length) % words.length);
+    setCurrentIndex((prev) => (prev - 1 + unmasteredWords.length) % unmasteredWords.length);
   };
 
   const handleAnswer = (isCorrect: boolean) => {
     if (!currentWord) return;
     audioService.stopSpeech();
+
     if (isCorrect) {
       audioService.playSuccessChime();
       confetti({
@@ -68,12 +102,42 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
         spread: 60,
         origin: { y: 0.8 },
       });
+
+      // Mark this card as mastered so it won't appear anymore!
+      const newMastered = [...masteredWordIds, currentWord.id];
+      setMasteredWordIds(newMastered);
+      storageService.saveMasteredFlashcardIds(newMastered);
+      onUpdateWordSRS(currentWord.id, true);
+
+      setIsFlipped(false);
+      setDragOffset(0);
+      setDragOffsetY(0);
+
+      const remaining = unmasteredWords.length - 1;
+      if (remaining === 0) {
+        // All cards finished! Grand celebration!
+        setTimeout(() => {
+          audioService.playSuccessChime();
+          confetti({
+            particleCount: 100,
+            spread: 90,
+            origin: { y: 0.5 },
+          });
+        }, 300);
+        setCurrentIndex(0);
+      } else if (safeIndex >= remaining) {
+        setCurrentIndex(0);
+      }
     } else {
       audioService.playErrorBuzz();
-    }
+      onUpdateWordSRS(currentWord.id, false);
 
-    onUpdateWordSRS(currentWord.id, isCorrect);
-    handleNext();
+      // Card remains in unmastered queue for further review
+      setIsFlipped(false);
+      setDragOffset(0);
+      setDragOffsetY(0);
+      setCurrentIndex((prev) => (prev + 1) % unmasteredWords.length);
+    }
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -133,7 +197,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   };
 
   useEffect(() => {
-    if (!hasWords) return;
+    if (!hasWords || !currentWord) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
       if (e.code === 'Space') {
@@ -154,9 +218,9 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
       window.removeEventListener('keydown', handleKeyDown);
       audioService.stopSpeech();
     };
-  }, [currentIndex, isFlipped, words, hasWords, currentWord]);
+  }, [safeIndex, isFlipped, unmasteredWords, hasWords, currentWord]);
 
-  if (!hasWords || !currentWord) {
+  if (!hasWords) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
         <p className="text-slate-400">Chưa có từ vựng nào trong danh sách.</p>
@@ -164,21 +228,62 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
     );
   }
 
+  // Celebration screen when all cards in deck have been mastered!
+  if (isDeckCompleted) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[65vh] max-w-md w-full mx-auto p-6 text-center animate-in fade-in duration-300">
+        <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-rose-500 flex items-center justify-center shadow-xl shadow-emerald-900/30 text-white mb-5 animate-bounce">
+          <Sparkles className="w-10 h-10" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-100 mb-2">Xuất sắc! Bạn đã thuộc hết thẻ!</h2>
+        <p className="text-xs text-slate-400 mb-2 leading-relaxed">
+          Toàn bộ <span className="font-bold text-emerald-400">{words.length}</span> thẻ flashcard trong danh sách đã được bạn học thuộc và ghi nhớ thành công.
+        </p>
+        <p className="text-[11px] text-slate-500 mb-6">
+          Các thẻ đã thuộc được ẩn đi. Khi muốn ôn tập lại từ đầu, bạn chỉ cần bấm nút bên dưới.
+        </p>
+        <button
+          onClick={handleResetMastered}
+          className="flex items-center justify-center space-x-2 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-sm shadow-lg shadow-rose-900/40 active:scale-95 transition-all"
+        >
+          <RotateCcw className="w-4 h-4" />
+          <span>Học lại từ đầu (Reset)</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col flex-1 max-w-md w-full mx-auto p-4 pb-24">
-      {/* Top Controls: Progress & Peek Mask Toggles */}
-      <div className="flex items-center justify-between mb-3 text-xs text-slate-400">
-        <div className="flex items-center space-x-2">
+      {/* Top Controls: Progress, Mastered Count, Reset & Peek Mask Toggles */}
+      <div className="flex items-center justify-between mb-2 text-xs text-slate-400">
+        <div className="flex items-center space-x-2 flex-wrap gap-y-1">
           <span className="font-medium text-slate-300">
-            {currentIndex + 1} / {words.length}
+            Còn {unmasteredWords.length} thẻ
           </span>
-          <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-            Hộp SRS {currentWord.box || 1}
+          <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px] font-semibold">
+            Đã thuộc: {masteredWordIds.length}/{words.length}
           </span>
+          {currentWord && (
+            <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-[10px]">
+              Hộp SRS {currentWord.box || 1}
+            </span>
+          )}
         </div>
 
-        {/* Peek Mask Toggles */}
-        <div className="flex items-center space-x-2">
+        {/* Peek Mask Toggles & Reset CTA */}
+        <div className="flex items-center space-x-1.5">
+          {masteredWordIds.length > 0 && (
+            <button
+              onClick={handleResetMastered}
+              className="flex items-center space-x-1 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-[11px] font-semibold transition-colors"
+              title="Xóa danh sách đã thuộc, học lại tất cả thẻ từ đầu"
+            >
+              <RotateCcw className="w-3 h-3 text-rose-400" />
+              <span>Reset</span>
+            </button>
+          )}
+
           <button
             onClick={() => {
               audioService.playClick();
@@ -213,227 +318,218 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
         </div>
       </div>
 
-      {/* Progress Bar */}
+      {/* Progress Bar showing % cards mastered */}
       <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-4">
         <div
-          className="bg-gradient-to-r from-rose-500 to-amber-500 h-full transition-all duration-300 rounded-full"
-          style={{ width: `${((currentIndex + 1) / words.length) * 100}%` }}
+          className="bg-gradient-to-r from-emerald-500 to-rose-500 h-full transition-all duration-300 rounded-full"
+          style={{ width: `${words.length > 0 ? (masteredWordIds.length / words.length) * 100 : 0}%` }}
         />
       </div>
 
-      {/* 3D Flashcard Container with Touch Swipe Support */}
-      <div
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onClick={() => {
-          if (Date.now() - lastTouchEndRef.current < 450) return;
-          if (Math.abs(dragOffset) < 5 && Math.abs(dragOffsetY) < 5) {
-            handleFlip();
-          }
-        }}
-        style={{
-          transform: `translateX(${dragOffset}px) translateY(${dragOffsetY * 0.25}px) rotate(${dragOffset * 0.04}deg)`,
-          transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
-        }}
-        className="relative w-full aspect-[4/5] min-h-[350px] max-h-[460px] perspective-1000 cursor-pointer select-none touch-none"
-      >
-        {/* Swipe Up Pill Feedback */}
-        {dragOffsetY < -25 && (
-          <div className="absolute top-4 inset-x-0 mx-auto w-fit z-40 px-3.5 py-1.5 rounded-2xl bg-sky-500 text-white font-bold text-xs shadow-xl animate-pulse flex items-center gap-1">
-            <ChevronUp className="w-3.5 h-3.5" />
-            <span>VUỐT LÊN ĐỂ LẬT</span>
-          </div>
-        )}
-        {/* Swipe Pill Feedback */}
-        {dragOffset > 35 && (
-          <div className="absolute top-4 right-4 z-40 px-3.5 py-1.5 rounded-2xl bg-emerald-500 text-white font-bold text-xs shadow-xl animate-pulse">
-            ĐÃ THUỘC →
-          </div>
-        )}
-        {dragOffset < -35 && (
-          <div className="absolute top-4 left-4 z-40 px-3.5 py-1.5 rounded-2xl bg-rose-500 text-white font-bold text-xs shadow-xl animate-pulse">
-            ← CHƯA NHỚ
-          </div>
-        )}
-
-        <div
-          className={`relative w-full h-full duration-500 transform-style-3d transition-transform rounded-3xl ${
-            isFlipped ? 'rotate-x-180' : ''
-          }`}
-        >
-          {/* FRONT SIDE */}
-          <div className="absolute inset-0 w-full h-full backface-hidden rounded-3xl bg-gradient-to-b from-slate-800/90 to-slate-900 border border-slate-700/80 p-6 flex flex-col justify-between shadow-2xl shadow-black/40">
-            <div className="flex justify-between items-start">
-              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                {currentWord.pos}
-              </span>
-              <button
-                onClick={(e) => handleSpeak(e, currentWord.hanzi)}
-                className="p-2.5 rounded-full bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all active:scale-95"
-                title="Nghe phát âm"
-              >
-                <Volume2 className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Central Hanzi Display */}
-            <div className="flex flex-col items-center justify-center my-auto">
-              <div className="text-6xl font-bold text-slate-100 tracking-wider mb-3 select-all">
-                {currentWord.hanzi}
+      {currentWord && (
+        <>
+          {/* 3D Flashcard Container with Touch Swipe Support */}
+          <div
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onClick={() => {
+              if (Date.now() - lastTouchEndRef.current < 450) return;
+              if (Math.abs(dragOffset) < 5 && Math.abs(dragOffsetY) < 5) {
+                handleFlip();
+              }
+            }}
+            style={{
+              transform: `translateX(${dragOffset}px) translateY(${dragOffsetY * 0.25}px) rotate(${dragOffset * 0.04}deg)`,
+              transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+            }}
+            className="relative w-full aspect-[4/5] min-h-[350px] max-h-[460px] perspective-1000 cursor-pointer select-none touch-none"
+          >
+            {/* Swipe Up Pill Feedback */}
+            {dragOffsetY < -25 && (
+              <div className="absolute top-4 inset-x-0 mx-auto w-fit z-40 px-3.5 py-1.5 rounded-2xl bg-sky-500 text-white font-bold text-xs shadow-xl animate-pulse flex items-center gap-1">
+                <ChevronUp className="w-3.5 h-3.5" />
+                <span>VUỐT LÊN ĐỂ LẬT</span>
               </div>
-
-              {/* Pinyin (Maskable) */}
-              <div className="mb-2">
-                {hidePinyin ? (
-                  <span className="px-3 py-1 rounded-md bg-slate-800 text-slate-500 text-sm italic border border-slate-700/50">
-                    (Pinyin ẩn - Vuốt lên để lật)
-                  </span>
-                ) : (
-                  <span className="text-xl font-medium text-rose-400 pinyin-text tracking-normal">
-                    {currentWord.pinyin}
-                  </span>
-                )}
+            )}
+            {/* Swipe Pill Feedback */}
+            {dragOffset > 35 && (
+              <div className="absolute top-4 right-4 z-40 px-3.5 py-1.5 rounded-2xl bg-emerald-500 text-white font-bold text-xs shadow-xl animate-pulse">
+                ĐÃ THUỘC →
               </div>
-
-              {/* Hán Việt (Maskable) */}
-              <div>
-                {hideHanviet ? (
-                  <span className="px-2 py-0.5 text-xs text-slate-500 italic">
-                    [Âm Hán Việt ẩn]
-                  </span>
-                ) : (
-                  <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20 uppercase tracking-widest">
-                    {currentWord.hanviet}
-                  </span>
-                )}
+            )}
+            {dragOffset < -35 && (
+              <div className="absolute top-4 left-4 z-40 px-3.5 py-1.5 rounded-2xl bg-rose-500 text-white font-bold text-xs shadow-xl animate-pulse">
+                ← CHƯA NHỚ
               </div>
-            </div>
+            )}
 
-            {/* Bottom hint */}
-            <div className="flex items-center justify-center gap-1.5 text-center text-xs text-slate-400 font-medium">
-              <ChevronUp className="w-3.5 h-3.5 text-rose-400 animate-bounce" />
-              <span>Vuốt lên để lật</span>
-            </div>
-          </div>
-
-          {/* BACK SIDE */}
-          <div className="absolute inset-0 w-full h-full backface-hidden rotate-x-180 rounded-3xl bg-gradient-to-b from-slate-800 to-slate-900 border border-rose-500/30 p-6 flex flex-col justify-between shadow-2xl shadow-black/40 overflow-y-auto">
-            <div>
-              <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-                <div className="flex items-center space-x-2">
-                  <span className="text-2xl font-bold text-slate-100">{currentWord.hanzi}</span>
-                  <span className="text-sm text-rose-400 font-medium pinyin-text tracking-normal">{currentWord.pinyin}</span>
+            <div
+              className={`relative w-full h-full duration-500 transform-style-3d ${
+                isFlipped ? 'rotate-x-180' : ''
+              }`}
+            >
+              {/* Mặt trước: Hán tự, Pinyin, Hán Việt */}
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-slate-850 to-slate-900 border border-slate-750/80 rounded-3xl p-6 flex flex-col justify-between shadow-2xl backface-hidden">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-rose-400 border border-slate-700/80 tracking-wide">
+                    {currentWord.level}
+                  </span>
+                  <button
+                    onClick={(e) => handleSpeak(e, currentWord.hanzi)}
+                    className="p-2.5 rounded-full bg-slate-800/80 hover:bg-slate-750 text-slate-300 hover:text-white transition-colors border border-slate-700 active:scale-95"
+                    title="Phát âm từ"
+                  >
+                    <Volume2 className="w-5 h-5" />
+                  </button>
                 </div>
-                <button
-                  onClick={(e) => handleSpeak(e, currentWord.hanzi)}
-                  className="p-2 rounded-full bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-all active:scale-95"
-                >
-                  <Volume2 className="w-4 h-4" />
-                </button>
-              </div>
 
-              {/* Hán Việt & Nghĩa */}
-              <div className="mt-4">
-                <div className="text-xs uppercase tracking-wider text-amber-400 font-semibold mb-1">
-                  Âm Hán Việt: {currentWord.hanviet}
+                {/* Central Hanzi Display */}
+                <div className="flex flex-col items-center justify-center my-auto py-2">
+                  <span className="text-7xl sm:text-8xl font-bold text-slate-100 tracking-wider filter drop-shadow-md select-all">
+                    {currentWord.hanzi}
+                  </span>
+
+                  {/* Pinyin */}
+                  <div className="h-8 flex items-center justify-center mt-3">
+                    {hidePinyin ? (
+                      <span className="px-3 py-1 rounded-lg bg-slate-800/60 border border-dashed border-slate-700 text-slate-500 text-xs italic">
+                        Pinyin bị ẩn
+                      </span>
+                    ) : (
+                      <span className="text-xl sm:text-2xl font-semibold text-rose-400 pinyin-text tracking-wide">
+                        {currentWord.pinyin}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Hanviet */}
+                  <div className="h-6 flex items-center justify-center mt-1">
+                    {hideHanviet ? (
+                      <span className="px-2.5 py-0.5 rounded bg-slate-800/60 border border-dashed border-slate-700 text-slate-500 text-[10px] italic">
+                        Hán Việt bị ẩn
+                      </span>
+                    ) : (
+                      currentWord.hanviet && (
+                        <span className="text-xs uppercase font-bold text-amber-300 tracking-widest px-2.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20">
+                          {currentWord.hanviet}
+                        </span>
+                      )
+                    )}
+                  </div>
                 </div>
-                <div className="text-lg font-medium text-slate-100">{currentWord.meaning}</div>
-                {currentWord.radical && (
-                  <div className="mt-1 text-xs text-slate-400">
-                    Bộ thủ: <span className="text-slate-200">{currentWord.radical}</span>
-                    {currentWord.strokeCount && ` (${currentWord.strokeCount} nét)`}
-                  </div>
-                )}
+
+                <div className="flex items-center justify-center gap-1.5 text-center text-xs text-slate-400 font-medium pt-2">
+                  <ChevronUp className="w-3.5 h-3.5 text-rose-400 animate-bounce" />
+                  <span>Vuốt lên để lật</span>
+                </div>
               </div>
 
-              {/* Examples */}
-              {currentWord.examples && currentWord.examples.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-slate-800/80">
-                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-rose-400" /> Câu ví dụ:
+              {/* Mặt sau: Nghĩa & Ví dụ song ngữ */}
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-slate-850 to-slate-900 border border-slate-750/80 rounded-3xl p-6 flex flex-col justify-between shadow-2xl backface-hidden rotate-x-180">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-2xl font-bold text-slate-100">{currentWord.hanzi}</span>
+                    <span className="text-sm text-rose-400 font-medium pinyin-text">{currentWord.pinyin}</span>
                   </div>
-                  <div className="space-y-2">
-                    {currentWord.examples.map((ex, idx) => (
-                      <div
-                        key={idx}
-                        onClick={(e) => handleSpeakSentence(e, ex.zh)}
-                        className="p-2.5 rounded-2xl bg-slate-800/80 border border-slate-750 hover:border-slate-700 transition-colors cursor-pointer flex items-center justify-between gap-3 shadow-xs"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold text-slate-100">{ex.zh}</div>
-                          <div className="text-xs text-rose-400 pinyin-text tracking-normal mt-0.5">{ex.pinyin}</div>
-                          <div className="text-xs text-slate-400 mt-0.5">{ex.vi}</div>
-                        </div>
+                  <button
+                    onClick={(e) => handleSpeak(e, currentWord.hanzi)}
+                    className="p-2 rounded-full bg-slate-800 hover:bg-slate-750 text-slate-300 transition-colors border border-slate-700"
+                    title="Phát âm"
+                  >
+                    <Volume2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Meaning & Details */}
+                <div className="flex-1 flex flex-col justify-center my-3 space-y-3">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Định nghĩa</span>
+                    <p className="text-lg sm:text-xl font-bold text-slate-100 mt-0.5 leading-snug">
+                      {currentWord.meaning}
+                    </p>
+                    <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-750">
+                      {currentWord.pos}
+                    </span>
+                  </div>
+
+                  {currentWord.examples && currentWord.examples.length > 0 && (
+                    <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800">
+                      <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+                        <span className="font-semibold text-rose-400">Ví dụ câu:</span>
                         <button
-                          type="button"
-                          onClick={(e) => handleSpeakSentence(e, ex.zh)}
-                          className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-transform active:scale-90 shrink-0 flex items-center gap-1"
+                          onClick={(e) => handleSpeakSentence(e, currentWord.examples![0].zh)}
+                          className="hover:text-slate-200 flex items-center gap-1"
                           title="Nghe câu ví dụ"
                         >
-                          <Volume2 className="w-4 h-4" />
-                          <span className="text-[10px] font-semibold">Nghe</span>
+                          <Volume2 className="w-3.5 h-3.5 text-rose-400" />
+                          <span>Nghe câu</span>
                         </button>
                       </div>
-                    ))}
-                  </div>
+                      <p className="text-sm font-semibold text-slate-100">{currentWord.examples[0].zh}</p>
+                      <p className="text-xs text-rose-400/90 font-medium pinyin-text mt-0.5">
+                        {currentWord.examples[0].pinyin}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1 italic">{currentWord.examples[0].vi}</p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <div className="flex items-center justify-center gap-1.5 text-center text-xs text-slate-400 font-medium pt-2">
-              <ChevronUp className="w-3.5 h-3.5 text-rose-400 animate-bounce" />
-              <span>Vuốt lên để lật</span>
+                <div className="flex items-center justify-center gap-1.5 text-center text-xs text-slate-400 font-medium pt-2">
+                  <ChevronUp className="w-3.5 h-3.5 text-rose-400 animate-bounce" />
+                  <span>Vuốt lên để lật</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Action Buttons: SRS Rating & Navigation */}
-      <div className="grid grid-cols-2 gap-3 mt-4">
-        <button
-          onClick={() => handleAnswer(false)}
-          className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-slate-800/90 hover:bg-slate-750 text-slate-300 border border-slate-700 active:scale-98 transition-all font-medium text-sm"
-        >
-          <RotateCcw className="w-4 h-4 text-rose-400" />
-          <span>Chưa nhớ (Ôn lại)</span>
-        </button>
+          {/* Action Buttons: SRS Rating & Navigation */}
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <button
+              onClick={() => handleAnswer(false)}
+              className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-slate-800/90 hover:bg-slate-750 text-slate-300 border border-slate-700 active:scale-98 transition-all font-medium text-sm"
+            >
+              <RotateCcw className="w-4 h-4 text-rose-400" />
+              <span>Chưa nhớ (Ôn lại)</span>
+            </button>
 
-        <button
-          onClick={() => handleAnswer(true)}
-          className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-medium text-sm shadow-lg shadow-rose-900/30 active:scale-98 transition-all"
-        >
-          <Check className="w-4 h-4" />
-          <span>Đã thuộc (Nhớ rõ)</span>
-        </button>
-      </div>
+            <button
+              onClick={() => handleAnswer(true)}
+              className="flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-medium text-sm shadow-lg shadow-rose-900/30 active:scale-98 transition-all"
+            >
+              <Check className="w-4 h-4" />
+              <span>Đã thuộc (Nhớ rõ)</span>
+            </button>
+          </div>
 
-      {/* Navigation Arrows */}
-      <div className="flex items-center justify-between mt-3 text-slate-400">
-        <button
-          onClick={() => {
-            audioService.playClick();
-            handlePrev();
-          }}
-          className="p-2 rounded-lg hover:bg-slate-800 flex items-center text-xs"
-        >
-          <ChevronLeft className="w-4 h-4 mr-1" /> Từ trước
-        </button>
-        <button
-          onClick={() => {
-            audioService.playClick();
-            handleNext();
-          }}
-          className="p-2 rounded-lg hover:bg-slate-800 flex items-center text-xs"
-        >
-          Từ sau <ChevronRight className="w-4 h-4 ml-1" />
-        </button>
-      </div>
+          {/* Navigation Arrows */}
+          <div className="flex items-center justify-between mt-3 text-slate-400">
+            <button
+              onClick={() => {
+                audioService.playClick();
+                handlePrev();
+              }}
+              className="p-2 rounded-lg hover:bg-slate-800 flex items-center text-xs"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" /> Từ trước
+            </button>
+            <button
+              onClick={() => {
+                audioService.playClick();
+                handleNext();
+              }}
+              className="p-2 rounded-lg hover:bg-slate-800 flex items-center text-xs"
+            >
+              Từ sau <ChevronRight className="w-4 h-4 ml-1" />
+            </button>
+          </div>
 
-      {/* Swipe Gesture Hint */}
-      <div className="text-center text-[11px] text-slate-500 mt-2.5 select-none">
-        Mẹo: Vuốt lên để lật • Vuốt sang phải (Đã thuộc) • Vuốt sang trái (Chưa nhớ)
-      </div>
+          {/* Swipe Gesture Hint */}
+          <div className="text-center text-[11px] text-slate-500 mt-2.5 select-none">
+            Mẹo: Vuốt lên để lật • Vuốt sang phải (Đã thuộc) • Vuốt sang trái (Chưa nhớ)
+          </div>
+        </>
+      )}
     </div>
   );
 };

@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { X, Search, Plus, Check, Volume2, Sparkles, BookOpen, PenLine, AlertCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
-import { DICTIONARY_WORDS } from '../../data/dictionaryData';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
 import { autoGenerateWordFromVietnamese } from '../../utils/vietnameseAutoGenerator';
@@ -83,10 +82,15 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
     return new Set(savedWords.map((w) => w.hanzi.trim()));
   }, [savedWords]);
 
+  // Dynamic dictionary pool: merges built-in dictionary with all user-added words in DB
+  const dictionaryWords = useMemo(() => {
+    return storageService.getDictionaryWords();
+  }, [isOpen, activeMode, savedWords]);
+
   // Filter dictionary words
   const searchResults = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    return DICTIONARY_WORDS.filter((item) => {
+    return dictionaryWords.filter((item) => {
       // Level filter
       if (selectedLevel !== 'ALL' && item.level !== selectedLevel) {
         return false;
@@ -99,7 +103,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
         item.meaning.toLowerCase().includes(q)
       );
     });
-  }, [searchQuery, selectedLevel]);
+  }, [dictionaryWords, searchQuery, selectedLevel]);
 
   if (!isOpen) return null;
 
@@ -227,7 +231,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Tra cứu từ điển ({DICTIONARY_WORDS.length}+ từ)</span>
+            <span>Tra cứu từ điển ({dictionaryWords.length}+ từ)</span>
           </button>
           <button
             type="button"
@@ -315,19 +319,24 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
                         className="p-3 rounded-2xl bg-slate-800/80 border border-slate-750 flex items-center justify-between gap-3 hover:border-slate-700 transition-colors"
                       >
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-xl font-bold text-slate-100">{item.hanzi}</span>
-                            <span className="text-xs text-rose-400 font-medium pinyin-text">
+                          <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                            <span className="text-xl font-bold text-slate-100 whitespace-nowrap shrink-0">{item.hanzi}</span>
+                            <span className="text-xs text-rose-400 font-medium pinyin-text whitespace-nowrap shrink-0">
                               {item.pinyin}
                             </span>
                             {item.hanviet && (
-                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 whitespace-nowrap shrink-0">
                                 {item.hanviet}
                               </span>
                             )}
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/80 text-slate-300">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-700/80 text-slate-300 whitespace-nowrap shrink-0">
                               {item.level}
                             </span>
+                            {item.id.startsWith('dict_') && (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 whitespace-nowrap shrink-0">
+                                User DB
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs text-slate-300 mt-1 truncate">{item.meaning}</p>
                           {item.examples && item.examples.length > 0 && (

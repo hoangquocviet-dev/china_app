@@ -986,11 +986,11 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                           {isChecked && <Check className="w-3.5 h-3.5" />}
                         </div>
                         <div className="min-w-0">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-base font-bold text-slate-100">{word.hanzi}</span>
-                            <span className="text-xs text-rose-400 pinyin-text">{word.pinyin}</span>
+                          <div className="flex items-center space-x-2 flex-wrap gap-y-0.5">
+                            <span className="text-base font-bold text-slate-100 whitespace-nowrap shrink-0">{word.hanzi}</span>
+                            <span className="text-xs text-rose-400 pinyin-text whitespace-nowrap shrink-0">{word.pinyin}</span>
                             {word.hanviet && (
-                              <span className="text-[10px] text-amber-300 font-medium uppercase px-1 rounded bg-amber-500/10">
+                              <span className="text-[10px] text-amber-300 font-medium uppercase px-1 rounded bg-amber-500/10 whitespace-nowrap shrink-0">
                                 {word.hanviet}
                               </span>
                             )}

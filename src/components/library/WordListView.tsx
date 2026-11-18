@@ -4,7 +4,6 @@ import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
 import { AddWordModal } from './AddWordModal';
-import { DICTIONARY_WORDS } from '../../data/dictionaryData';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -106,7 +105,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
           title="Mở kho từ điển tra cứu"
         >
           <BookOpen className="w-3.5 h-3.5 text-amber-400" />
-          <span>Từ điển ({DICTIONARY_WORDS.length}+)</span>
+          <span>Từ điển ({storageService.getDictionaryWords().length}+)</span>
         </button>
       </div>
 

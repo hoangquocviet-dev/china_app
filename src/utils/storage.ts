@@ -1,5 +1,6 @@
 import { INITIAL_WORDS } from '../data/hsk1Words';
 import { INITIAL_SENTENCES } from '../data/hsk1Sentences';
+import { DICTIONARY_WORDS } from '../data/dictionaryData';
 import type { ChineseWord, SentenceExercise, LessonCustomConfig } from '../types';
 
 const STORAGE_KEYS = {
@@ -10,6 +11,8 @@ const STORAGE_KEYS = {
   BACKUP: 'hanziflow_backup',
   SENTENCES: 'hanziflow_sentences',
   LESSON_CONFIG: 'hanziflow_lesson_config',
+  CUSTOM_DICTIONARY: 'hanziflow_custom_dictionary',
+  MASTERED_FLASHCARDS: 'hanziflow_flashcard_mastered_ids',
 };
 
 class SafeStorageService {
@@ -99,7 +102,61 @@ class SafeStorageService {
 
     const updated = [newWord, ...words];
     this.saveWords(updated);
+
+    // Tự động đồng bộ từ mới này vào Database kho từ điển (Dictionary DB) của hệ thống
+    this.addWordToDictionary(newWord);
+
     return { success: true, message: `Đã thêm thành công "${cleanHanzi}" vào sổ từ!`, word: newWord };
+  }
+
+  // --- Dictionary Database Management (Kho từ điển dùng chung) ---
+  public getCustomDictionaryWords(): ChineseWord[] {
+    return this.get<ChineseWord[]>(STORAGE_KEYS.CUSTOM_DICTIONARY, []);
+  }
+
+  public getDictionaryWords(): ChineseWord[] {
+    const customWords = this.getCustomDictionaryWords();
+    const customHanziSet = new Set(customWords.map((w) => w.hanzi.trim()));
+    const defaultWords = DICTIONARY_WORDS.filter((w) => !customHanziSet.has(w.hanzi.trim()));
+    return [...customWords, ...defaultWords];
+  }
+
+  public addWordToDictionary(word: ChineseWord): void {
+    const cleanHanzi = word.hanzi.trim();
+    if (!cleanHanzi) return;
+
+    const customWords = this.getCustomDictionaryWords();
+    const alreadyInCustom = customWords.some((w) => w.hanzi.trim() === cleanHanzi);
+    if (!alreadyInCustom) {
+      const alreadyInDefault = DICTIONARY_WORDS.some((w) => w.hanzi.trim() === cleanHanzi);
+      if (!alreadyInDefault) {
+        const dictWord: ChineseWord = {
+          ...word,
+          id: `dict_${word.id || Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          hanzi: cleanHanzi,
+          box: 1,
+        };
+        const updated = [dictWord, ...customWords];
+        this.set(STORAGE_KEYS.CUSTOM_DICTIONARY, updated);
+      }
+    }
+  }
+
+  // --- Mastered Flashcards Management ---
+  public getMasteredFlashcardIds(): string[] {
+    return this.get<string[]>(STORAGE_KEYS.MASTERED_FLASHCARDS, []);
+  }
+
+  public saveMasteredFlashcardIds(ids: string[]): void {
+    this.set(STORAGE_KEYS.MASTERED_FLASHCARDS, ids);
+  }
+
+  public resetMasteredFlashcards(): void {
+    if (this.isLocalStorageAvailable()) {
+      try {
+        window.localStorage.removeItem(STORAGE_KEYS.MASTERED_FLASHCARDS);
+      } catch {}
+    }
   }
 
   public deleteWord(wordId: string): boolean {
@@ -245,9 +302,12 @@ class SafeStorageService {
 
   public exportBackup(): string {
     const data = {
-      version: 1,
+      version: 2,
       timestamp: Date.now(),
       words: this.getWords(),
+      sentences: this.getSentences(),
+      customDictionary: this.getCustomDictionaryWords(),
+      lessonConfig: this.getLessonConfig(),
     };
     return JSON.stringify(data, null, 2);
   }
@@ -257,9 +317,17 @@ class SafeStorageService {
       const parsed = JSON.parse(jsonString);
       if (Array.isArray(parsed.words)) {
         this.saveWords(parsed.words);
-        return true;
       }
-      return false;
+      if (Array.isArray(parsed.sentences)) {
+        this.saveSentences(parsed.sentences);
+      }
+      if (Array.isArray(parsed.customDictionary)) {
+        this.set(STORAGE_KEYS.CUSTOM_DICTIONARY, parsed.customDictionary);
+      }
+      if (parsed.lessonConfig) {
+        this.saveLessonConfig(parsed.lessonConfig);
+      }
+      return true;
     } catch {
       return false;
     }
