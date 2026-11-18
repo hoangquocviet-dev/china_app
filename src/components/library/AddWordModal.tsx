@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
+import { matchesWordSearch } from '../../utils/pinyinHelper';
 import { autoGenerateWordFromVietnamese } from '../../utils/vietnameseAutoGenerator';
 
 interface AddWordModalProps {
@@ -89,19 +90,12 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
 
   // Filter dictionary words
   const searchResults = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim();
     return dictionaryWords.filter((item) => {
       // Level filter
       if (selectedLevel !== 'ALL' && item.level !== selectedLevel) {
         return false;
       }
-      if (!q) return true;
-      return (
-        item.hanzi.includes(q) ||
-        item.pinyin.toLowerCase().includes(q) ||
-        item.hanviet.toLowerCase().includes(q) ||
-        item.meaning.toLowerCase().includes(q)
-      );
+      return matchesWordSearch(item, searchQuery);
     });
   }, [dictionaryWords, searchQuery, selectedLevel]);
 

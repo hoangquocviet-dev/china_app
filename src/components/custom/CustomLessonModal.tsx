@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import type { ChineseWord, SentenceExercise, LessonCustomConfig } from '../../types';
 import { audioService } from '../../utils/audio';
+import { matchesWordSearch, matchesSentenceSearch } from '../../utils/pinyinHelper';
 import {
   autoGenerateWordFromVietnamese,
   autoGenerateSentenceFromVietnamese,
@@ -566,21 +567,9 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
     }
   };
 
-  // Filtered lists by search query
-  const filteredWords = words.filter(
-    (w) =>
-      w.hanzi.includes(searchQuery) ||
-      w.pinyin.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      w.meaning.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (w.hanviet && w.hanviet.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
-  const filteredSentences = sentences.filter(
-    (s) =>
-      s.targetSentence.includes(searchQuery) ||
-      (s.pinyin && s.pinyin.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      s.sourceSentence.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filtered lists by smart search query (Pinyin toneless & Vietnamese unaccented matching)
+  const filteredWords = words.filter((w) => matchesWordSearch(w, searchQuery));
+  const filteredSentences = sentences.filter((s) => matchesSentenceSearch(s, searchQuery));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">

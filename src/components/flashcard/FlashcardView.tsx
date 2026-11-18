@@ -329,7 +329,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
       <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-4">
         <div
           className="bg-gradient-to-r from-emerald-500 to-rose-500 h-full transition-all duration-300 rounded-full"
-          style={{ width: `${words.length > 0 ? (masteredWordIds.length / words.length) * 100 : 0}%` }}
+          style={{ width: `${words.length > 0 ? Math.min(100, (deckMasteredCount / words.length) * 100) : 0}%` }}
         />
       </div>
 

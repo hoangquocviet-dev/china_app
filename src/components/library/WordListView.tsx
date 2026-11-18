@@ -3,6 +3,7 @@ import { Search, Volume2, PenTool, Download, Upload, Sparkles, Plus, Trash2, Boo
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
+import { matchesWordSearch } from '../../utils/pinyinHelper';
 import { AddWordModal } from './AddWordModal';
 
 interface WordListViewProps {
@@ -30,16 +31,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const filteredWords = words.filter((w) => {
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return true;
-    return (
-      w.hanzi.includes(q) ||
-      w.pinyin.toLowerCase().includes(q) ||
-      w.hanviet.toLowerCase().includes(q) ||
-      w.meaning.toLowerCase().includes(q)
-    );
-  });
+  const filteredWords = words.filter((w) => matchesWordSearch(w, searchQuery));
 
   const handleExport = () => {
     audioService.playClick();
