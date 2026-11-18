@@ -675,3 +675,270 @@ export async function autoGenerateWordFromVietnamese(
     message: `Chưa thể tự tạo cho từ "${raw}". Bạn hãy chọn từ gợi ý hoặc nhập chi tiết nhé!`,
   };
 }
+
+// Common compound words for sentence tokenization
+const COMMON_COMPOUNDS: string[] = [
+  '我们', '他们', '她们', '你们', '这是', '那是', '什么', '怎么', '怎么样', '为什么',
+  '因为', '所以', '如果', '但是', '一起', '很高兴', '高兴', '喜欢', '爱吃', '爱喝',
+  '喝水', '喝茶', '咖啡', '吃饭', '看书', '电影', '去看', '去过', '学校', '医院',
+  '医生', '老师', '学生', '朋友', '今天', '明天', '昨天', '现在', '天气', '很热',
+  '很冷', '很好', '很大', '很小', '非常', '感谢', '谢谢', '对不起', '没关系', '不客气',
+  '再见', '你好', '名字', '一个', '一杯', '几点', '几月', '几号', '多少', '中国',
+  '北京', '越南', '旅游', '买东西', '出租车', '飞机', '火车站', '认识', '说话', '听见', '写字'
+];
+
+export function tokenizeChineseSentence(sentence: string): string[] {
+  const clean = sentence.replace(/[。，！？!?.,\s]/g, '');
+  if (!clean) return [];
+
+  const tokens: string[] = [];
+  let i = 0;
+  while (i < clean.length) {
+    if (i + 3 <= clean.length) {
+      const sub3 = clean.slice(i, i + 3);
+      if (COMMON_COMPOUNDS.includes(sub3)) {
+        tokens.push(sub3);
+        i += 3;
+        continue;
+      }
+    }
+    if (i + 2 <= clean.length) {
+      const sub2 = clean.slice(i, i + 2);
+      if (COMMON_COMPOUNDS.includes(sub2)) {
+        tokens.push(sub2);
+        i += 2;
+        continue;
+      }
+    }
+    tokens.push(clean[i]);
+    i++;
+  }
+  return tokens;
+}
+
+export const CURATED_SENTENCES = [
+  {
+    keywords: ['hom nay toi rat vui', 'toi rat vui', 'hom nay vui', 'rat vui'],
+    targetSentence: '今天我很高兴。',
+    pinyin: 'Jīntiān wǒ hěn gāoxìng.',
+    sourceSentence: 'Hôm nay tôi rất vui.',
+    tokens: ['今天', '我', '很', '高兴'],
+    distractors: ['昨天', '不', '他'],
+  },
+  {
+    keywords: ['ban muon uong gi', 'muon uong gi', 'uong gi'],
+    targetSentence: '你想喝什么？',
+    pinyin: 'Nǐ xiǎng hē shénme?',
+    sourceSentence: 'Bạn muốn uống gì?',
+    tokens: ['你', '想', '喝', '什么'],
+    distractors: ['我', '咖啡', '吃'],
+  },
+  {
+    keywords: ['chung toi cung nhau hoc tieng trung', 'cung nhau hoc tieng trung', 'hoc tieng trung'],
+    targetSentence: '我们一起学习汉语。',
+    pinyin: 'Wǒmen yīqǐ xuéxí hànyǔ.',
+    sourceSentence: 'Chúng tôi cùng nhau học tiếng Trung.',
+    tokens: ['我们', '一起', '学习', '汉语'],
+    distractors: ['他们', '不', '去'],
+  },
+  {
+    keywords: ['ngay mai chung ta di xem phim', 'ngay mai di xem phim', 'di xem phim nhe', 'xem phim'],
+    targetSentence: '明天我们去看电影吧。',
+    pinyin: 'Míngtiān wǒmen qù kàn diànyǐng ba.',
+    sourceSentence: 'Ngày mai chúng ta đi xem phim nhé.',
+    tokens: ['明天', '我们', '去', '看', '电影', '吧'],
+    distractors: ['今天', '买', '书'],
+  },
+  {
+    keywords: ['toi thich uong tra', 'toi rat thich uong tra', 'thich uong tra'],
+    targetSentence: '我很喜欢喝茶。',
+    pinyin: 'Wǒ hěn xǐhuan hē chá.',
+    sourceSentence: 'Tôi rất thích uống trà.',
+    tokens: ['我', '很', '喜欢', '喝', '茶'],
+    distractors: ['不', '咖啡', '他'],
+  },
+  {
+    keywords: ['day la sach cua toi', 'sach cua toi'],
+    targetSentence: '这是我的书。',
+    pinyin: 'Zhè shì wǒ de shū.',
+    sourceSentence: 'Đây là sách của tôi.',
+    tokens: ['这', '是', '我的', '书'],
+    distractors: ['那', '有', '不'],
+  },
+  {
+    keywords: ['cam on ban', 'cam on ban rat nhieu', 'rat cam on ban'],
+    targetSentence: '非常感谢你。',
+    pinyin: 'Fēicháng gǎnxiè nǐ.',
+    sourceSentence: 'Cảm ơn bạn rất nhiều.',
+    tokens: ['非常', '感谢', '你'],
+    distractors: ['对不起', '不客气', '再见'],
+  },
+  {
+    keywords: ['khong co gi', 'dung khach sao', 'khong khach sao'],
+    targetSentence: '不客气。',
+    pinyin: 'Bú kèqi.',
+    sourceSentence: 'Không có gì, đừng khách sáo.',
+    tokens: ['不', '客气'],
+    distractors: ['没关系', '好', '谢谢'],
+  },
+  {
+    keywords: ['thoi tiet hom nay rat dep', 'hom nay thoi tiet rat dep', 'thoi tiet rat dep'],
+    targetSentence: '今天天气很好。',
+    pinyin: 'Jīntiān tiānqì hěn hǎo.',
+    sourceSentence: 'Thời tiết hôm nay rất đẹp.',
+    tokens: ['今天', '天气', '很', '好'],
+    distractors: ['昨天', '冷', '热'],
+  },
+  {
+    keywords: ['thoi tiet hom nay rat nong', 'hom nay rat nong', 'thoi tiet nong'],
+    targetSentence: '今天天气很热。',
+    pinyin: 'Jīntiān tiānqì hěn rè.',
+    sourceSentence: 'Thời tiết hôm nay rất nóng.',
+    tokens: ['今天', '天气', '很', '热'],
+    distractors: ['昨天', '冷', '不'],
+  },
+  {
+    keywords: ['thoi tiet hom nay rat lanh', 'hom nay rat lanh', 'thoi tiet lanh'],
+    targetSentence: '今天天气很冷。',
+    pinyin: 'Jīntiān tiānqì hěn lěng.',
+    sourceSentence: 'Thời tiết hôm nay rất lạnh.',
+    tokens: ['今天', '天气', '很', '冷'],
+    distractors: ['明天', '热', '不'],
+  },
+  {
+    keywords: ['anh ay khong thich an com', 'khong thich an com'],
+    targetSentence: '他不爱吃饭。',
+    pinyin: 'Tā bú ài chī fàn.',
+    sourceSentence: 'Anh ấy không thích ăn cơm.',
+    tokens: ['他', '不', '爱', '吃饭'],
+    distractors: ['我', '喝水', '想'],
+  },
+  {
+    keywords: ['toi muon mua ca phe', 'mua mot coc ca phe', 'muon mua ca phe'],
+    targetSentence: '我想买一杯咖啡。',
+    pinyin: 'Wǒ xiǎng mǎi yì bēi kāfēi.',
+    sourceSentence: 'Tôi muốn mua một cốc cà phê.',
+    tokens: ['我', '想', '买', '一杯', '咖啡'],
+    distractors: ['卖', '他', '茶'],
+  },
+  {
+    keywords: ['ban ten la gi', 'ban ten gi'],
+    targetSentence: '你叫什么名字？',
+    pinyin: 'Nǐ jiào shénme míngzi?',
+    sourceSentence: 'Bạn tên là gì?',
+    tokens: ['你', '叫', '什么', '名字'],
+    distractors: ['我', '谁', '的'],
+  },
+  {
+    keywords: ['bac si o benh vien', 'bac si dang o benh vien'],
+    targetSentence: '医生在医院。',
+    pinyin: 'Yīshēng zài yīyuàn.',
+    sourceSentence: 'Bác sĩ đang ở bệnh viện.',
+    tokens: ['医生', '在', '医院'],
+    distractors: ['学校', '老师', '看书'],
+  },
+  {
+    keywords: ['bay gio la may gio', 'may gio roi'],
+    targetSentence: '现在几点了？',
+    pinyin: 'Xiànzài jǐ diǎn le?',
+    sourceSentence: 'Bây giờ là mấy giờ rồi?',
+    tokens: ['现在', '几点', '了'],
+    distractors: ['今天', '分', '多少'],
+  }
+];
+
+/**
+ * Auto-generate a complete SentenceExercise from a Vietnamese input.
+ */
+export async function autoGenerateSentenceFromVietnamese(raw: string): Promise<{
+  success: boolean;
+  sentence?: {
+    targetSentence: string;
+    sourceSentence: string;
+    pinyin: string;
+    tokens: string[];
+    distractorTokens: string[];
+    sourceLang: 'vi';
+    targetLang: 'zh';
+    includeInAssembly: boolean;
+    includeInSpeaking: boolean;
+  };
+  message: string;
+}> {
+  if (!raw || !raw.trim()) {
+    return { success: false, message: 'Vui lòng nhập câu tiếng Việt.' };
+  }
+
+  const clean = raw.trim();
+  const normalized = removeVietnameseTones(clean);
+
+  // 1. Check in curated sentences
+  const curatedMatch = CURATED_SENTENCES.find((item) =>
+    item.keywords.some((k) => {
+      const kNorm = removeVietnameseTones(k);
+      return normalized === kNorm || normalized.includes(kNorm) || kNorm.includes(normalized);
+    })
+  );
+
+  if (curatedMatch) {
+    return {
+      success: true,
+      sentence: {
+        targetSentence: curatedMatch.targetSentence,
+        sourceSentence: clean,
+        pinyin: curatedMatch.pinyin,
+        tokens: [...curatedMatch.tokens],
+        distractorTokens: [...curatedMatch.distractors],
+        sourceLang: 'vi',
+        targetLang: 'zh',
+        includeInAssembly: true,
+        includeInSpeaking: true,
+      },
+      message: `Đã tìm thấy câu mẫu: "${curatedMatch.targetSentence}" (${curatedMatch.pinyin}).`,
+    };
+  }
+
+  // 2. Fallback: Call Translation API
+  try {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(raw)}&langpair=vi|zh-CN`;
+    const res = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      const translatedText = data?.responseData?.translatedText;
+      if (translatedText && typeof translatedText === 'string') {
+        const cleanZh = translatedText.replace(/[^\u4e00-\u9fa5，。！？]/g, '').trim();
+        if (cleanZh) {
+          const { pinyin } = synthesizePinyinAndHanviet(cleanZh);
+          const tokens = tokenizeChineseSentence(cleanZh);
+          const allDistractors = ['不', '他', '她', '很', '有', '买', '昨天', '今天', '学校', '茶'];
+          const distractors = allDistractors
+            .filter((d) => !tokens.includes(d))
+            .slice(0, 3);
+
+          return {
+            success: true,
+            sentence: {
+              targetSentence: cleanZh.endsWith('。') || cleanZh.endsWith('？') ? cleanZh : cleanZh + '。',
+              sourceSentence: clean,
+              pinyin: pinyin || '...',
+              tokens: tokens.length > 0 ? tokens : Array.from(cleanZh),
+              distractorTokens: distractors,
+              sourceLang: 'vi',
+              targetLang: 'zh',
+              includeInAssembly: true,
+              includeInSpeaking: true,
+            },
+            message: `AI đã dịch và phân tích câu thành công: "${cleanZh}"!`,
+          };
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[AutoGenerateSentence] Translation API error:', err);
+  }
+
+  return {
+    success: false,
+    message: `Chưa thể tự động tạo câu cho "${raw}". Bạn hãy chọn câu gợi ý hoặc tự nhập nhé!`,
+  };
+}

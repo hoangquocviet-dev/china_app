@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import type { ChineseWord, SentenceExercise, LessonCustomConfig } from '../../types';
 import { audioService } from '../../utils/audio';
-import { autoGenerateWordFromVietnamese } from '../../utils/vietnameseAutoGenerator';
+import { autoGenerateWordFromVietnamese, autoGenerateSentenceFromVietnamese } from '../../utils/vietnameseAutoGenerator';
 
 interface CustomLessonModalProps {
   isOpen: boolean;
@@ -66,6 +66,9 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
   const [wordMeaning, setWordMeaning] = useState('');
 
   // Sentence Form State (for Assembly & Speaking)
+  const [addSentenceMode, setAddSentenceMode] = useState<'vietnamese' | 'manual'>('vietnamese');
+  const [vietnameseSentenceInput, setVietnameseSentenceInput] = useState('');
+  const [isGeneratingSentence, setIsGeneratingSentence] = useState(false);
   const [sentenceTarget, setSentenceTarget] = useState('');
   const [sentencePinyin, setSentencePinyin] = useState('');
   const [sentenceMeaning, setSentenceMeaning] = useState('');
@@ -296,6 +299,81 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
       showToast(res.message);
     } else {
       showToast(res.message, 'error');
+    }
+  };
+
+  // Handle Auto-generate Sentence from Vietnamese input
+  const handleAutoGenerateSentenceFromVietnamese = async () => {
+    if (!vietnameseSentenceInput.trim()) {
+      showToast('Vui lòng nhập câu tiếng Việt.', 'error');
+      return;
+    }
+    audioService.playClick();
+    setIsGeneratingSentence(true);
+
+    try {
+      const res = await autoGenerateSentenceFromVietnamese(vietnameseSentenceInput);
+      if (res.success && res.sentence) {
+        const added = onAddSentence({
+          ...res.sentence,
+          type: activeTab === 'assembly' ? 'assembly' : 'speaking',
+        });
+
+        if (added.success && added.sentence) {
+          if (activeTab === 'assembly') {
+            const cur = lessonConfig.assemblySentenceIds ?? sentences.map((s) => s.id);
+            onSaveConfig({ ...lessonConfig, assemblySentenceIds: [added.sentence.id, ...cur] });
+          } else if (activeTab === 'speaking') {
+            const cur = lessonConfig.speakingSentenceIds ?? sentences.map((s) => s.id);
+            onSaveConfig({ ...lessonConfig, speakingSentenceIds: [added.sentence.id, ...cur] });
+          }
+          audioService.playSuccessChime();
+          setVietnameseSentenceInput('');
+          setIsSentenceFormOpen(false);
+          showToast(`Đã tự động tạo: "${res.sentence.targetSentence}" (${res.sentence.pinyin})!`);
+        } else {
+          showToast(added.message, 'error');
+        }
+      } else {
+        audioService.playErrorBuzz();
+        showToast(res.message, 'error');
+      }
+    } catch (e) {
+      audioService.playErrorBuzz();
+      showToast('Có lỗi xảy ra khi tạo câu.', 'error');
+    } finally {
+      setIsGeneratingSentence(false);
+    }
+  };
+
+  // Helper to auto-fill manual sentence form from meaning
+  const handleAutoFillManualSentenceFromVietnamese = async () => {
+    const raw = sentenceMeaning.trim() || vietnameseSentenceInput.trim();
+    if (!raw) {
+      showToast('Vui lòng nhập dịch nghĩa tiếng Việt trước.', 'error');
+      return;
+    }
+    audioService.playClick();
+    setIsGeneratingSentence(true);
+    try {
+      const res = await autoGenerateSentenceFromVietnamese(raw);
+      if (res.success && res.sentence) {
+        setSentenceTarget(res.sentence.targetSentence);
+        setSentencePinyin(res.sentence.pinyin);
+        setSentenceTokens(res.sentence.tokens.join(' '));
+        setSentenceDistractors(res.sentence.distractorTokens.join(' '));
+        if (!sentenceMeaning.trim()) {
+          setSentenceMeaning(res.sentence.sourceSentence);
+        }
+        audioService.playSuccessChime();
+        showToast(`Đã tự điền câu: ${res.sentence.targetSentence}`);
+      } else {
+        showToast(res.message, 'error');
+      }
+    } catch {
+      showToast('Chưa thể tự điền câu này.', 'error');
+    } finally {
+      setIsGeneratingSentence(false);
     }
   };
 
@@ -814,107 +892,211 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                 {isSentenceFormOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
 
-              {/* Add Sentence Form */}
+              {/* Add Sentence Form with Vietnamese Auto-Generate */}
               {isSentenceFormOpen && (
-                <form
-                  onSubmit={handleAddNewSentence}
-                  className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2.5 animate-fadeIn"
-                >
-                  <div>
-                    <label className="text-[10px] text-slate-400 font-semibold block mb-1">
-                      Câu tiếng Trung *
-                    </label>
-                    <input
-                      type="text"
-                      value={sentenceTarget}
-                      onChange={(e) => setSentenceTarget(e.target.value)}
-                      placeholder="VD: 我们去看电影吧。"
-                      required
-                      className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-[10px] text-slate-400 font-semibold block mb-1">
-                        Phiên âm Pinyin
-                      </label>
-                      <input
-                        type="text"
-                        value={sentencePinyin}
-                        onChange={(e) => setSentencePinyin(e.target.value)}
-                        placeholder="VD: Wǒmen qù kàn diànyǐng ba."
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] text-slate-400 font-semibold block mb-1">
-                        Dịch nghĩa tiếng Việt *
-                      </label>
-                      <input
-                        type="text"
-                        value={sentenceMeaning}
-                        onChange={(e) => setSentenceMeaning(e.target.value)}
-                        placeholder="VD: Chúng ta cùng đi xem phim nhé."
-                        required
-                        className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Assembly-specific tokens fields */}
-                  {activeTab === 'assembly' && (
-                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-750">
-                      <div>
-                        <label className="text-[10px] text-slate-400 font-semibold block mb-1">
-                          Mảnh ghép từ (cách nhau dấu cách)
-                        </label>
-                        <input
-                          type="text"
-                          value={sentenceTokens}
-                          onChange={(e) => setSentenceTokens(e.target.value)}
-                          placeholder="VD: 我们 去 看 电影 吧"
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[10px] text-slate-400 font-semibold block mb-1">
-                          Từ gây nhiễu (tùy chọn)
-                        </label>
-                        <input
-                          type="text"
-                          value={sentenceDistractors}
-                          onChange={(e) => setSentenceDistractors(e.target.value)}
-                          placeholder="VD: 他 昨天 喝茶"
-                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between pt-1">
-                    {sentenceTarget.trim() ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          audioService.playClick();
-                          audioService.speakChinese(sentenceTarget.trim());
-                        }}
-                        className="text-[11px] text-rose-400 flex items-center space-x-1"
-                      >
-                        <Volume2 className="w-3.5 h-3.5" />
-                        <span>Nghe thử câu</span>
-                      </button>
-                    ) : <span />}
-
+                <div className="p-3.5 rounded-2xl bg-slate-800/90 border border-slate-700 space-y-3 animate-fadeIn">
+                  {/* Mode switcher */}
+                  <div className="grid grid-cols-2 p-1 bg-slate-900 rounded-xl border border-slate-750 gap-1 text-xs">
                     <button
-                      type="submit"
-                      className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-md shadow-rose-900/30"
+                      type="button"
+                      onClick={() => {
+                        audioService.playClick();
+                        setAddSentenceMode('vietnamese');
+                      }}
+                      className={`py-1.5 px-2 rounded-lg font-semibold flex items-center justify-center space-x-1 transition-all ${
+                        addSentenceMode === 'vietnamese'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
                     >
-                      Lưu câu bài học
+                      <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                      <span>Nhập tiếng Việt (Tự tạo AI)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        audioService.playClick();
+                        setAddSentenceMode('manual');
+                      }}
+                      className={`py-1.5 px-2 rounded-lg font-semibold flex items-center justify-center space-x-1 transition-all ${
+                        addSentenceMode === 'manual'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <span>Tự điền chi tiết</span>
                     </button>
                   </div>
-                </form>
+
+                  {/* Mode 1: Auto-generate sentence from Vietnamese */}
+                  {addSentenceMode === 'vietnamese' ? (
+                    <div className="space-y-2.5">
+                      <div>
+                        <label className="text-[11px] text-slate-300 font-semibold block mb-1">
+                          Câu tiếng Việt (Hệ thống tự dịch câu Hán, Pinyin & tách mảnh ghép):
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            data-testid="vietnamese-sentence-input"
+                            value={vietnameseSentenceInput}
+                            onChange={(e) => setVietnameseSentenceInput(e.target.value)}
+                            placeholder="VD: Hôm nay tôi rất vui, Bạn muốn uống gì?..."
+                            className="flex-1 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleAutoGenerateSentenceFromVietnamese();
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            data-testid="auto-generate-sentence-btn"
+                            disabled={isGeneratingSentence || !vietnameseSentenceInput.trim()}
+                            onClick={handleAutoGenerateSentenceFromVietnamese}
+                            className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md shadow-rose-900/30 flex items-center space-x-1 shrink-0 active:scale-95"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                            <span>{isGeneratingSentence ? 'Đang tạo...' : 'Tự tạo & Thêm'}</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Quick Suggestions */}
+                      <div>
+                        <div className="text-[10px] text-slate-400 font-medium mb-1.5 flex items-center gap-1">
+                          <span>Gợi ý câu mẫu phổ biến (bấm để điền nhanh):</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {[
+                            'Hôm nay tôi rất vui',
+                            'Bạn muốn uống gì?',
+                            'Tôi rất thích uống trà',
+                            'Ngày mai chúng ta đi xem phim nhé',
+                            'Thời tiết hôm nay rất đẹp',
+                            'Bác sĩ đang ở bệnh viện',
+                          ].map((suggestion, sIdx) => (
+                            <button
+                              key={sIdx}
+                              type="button"
+                              onClick={() => {
+                                audioService.playClick();
+                                setVietnameseSentenceInput(suggestion);
+                              }}
+                              className="text-[11px] px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-rose-600/20 text-slate-300 hover:text-rose-300 border border-slate-750 transition-colors"
+                            >
+                              + {suggestion}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-slate-850/80 border border-slate-750 text-[11px] text-slate-400 space-y-1">
+                        <div className="flex items-center space-x-1.5 text-slate-300 font-medium">
+                          <Sparkles className="w-3 h-3 text-rose-400" />
+                          <span>Tính năng thông minh cho câu:</span>
+                        </div>
+                        <p>
+                          Chỉ cần gõ tiếng Việt, hệ thống sẽ tự động dịch câu tiếng Trung, sinh Pinyin chuẩn, tự động bóc tách thành các mảnh ghép từ cho <b>Ghép câu</b> và chuẩn bị dữ liệu cho <b>Luyện nói AI</b>!
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Mode 2: Manual Sentence Fill */
+                    <form onSubmit={handleAddNewSentence} className="space-y-2.5">
+                      <div>
+                        <label className="text-[10px] text-slate-400 font-semibold block mb-1">
+                          Câu tiếng Trung *
+                        </label>
+                        <input
+                          type="text"
+                          value={sentenceTarget}
+                          onChange={(e) => setSentenceTarget(e.target.value)}
+                          placeholder="VD: 我们去看电影吧。"
+                          required
+                          className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[10px] text-slate-400 font-semibold block mb-1">
+                            Phiên âm Pinyin
+                          </label>
+                          <input
+                            type="text"
+                            value={sentencePinyin}
+                            onChange={(e) => setSentencePinyin(e.target.value)}
+                            placeholder="VD: Wǒmen qù kàn diànyǐng ba."
+                            className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-slate-400 font-semibold block mb-1">
+                            Dịch nghĩa tiếng Việt *
+                          </label>
+                          <input
+                            type="text"
+                            value={sentenceMeaning}
+                            onChange={(e) => setSentenceMeaning(e.target.value)}
+                            placeholder="VD: Chúng ta cùng đi xem phim nhé."
+                            required
+                            className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Assembly-specific tokens fields */}
+                      {activeTab === 'assembly' && (
+                        <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-750">
+                          <div>
+                            <label className="text-[10px] text-slate-400 font-semibold block mb-1">
+                              Mảnh ghép từ (cách nhau dấu cách)
+                            </label>
+                            <input
+                              type="text"
+                              value={sentenceTokens}
+                              onChange={(e) => setSentenceTokens(e.target.value)}
+                              placeholder="VD: 我们 去 看 电影 吧"
+                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-slate-400 font-semibold block mb-1">
+                              Từ gây nhiễu (tùy chọn)
+                            </label>
+                            <input
+                              type="text"
+                              value={sentenceDistractors}
+                              onChange={(e) => setSentenceDistractors(e.target.value)}
+                              placeholder="VD: 他 昨天 喝茶"
+                              className="w-full px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between pt-1">
+                        <button
+                          type="button"
+                          onClick={handleAutoFillManualSentenceFromVietnamese}
+                          className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center space-x-1"
+                        >
+                          <Sparkles className="w-3 h-3 text-amber-400" />
+                          <span>Tự điền từ nghĩa</span>
+                        </button>
+
+                        <button
+                          type="submit"
+                          className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-md shadow-rose-900/30"
+                        >
+                          Lưu câu bài học
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
               )}
 
               {/* Search input */}
