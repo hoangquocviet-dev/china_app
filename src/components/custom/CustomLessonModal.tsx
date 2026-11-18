@@ -187,6 +187,17 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
     showToast('Đã chọn tất cả từ vựng.');
   };
 
+  const handleDeselectAllWords = (target: 'flashcard' | 'writing') => {
+    audioService.playClick();
+    const firstWordId = words[0]?.id ? [words[0].id] : [];
+    if (target === 'flashcard') {
+      onSaveConfig({ ...lessonConfig, flashcardWordIds: firstWordId });
+    } else {
+      onSaveConfig({ ...lessonConfig, writingWordIds: firstWordId });
+    }
+    showToast('Đã bỏ chọn (giữ 1 từ tối thiểu).');
+  };
+
   const handleSelectAllSentences = (target: 'assembly' | 'speaking') => {
     audioService.playClick();
     const allIds = sentences.map((s) => s.id);
@@ -196,6 +207,17 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
       onSaveConfig({ ...lessonConfig, speakingSentenceIds: allIds });
     }
     showToast('Đã chọn tất cả câu bài tập.');
+  };
+
+  const handleDeselectAllSentences = (target: 'assembly' | 'speaking') => {
+    audioService.playClick();
+    const firstSentId = sentences[0]?.id ? [sentences[0].id] : [];
+    if (target === 'assembly') {
+      onSaveConfig({ ...lessonConfig, assemblySentenceIds: firstSentId });
+    } else {
+      onSaveConfig({ ...lessonConfig, speakingSentenceIds: firstSentId });
+    }
+    showToast('Đã bỏ chọn (giữ 1 câu tối thiểu).');
   };
 
   // Handle Auto-Generate from Vietnamese Input (No Hanzi or Pinyin needed)
@@ -691,9 +713,16 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSelectAllWords(activeTab)}
-                    className="text-[11px] px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700"
+                    className="text-[11px] px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 transition-colors"
                   >
                     Chọn tất cả
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeselectAllWords(activeTab)}
+                    className="text-[11px] px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-rose-300 border border-slate-700 transition-colors"
+                  >
+                    Bỏ chọn hết
                   </button>
                 </div>
               </div>
@@ -1036,9 +1065,16 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSelectAllSentences(activeTab)}
-                    className="text-[11px] px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700"
+                    className="text-[11px] px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 transition-colors"
                   >
                     Chọn tất cả
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeselectAllSentences(activeTab)}
+                    className="text-[11px] px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-rose-300 border border-slate-700 transition-colors"
+                  >
+                    Bỏ chọn hết
                   </button>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import HanziWriter from 'hanzi-writer';
-import { Play, RotateCcw, HelpCircle, Volume2, CheckCircle2, AlertCircle, ChevronRight, Sparkles } from 'lucide-react';
+import { Play, RotateCcw, HelpCircle, Volume2, CheckCircle2, AlertCircle, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
@@ -189,6 +189,14 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
     setHintMessage(null);
   };
 
+  const handlePrevWord = () => {
+    audioService.playClick();
+    setSelectedWordIndex((prev) => (prev - 1 + words.length) % words.length);
+    setCurrentCharIndex(0);
+    setIsCompleted(false);
+    setHintMessage(null);
+  };
+
   useEffect(() => {
     initWriter();
     return () => {
@@ -273,22 +281,40 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
   return (
     <div className="flex flex-col flex-1 max-w-md w-full mx-auto p-4 pb-24">
       {/* Word & Char Selectors */}
-      <div className="flex items-center justify-between mb-3">
-        <select
-          value={selectedWordIndex}
-          onChange={(e) => {
-            audioService.playClick();
-            setSelectedWordIndex(Number(e.target.value));
-            setCurrentCharIndex(0);
-          }}
-          className="bg-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-rose-500 font-medium max-w-[200px]"
-        >
-          {words.map((w, idx) => (
-            <option key={w.id} value={idx}>
-              {w.hanzi} - {w.pinyin} ({w.hanviet})
-            </option>
-          ))}
-        </select>
+      <div className="flex items-center justify-between mb-3 gap-2">
+        <div className="flex items-center space-x-1 flex-1 min-w-0">
+          <button
+            onClick={handlePrevWord}
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-slate-200 border border-slate-700 active:scale-95 transition-all shrink-0"
+            title="Từ trước"
+            aria-label="Từ trước"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+          <select
+            value={selectedWordIndex}
+            onChange={(e) => {
+              audioService.playClick();
+              setSelectedWordIndex(Number(e.target.value));
+              setCurrentCharIndex(0);
+            }}
+            className="bg-slate-800 text-slate-200 text-xs rounded-xl px-2.5 py-2 border border-slate-700 focus:outline-none focus:border-rose-500 font-medium flex-1 truncate"
+          >
+            {words.map((w, idx) => (
+              <option key={w.id} value={idx}>
+                {w.hanzi} - {w.pinyin} ({w.hanviet})
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleNextWord}
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-slate-200 border border-slate-700 active:scale-95 transition-all shrink-0"
+            title="Từ tiếp theo"
+            aria-label="Từ tiếp theo"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
 
         {/* Character tabs if multi-char word */}
         <div className="flex items-center space-x-1.5">

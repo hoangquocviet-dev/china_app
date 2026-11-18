@@ -239,19 +239,29 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
         </div>
       )}
 
-      {/* Action Check Button */}
-      <button
-        onClick={handleCheck}
-        disabled={selectedTokens.length === 0}
-        className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center space-x-2 shadow-lg mb-3 ${
-          selectedTokens.length > 0
-            ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-rose-900/40 active:scale-98'
-            : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-        }`}
-      >
-        <Check className="w-4 h-4" />
-        <span>Kiểm tra kết quả</span>
-      </button>
+      {/* Action Check or Next Button */}
+      {isEvaluated && isCorrect ? (
+        <button
+          onClick={handleNext}
+          className="w-full py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center space-x-2 shadow-lg shadow-emerald-900/40 mb-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white active:scale-98"
+        >
+          <span>Câu tiếp theo</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      ) : (
+        <button
+          onClick={handleCheck}
+          disabled={selectedTokens.length === 0}
+          className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center space-x-2 shadow-lg mb-3 ${
+            selectedTokens.length > 0
+              ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-rose-900/40 active:scale-98'
+              : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+          }`}
+        >
+          <Check className="w-4 h-4" />
+          <span>Kiểm tra kết quả</span>
+        </button>
+      )}
 
       {/* Next / Prev navigation */}
       <div className="flex items-center justify-between text-slate-400 mt-auto">
