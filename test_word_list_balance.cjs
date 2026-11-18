@@ -75,7 +75,7 @@ async function testWordListBalance(targetUrl) {
 
     // Check words in list
     const wordBadges = await page.evaluate(() => {
-      const badges = Array.from(document.querySelectorAll('.select-all.whitespace-nowrap'));
+      const badges = Array.from(document.querySelectorAll('.hanzi-badge'));
       return badges.map(b => ({
         text: b.textContent ? b.textContent.trim() : '',
         width: b.clientWidth,

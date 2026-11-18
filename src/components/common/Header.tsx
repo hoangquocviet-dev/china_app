@@ -21,16 +21,26 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [isRotating, setIsRotating] = useState(false);
 
-  const handleReloadClick = () => {
+  const handleReloadClick = async () => {
     audioService.playClick();
     setIsRotating(true);
+    try {
+      if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const reg of registrations) {
+          await reg.update();
+        }
+      }
+    } catch {
+      // Ignore if offline or no SW
+    }
     setTimeout(() => {
       if (onReload) {
         onReload();
       } else {
         window.location.reload();
       }
-    }, 250);
+    }, 300);
   };
   return (
     <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">

@@ -70,3 +70,16 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Chinese Hanzi Badge: strictly prevent character stacking or vertical wrapping */
+.hanzi-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
