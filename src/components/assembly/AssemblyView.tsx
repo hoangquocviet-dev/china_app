@@ -49,6 +49,9 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const handleSelectToken = (token: string, tokenIndex: number) => {
     if (isEvaluated && isCorrect) return;
     audioService.playClick();
+    try {
+      navigator.vibrate?.(12);
+    } catch {}
     setSelectedTokens((prev) => [...prev, token]);
     setAvailableTokens((prev) => prev.filter((_, idx) => idx !== tokenIndex));
   };
@@ -56,6 +59,9 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const handleDeselectToken = (token: string, tokenIndex: number) => {
     if (isEvaluated && isCorrect) return;
     audioService.playClick();
+    try {
+      navigator.vibrate?.(10);
+    } catch {}
     setSelectedTokens((prev) => prev.filter((_, idx) => idx !== tokenIndex));
     setAvailableTokens((prev) => [...prev, token]);
   };
@@ -71,6 +77,9 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
 
     if (correct) {
       audioService.playSuccessChime();
+      try {
+        navigator.vibrate?.([20, 30, 20]);
+      } catch {}
       confetti({
         particleCount: 30,
         spread: 60,
@@ -82,6 +91,9 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
       }, 350);
     } else {
       audioService.playErrorBuzz();
+      try {
+        navigator.vibrate?.([40, 30, 40]);
+      } catch {}
     }
   };
 

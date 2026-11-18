@@ -11,6 +11,7 @@ import {
   BookOpen,
   CheckCircle2,
   ChevronDown,
+  X,
 } from 'lucide-react';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
@@ -159,8 +160,19 @@ export const WordListView: React.FC<WordListViewProps> = ({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Tìm trong sổ từ: Hán tự, Pinyin, Hán Việt..."
-          className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-800/90 border border-slate-700 text-slate-100 placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:border-rose-500"
+          className="w-full pl-10 pr-10 py-2.5 rounded-2xl bg-slate-800/90 border border-slate-700 text-slate-100 placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:border-rose-500"
         />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-200 transition-colors"
+            title="Xóa tìm kiếm"
+            aria-label="Xóa tìm kiếm"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Stats & Backup Toolbar */}
