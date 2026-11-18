@@ -228,6 +228,18 @@ class SafeStorageService {
     if (mastered.includes(wordId)) {
       this.saveMasteredFlashcardIds(mastered.filter((id) => id !== wordId));
     }
+
+    // Prune deleted wordId from custom lesson config to prevent orphaned selections
+    const cfg = this.getLessonConfig();
+    if (cfg.flashcardWordIds?.includes(wordId) || cfg.writingWordIds?.includes(wordId)) {
+      const nextFlash = cfg.flashcardWordIds?.filter((id) => id !== wordId);
+      const nextWrite = cfg.writingWordIds?.filter((id) => id !== wordId);
+      this.saveLessonConfig({
+        ...cfg,
+        flashcardWordIds: nextFlash && nextFlash.length > 0 ? nextFlash : undefined,
+        writingWordIds: nextWrite && nextWrite.length > 0 ? nextWrite : undefined,
+      });
+    }
     return true;
   }
 
@@ -348,6 +360,18 @@ class SafeStorageService {
     }
     const updated = sentences.filter((s) => s.id !== sentenceId);
     this.saveSentences(updated);
+
+    // Prune deleted sentenceId from custom lesson config
+    const cfg = this.getLessonConfig();
+    if (cfg.assemblySentenceIds?.includes(sentenceId) || cfg.speakingSentenceIds?.includes(sentenceId)) {
+      const nextAsm = cfg.assemblySentenceIds?.filter((id) => id !== sentenceId);
+      const nextSpk = cfg.speakingSentenceIds?.filter((id) => id !== sentenceId);
+      this.saveLessonConfig({
+        ...cfg,
+        assemblySentenceIds: nextAsm && nextAsm.length > 0 ? nextAsm : undefined,
+        speakingSentenceIds: nextSpk && nextSpk.length > 0 ? nextSpk : undefined,
+      });
+    }
     return true;
   }
 

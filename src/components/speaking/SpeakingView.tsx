@@ -48,12 +48,15 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const userAudioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
   const hasWords = Boolean(words && words.length > 0);
-  const currentWord = hasWords ? (words[wordIndex] || words[0]) : null;
-  const currentSentence = activeSentences[sentenceIndex] || activeSentences[0];
+  const safeWordIndex = hasWords ? Math.min(wordIndex, words.length - 1) : 0;
+  const safeSentenceIndex = activeSentences.length > 0 ? Math.min(sentenceIndex, activeSentences.length - 1) : 0;
+  const currentWord = hasWords ? words[safeWordIndex] : null;
+  const currentSentence = activeSentences[safeSentenceIndex] || activeSentences[0];
 
   const targetText = practiceType === 'word'
     ? (currentWord ? currentWord.hanzi : '')
@@ -70,9 +73,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const targetHanviet = practiceType === 'word' && currentWord ? currentWord.hanviet : null;
 
   useEffect(() => {
-    setSentenceIndex(0);
-    resetEvalState();
-  }, [sentences]);
+    if (sentenceIndex >= activeSentences.length) {
+      setSentenceIndex(0);
+      resetEvalState();
+    }
+  }, [sentences, activeSentences.length, sentenceIndex]);
 
   // Check Web Speech API support & cleanup on unmount
   useEffect(() => {
@@ -95,6 +100,14 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
           mediaRecorderRef.current.stop();
         } catch {}
       }
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+        mediaStreamRef.current = null;
+      }
+      if (userAudioPlayerRef.current) {
+        userAudioPlayerRef.current.pause();
+        userAudioPlayerRef.current = null;
+      }
     };
   }, []);
 
@@ -114,10 +127,10 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
     resetEvalState();
     if (practiceType === 'word') {
       if (words.length > 0) {
-        setWordIndex((prev) => (prev + 1) % words.length);
+        setWordIndex((safeWordIndex + 1) % words.length);
       }
     } else {
-      setSentenceIndex((prev) => (prev + 1) % activeSentences.length);
+      setSentenceIndex((safeSentenceIndex + 1) % activeSentences.length);
     }
   };
 
@@ -126,10 +139,10 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
     resetEvalState();
     if (practiceType === 'word') {
       if (words.length > 0) {
-        setWordIndex((prev) => (prev - 1 + words.length) % words.length);
+        setWordIndex((safeWordIndex - 1 + words.length) % words.length);
       }
     } else {
-      setSentenceIndex((prev) => (prev - 1 + activeSentences.length) % activeSentences.length);
+      setSentenceIndex((safeSentenceIndex - 1 + activeSentences.length) % activeSentences.length);
     }
   };
 
@@ -188,6 +201,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStreamRef.current = stream;
         const recorder = new MediaRecorder(stream);
         mediaRecorderRef.current = recorder;
         audioChunksRef.current = [];
@@ -199,7 +213,8 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
         };
 
         recorder.onstop = () => {
-          const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          const mimeType = recorder.mimeType || 'audio/webm';
+          const blob = new Blob(audioChunksRef.current, { type: mimeType });
           if (blob.size > 0) {
             const url = URL.createObjectURL(blob);
             setUserAudioUrl(url);
@@ -209,6 +224,9 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             setUserAudioUrl(url);
           }
           stream.getTracks().forEach((track) => track.stop());
+          if (mediaStreamRef.current === stream) {
+            mediaStreamRef.current = null;
+          }
         };
 
         recorder.start(100);

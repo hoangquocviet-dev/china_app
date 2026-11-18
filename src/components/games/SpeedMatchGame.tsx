@@ -385,6 +385,19 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
   };
 
   useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) return;
+      if (document.querySelector('.fixed.inset-0')) return;
+      if ((phase === 'ready' || phase === 'gameover') && (e.code === 'Space' || e.code === 'Enter')) {
+        e.preventDefault();
+        handleStartGame();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [phase]);
+
+  useEffect(() => {
     return () => {
       clearAllTimers();
       audioService.stopSpeech();

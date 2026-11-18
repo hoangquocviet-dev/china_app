@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
 import { RotateCw } from 'lucide-react';
 import type { ActiveTab, ChineseWord, SentenceExercise, LessonCustomConfig } from './types';
 import { Header } from './components/common/Header';
@@ -60,13 +60,14 @@ export function App() {
   };
 
   const loadWords = () => {
-    const loaded = storageService.getWords();
-    setWords(loaded);
+    setWords(storageService.getWords());
+    setSentences(storageService.getSentences());
+    setLessonConfig(storageService.getLessonConfig());
   };
 
   const loadSentences = () => {
-    const loaded = storageService.getSentences();
-    setSentences(loaded);
+    setSentences(storageService.getSentences());
+    setLessonConfig(storageService.getLessonConfig());
   };
 
   const handleSaveLessonConfig = (newConfig: LessonCustomConfig) => {
@@ -192,22 +193,34 @@ export function App() {
     setLessonConfig({});
   };
 
-  // Filtered lists for each practice mode according to lesson config
-  const activeFlashcardWords = words.filter(
-    (w) => !lessonConfig.flashcardWordIds?.length || lessonConfig.flashcardWordIds.includes(w.id)
-  );
+  // Memoized filtered lists so unrelated header renders (e.g. sound toggle, opening modal) never reset child views
+  const activeFlashcardWords = useMemo(() => {
+    const filtered = words.filter(
+      (w) => !lessonConfig.flashcardWordIds?.length || lessonConfig.flashcardWordIds.includes(w.id)
+    );
+    return filtered.length > 0 ? filtered : words;
+  }, [words, lessonConfig.flashcardWordIds]);
 
-  const activeWritingWords = words.filter(
-    (w) => !lessonConfig.writingWordIds?.length || lessonConfig.writingWordIds.includes(w.id)
-  );
+  const activeWritingWords = useMemo(() => {
+    const filtered = words.filter(
+      (w) => !lessonConfig.writingWordIds?.length || lessonConfig.writingWordIds.includes(w.id)
+    );
+    return filtered.length > 0 ? filtered : words;
+  }, [words, lessonConfig.writingWordIds]);
 
-  const activeAssemblySentences = sentences.filter(
-    (s) => !lessonConfig.assemblySentenceIds?.length || lessonConfig.assemblySentenceIds.includes(s.id)
-  );
+  const activeAssemblySentences = useMemo(() => {
+    const filtered = sentences.filter(
+      (s) => !lessonConfig.assemblySentenceIds?.length || lessonConfig.assemblySentenceIds.includes(s.id)
+    );
+    return filtered.length > 0 ? filtered : sentences;
+  }, [sentences, lessonConfig.assemblySentenceIds]);
 
-  const activeSpeakingSentences = sentences.filter(
-    (s) => !lessonConfig.speakingSentenceIds?.length || lessonConfig.speakingSentenceIds.includes(s.id)
-  );
+  const activeSpeakingSentences = useMemo(() => {
+    const filtered = sentences.filter(
+      (s) => !lessonConfig.speakingSentenceIds?.length || lessonConfig.speakingSentenceIds.includes(s.id)
+    );
+    return filtered.length > 0 ? filtered : sentences;
+  }, [sentences, lessonConfig.speakingSentenceIds]);
 
   useEffect(() => {
     loadWords();
@@ -268,6 +281,11 @@ export function App() {
   const touchStartY = useRef(0);
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    const target = e.target as HTMLElement | null;
+    // Never trigger pull-to-refresh when interacting inside modals or 3D Flashcard flip surface
+    if (target?.closest('.fixed.inset-0, .perspective-1000')) {
+      return;
+    }
     if (window.scrollY <= 0 && activeTab !== 'writing' && activeTab !== 'games') {
       touchStartY.current = e.touches[0].clientY;
       setIsPulling(true);
@@ -337,7 +355,7 @@ export function App() {
       <main className="flex-1 flex flex-col overflow-x-hidden">
         {activeTab === 'flashcard' && (
           <FlashcardView
-            words={activeFlashcardWords.length > 0 ? activeFlashcardWords : words}
+            words={activeFlashcardWords}
             onUpdateWordSRS={handleUpdateWordSRS}
           />
         )}
@@ -345,27 +363,26 @@ export function App() {
         <Suspense fallback={<ViewLoadingFallback />}>
           {activeTab === 'writing' && (
             <HanziWriterView
-              words={activeWritingWords.length > 0 ? activeWritingWords : words}
+              words={activeWritingWords}
               initialWordId={selectedWordIdForWriting}
+              onClearInitialWordId={() => setSelectedWordIdForWriting(null)}
             />
           )}
 
           {activeTab === 'assembly' && (
-            <AssemblyView
-              sentences={activeAssemblySentences.length > 0 ? activeAssemblySentences : sentences}
-            />
+            <AssemblyView sentences={activeAssemblySentences} />
           )}
 
           {activeTab === 'speaking' && (
             <SpeakingView
-              words={activeFlashcardWords.length > 0 ? activeFlashcardWords : words}
-              sentences={activeSpeakingSentences.length > 0 ? activeSpeakingSentences : sentences}
+              words={activeFlashcardWords}
+              sentences={activeSpeakingSentences}
             />
           )}
 
           {activeTab === 'games' && (
             <GamesHubView
-              activeWords={activeFlashcardWords.length > 0 ? activeFlashcardWords : words}
+              activeWords={activeFlashcardWords}
               allWords={words}
               onRefreshWords={loadWords}
             />

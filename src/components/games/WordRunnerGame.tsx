@@ -699,6 +699,8 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
   // Keyboard navigation: Left/Right switches lanes, Up/Space activates Turbo Dash, 1/2/3 picks lane
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) return;
+      if (document.querySelector('.fixed.inset-0')) return;
       if ((phase === 'ready' || phase === 'gameover') && (e.code === 'Space' || e.code === 'Enter')) {
         e.preventDefault();
         handleStartGame();

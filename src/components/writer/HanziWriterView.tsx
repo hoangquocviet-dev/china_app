@@ -9,9 +9,14 @@ import bundledStrokes from '../../data/bundledStrokes.json';
 interface HanziWriterViewProps {
   words: ChineseWord[];
   initialWordId?: string | null;
+  onClearInitialWordId?: () => void;
 }
 
-export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initialWordId }) => {
+export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
+  words,
+  initialWordId,
+  onClearInitialWordId,
+}) => {
   const [selectedWordIndex, setSelectedWordIndex] = useState(() => {
     if (initialWordId) {
       const idx = words.findIndex((w) => w.id === initialWordId);
@@ -39,8 +44,9 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
         setSelectedWordIndex(idx);
         setCurrentCharIndex(0);
       }
+      onClearInitialWordId?.();
     }
-  }, [initialWordId, words]);
+  }, [initialWordId, words, onClearInitialWordId]);
 
   useEffect(() => {
     let timeoutId: number;
@@ -61,8 +67,14 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
   const writerRef = useRef<HanziWriter | null>(null);
 
   const hasWords = Boolean(words && words.length > 0);
-  const currentWord = hasWords ? (words[selectedWordIndex] || words[0]) : null;
-  const characters = currentWord ? Array.from(currentWord.hanzi) : [];
+  const safeWordIndex = hasWords ? Math.min(selectedWordIndex, words.length - 1) : 0;
+  const currentWord = hasWords ? words[safeWordIndex] : null;
+  const characters = currentWord
+    ? (() => {
+        const cjkOnly = Array.from(currentWord.hanzi).filter((ch) => /[\u3400-\u9fff]/.test(ch));
+        return cjkOnly.length > 0 ? cjkOnly : Array.from(currentWord.hanzi.trim());
+      })()
+    : [];
   const currentChar = characters[currentCharIndex] || characters[0] || '';
 
   const initWriter = useCallback(() => {
@@ -182,16 +194,18 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
   };
 
   const handleNextWord = () => {
+    if (!words.length) return;
     audioService.playClick();
-    setSelectedWordIndex((prev) => (prev + 1) % words.length);
+    setSelectedWordIndex((safeWordIndex + 1) % words.length);
     setCurrentCharIndex(0);
     setIsCompleted(false);
     setHintMessage(null);
   };
 
   const handlePrevWord = () => {
+    if (!words.length) return;
     audioService.playClick();
-    setSelectedWordIndex((prev) => (prev - 1 + words.length) % words.length);
+    setSelectedWordIndex((safeWordIndex - 1 + words.length) % words.length);
     setCurrentCharIndex(0);
     setIsCompleted(false);
     setHintMessage(null);
@@ -292,13 +306,13 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({ words, initial
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
           <select
-            value={selectedWordIndex}
+            value={safeWordIndex}
             onChange={(e) => {
               audioService.playClick();
               setSelectedWordIndex(Number(e.target.value));
               setCurrentCharIndex(0);
             }}
-            className="bg-slate-800 text-slate-200 text-xs rounded-xl px-2.5 py-2 border border-slate-700 focus:outline-none focus:border-rose-500 font-medium flex-1 truncate"
+            className="bg-slate-800 text-slate-200 text-xs rounded-xl px-2.5 py-2 border border-slate-700 focus:outline-none focus:border-rose-500 font-medium flex-1 min-w-0 w-0 truncate"
           >
             {words.map((w, idx) => (
               <option key={w.id} value={idx}>

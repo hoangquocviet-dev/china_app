@@ -82,12 +82,17 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
     audioService.speakChinese(text);
   };
 
+  // Sync mastered IDs from storage when words deck changes (e.g. after backup restore or reset)
+  useEffect(() => {
+    setMasteredWordIds(storageService.getMasteredFlashcardIds());
+  }, [words]);
+
   const handleNext = () => {
     if (unmasteredWords.length === 0) return;
     setIsFlipped(false);
     setDragOffset(0);
     setDragOffsetY(0);
-    setCurrentIndex((prev) => (prev + 1) % unmasteredWords.length);
+    setCurrentIndex((safeIndex + 1) % unmasteredWords.length);
   };
 
   const handlePrev = () => {
@@ -95,7 +100,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
     setIsFlipped(false);
     setDragOffset(0);
     setDragOffsetY(0);
-    setCurrentIndex((prev) => (prev - 1 + unmasteredWords.length) % unmasteredWords.length);
+    setCurrentIndex((safeIndex - 1 + unmasteredWords.length) % unmasteredWords.length);
   };
 
   const handleAnswer = (isCorrect: boolean) => {
@@ -110,8 +115,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
         origin: { y: 0.8 },
       });
 
-      // Mark this card as mastered so it won't appear anymore!
-      const newMastered = [...masteredWordIds, currentWord.id];
+      // Mark this card as mastered (deduplicated) so it won't appear anymore!
+      const newMastered = Array.from(new Set([...masteredWordIds, currentWord.id]));
       setMasteredWordIds(newMastered);
       storageService.saveMasteredFlashcardIds(newMastered);
       onUpdateWordSRS(currentWord.id, true);
@@ -134,6 +139,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
         setCurrentIndex(0);
       } else if (safeIndex >= remaining) {
         setCurrentIndex(0);
+      } else {
+        setCurrentIndex(safeIndex);
       }
     } else {
       audioService.playErrorBuzz();
@@ -143,7 +150,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
       setIsFlipped(false);
       setDragOffset(0);
       setDragOffsetY(0);
-      setCurrentIndex((prev) => (prev + 1) % unmasteredWords.length);
+      setCurrentIndex((safeIndex + 1) % unmasteredWords.length);
     }
   };
 
@@ -206,7 +213,8 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   useEffect(() => {
     if (!hasWords || !currentWord) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) return;
+      if (document.querySelector('.fixed.inset-0')) return;
       if (e.code === 'Space') {
         e.preventDefault();
         setIsFlipped((prev) => !prev);

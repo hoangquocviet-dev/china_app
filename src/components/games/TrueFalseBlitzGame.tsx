@@ -300,6 +300,8 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
   // Keyboard shortcuts: Left / A = SAI, Right / D = ĐÚNG, Space / Enter = Start / Replay
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) return;
+      if (document.querySelector('.fixed.inset-0')) return;
       if ((phase === 'ready' || phase === 'gameover') && (e.code === 'Space' || e.code === 'Enter')) {
         e.preventDefault();
         handleStartGame();
