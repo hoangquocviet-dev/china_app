@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer-core');
-const { spawn } = require('child_process');
+const http = require('http');
+const fs = require('fs');
 const path = require('path');
 
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
@@ -11,30 +12,51 @@ function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-async function waitForServer(url, timeoutMs = 15000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
+const MIME_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
+  '.webmanifest': 'application/manifest+json',
+  '.woff2': 'font/woff2',
+};
+
+function createStaticServer() {
+  const distDir = path.join(__dirname, 'dist');
+  const server = http.createServer((req, res) => {
+    let reqPath = req.url ? req.url.split('?')[0].split('#')[0] : '/';
+    let filePath = path.join(distDir, reqPath === '/' ? 'index.html' : reqPath);
+
+    if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+      filePath = path.join(distDir, 'index.html');
+    }
+
+    const ext = path.extname(filePath).toLowerCase();
+    const mime = MIME_TYPES[ext] || 'application/octet-stream';
+
     try {
-      const res = await fetch(url);
-      if (res.ok) return;
-    } catch {}
-    await sleep(300);
-  }
-  throw new Error(`Preview server did not start at ${url}`);
+      const content = fs.readFileSync(filePath);
+      res.writeHead(200, { 'Content-Type': mime });
+      res.end(content);
+    } catch {
+      res.writeHead(404);
+      res.end('Not found');
+    }
+  });
+
+  return new Promise((resolve) => {
+    server.listen(PORT, '127.0.0.1', () => resolve(server));
+  });
 }
 
 async function runCloudE2E() {
   console.log('=== STARTING LIVE SUPABASE CLOUD SYNC & LEADERBOARD E2E TEST ===');
 
-  const serverProc = spawn(
-    process.platform === 'win32' ? 'npx.cmd' : 'npx',
-    ['vite', 'preview', '--port', String(PORT), '--strictPort'],
-    {
-      cwd: __dirname,
-      stdio: 'pipe',
-      shell: true,
-    }
-  );
+  const server = await createStaticServer();
+  console.log(`Preview server ready at ${BASE_URL}`);
 
   let browser;
   let syncCodeA = '';
@@ -45,8 +67,6 @@ async function runCloudE2E() {
   };
 
   try {
-    await waitForServer(BASE_URL);
-    console.log(`Preview server ready at ${BASE_URL}`);
 
     browser = await puppeteer.launch({
       executablePath: CHROME_PATH,
@@ -372,12 +392,12 @@ async function runCloudE2E() {
     console.log(`\nTEST_SYNC_CODE_FOR_CLEANUP=${syncCodeA}`);
     const failed = results.filter((r) => !r.pass);
     console.log(`\n=== E2E SUMMARY: ${results.length - failed.length}/${results.length} PASSED ===`);
-    if (failed.length > 0) {
-      process.exitCode = 1;
-    }
+    if (browser) await browser.close().catch(() => {});
+    if (server) server.close();
+    process.exit(failed.length > 0 ? 1 : 0);
   } finally {
     if (browser) await browser.close().catch(() => {});
-    serverProc.kill();
+    if (server) server.close();
   }
 }
 
