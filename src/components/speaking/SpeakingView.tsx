@@ -14,6 +14,7 @@ import { ParticlesModal } from '../common/ParticlesModal';
 import { PolyphonicModal } from '../common/PolyphonicModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
 import { ReduplicationModal } from '../common/ReduplicationModal';
+import { ComplementsModal } from '../common/ComplementsModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -64,6 +65,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
   const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
+  const [isComplementsOpen, setIsComplementsOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -531,6 +533,17 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             <span>✨ Trùng điệp</span>
           </button>
           <button
+            data-testid="open-complements-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsComplementsOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Kho 4 dạng bổ ngữ trọng yếu HSK 1 - 3"
+          >
+            <span>🎯 Bổ ngữ</span>
+          </button>
+          <button
             onClick={() => setShowPermissionGuide(true)}
             className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
             title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
@@ -860,6 +873,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <ReduplicationModal
         isOpen={isReduplicationOpen}
         onClose={() => setIsReduplicationOpen(false)}
+      />
+      {/* Complements Master Modal */}
+      <ComplementsModal
+        isOpen={isComplementsOpen}
+        onClose={() => setIsComplementsOpen(false)}
       />
     </div>
   );

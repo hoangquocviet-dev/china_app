@@ -17,6 +17,7 @@ import { ParticlesModal } from '../common/ParticlesModal';
 import { PolyphonicModal } from '../common/PolyphonicModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
 import { ReduplicationModal } from '../common/ReduplicationModal';
+import { ComplementsModal } from '../common/ComplementsModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -59,6 +60,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
   const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
+  const [isComplementsOpen, setIsComplementsOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -783,6 +785,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>✨ Trùng điệp</span>
           </button>
+          <button
+            data-testid="open-complements-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsComplementsOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Kho 4 dạng bổ ngữ trọng yếu HSK 1 - 3"
+          >
+            <span>🎯 Bổ ngữ</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -895,6 +908,12 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       <ReduplicationModal
         isOpen={isReduplicationOpen}
         onClose={() => setIsReduplicationOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+      />
+      {/* Complements Master Modal */}
+      <ComplementsModal
+        isOpen={isComplementsOpen}
+        onClose={() => setIsComplementsOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>

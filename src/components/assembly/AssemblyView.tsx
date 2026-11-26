@@ -9,6 +9,7 @@ import { MeasureWordsModal } from '../common/MeasureWordsModal';
 import { GrammarHandbookModal } from '../common/GrammarHandbookModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
 import { ReduplicationModal } from '../common/ReduplicationModal';
+import { ComplementsModal } from '../common/ComplementsModal';
 
 interface AssemblyViewProps {
   sentences?: SentenceExercise[];
@@ -37,6 +38,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const [isGrammarHandbookOpen, setIsGrammarHandbookOpen] = useState(false);
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
   const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
+  const [isComplementsOpen, setIsComplementsOpen] = useState(false);
 
   useEffect(() => {
     setExerciseIndex(0);
@@ -189,6 +191,18 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
             title="Bí kíp trùng điệp từ & từ láy HSK (AA, ABAB, AAB, AABB)"
           >
             <span>✨ Trùng điệp</span>
+          </button>
+          <button
+            type="button"
+            data-testid="assembly-complements-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsComplementsOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 border border-cyan-500/20 font-medium transition-colors"
+            title="Kho 4 dạng bổ ngữ trọng yếu HSK 1 - 3 (Kết quả, Xu hướng, Khả năng, Trạng thái)"
+          >
+            <span>🎯 Bổ ngữ</span>
           </button>
           <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
             Sắp xếp câu
@@ -418,6 +432,12 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
       <ReduplicationModal
         isOpen={isReduplicationOpen}
         onClose={() => setIsReduplicationOpen(false)}
+      />
+
+      {/* Chinese Complements Master Modal */}
+      <ComplementsModal
+        isOpen={isComplementsOpen}
+        onClose={() => setIsComplementsOpen(false)}
       />
     </div>
   );
