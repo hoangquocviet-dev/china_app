@@ -14,6 +14,7 @@ import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
 import { SpatialModal } from '../common/SpatialModal';
 import { QuestionsModal } from '../common/QuestionsModal';
+import { WordOrderModal } from '../common/WordOrderModal';
 
 interface AssemblyViewProps {
   sentences?: SentenceExercise[];
@@ -47,6 +48,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
   const [isSpatialOpen, setIsSpatialOpen] = useState(false);
   const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
+  const [isWordOrderOpen, setIsWordOrderOpen] = useState(false);
 
   useEffect(() => {
     setExerciseIndex(0);
@@ -264,6 +266,18 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
             title="Bảo điển câu hỏi & đại từ nghi vấn HSK (疑问句)"
           >
             <span>❓ Câu hỏi</span>
+          </button>
+          <button
+            type="button"
+            data-testid="assembly-word-order-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsWordOrderOpen(true);
+            }}
+            className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 hover:text-amber-200 border border-amber-500/20 font-medium transition-all active:scale-95 touch-manipulation whitespace-nowrap"
+            title="Khẩu quyết trật tự từ tiếng Trung S-T-P-M-V-O-C"
+          >
+            <span>📐 Trật tự từ</span>
           </button>
           <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium whitespace-nowrap">
             Sắp xếp câu
@@ -523,6 +537,12 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
       <QuestionsModal
         isOpen={isQuestionsOpen}
         onClose={() => setIsQuestionsOpen(false)}
+      />
+
+      {/* Chinese Word Order & Sentence Syntax Modal */}
+      <WordOrderModal
+        isOpen={isWordOrderOpen}
+        onClose={() => setIsWordOrderOpen(false)}
       />
     </div>
   );

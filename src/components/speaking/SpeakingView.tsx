@@ -19,6 +19,7 @@ import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
 import { SpatialModal } from '../common/SpatialModal';
 import { QuestionsModal } from '../common/QuestionsModal';
+import { WordOrderModal } from '../common/WordOrderModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -74,6 +75,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
   const [isSpatialOpen, setIsSpatialOpen] = useState(false);
   const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
+  const [isWordOrderOpen, setIsWordOrderOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -603,6 +605,17 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             <span>❓ Câu hỏi</span>
           </button>
           <button
+            data-testid="open-word-order-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsWordOrderOpen(true);
+            }}
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
+            title="Khẩu quyết trật tự từ tiếng Trung S-T-P-M-V-O-C"
+          >
+            <span>📐 Trật tự từ</span>
+          </button>
+          <button
             onClick={() => setShowPermissionGuide(true)}
             className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all whitespace-nowrap touch-manipulation"
             title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
@@ -959,6 +972,12 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <QuestionsModal
         isOpen={isQuestionsOpen}
         onClose={() => setIsQuestionsOpen(false)}
+      />
+
+      {/* Chinese Word Order & Sentence Syntax Modal */}
+      <WordOrderModal
+        isOpen={isWordOrderOpen}
+        onClose={() => setIsWordOrderOpen(false)}
       />
     </div>
   );

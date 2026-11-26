@@ -49,6 +49,7 @@ import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
 import { SpatialModal } from '../common/SpatialModal';
 import { QuestionsModal } from '../common/QuestionsModal';
+import { WordOrderModal } from '../common/WordOrderModal';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -116,6 +117,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
   const [isSpatialOpen, setIsSpatialOpen] = useState(false);
   const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
+  const [isWordOrderOpen, setIsWordOrderOpen] = useState(false);
 
   const refreshLeaderboard = useCallback(async () => {
     setLoadingBoard(true);
@@ -734,6 +736,24 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             <div className="text-[10px] text-slate-400 truncate">疑问句</div>
           </div>
         </button>
+
+        <button
+          type="button"
+          data-testid="games-word-order-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsWordOrderOpen(true);
+          }}
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-amber-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
+        >
+          <div className="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+            📐
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-slate-100 truncate">Trật Tự Từ</div>
+            <div className="text-[10px] text-slate-400 truncate">S-T-P-M-V-O</div>
+          </div>
+        </button>
       </div>
 
       {/* Game Deck Source & Pinyin Hint Controls */}
@@ -1298,6 +1318,10 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
       <QuestionsModal
         isOpen={isQuestionsOpen}
         onClose={() => setIsQuestionsOpen(false)}
+      />
+      <WordOrderModal
+        isOpen={isWordOrderOpen}
+        onClose={() => setIsWordOrderOpen(false)}
       />
     </div>
   );

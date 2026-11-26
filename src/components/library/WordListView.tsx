@@ -39,6 +39,7 @@ import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
 import { SpatialModal } from '../common/SpatialModal';
 import { QuestionsModal } from '../common/QuestionsModal';
+import { WordOrderModal } from '../common/WordOrderModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -87,6 +88,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
   const [isSpatialOpen, setIsSpatialOpen] = useState(false);
   const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
+  const [isWordOrderOpen, setIsWordOrderOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -477,6 +479,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-word-order-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsWordOrderOpen(true);
+            }}
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
+            title="Khẩu quyết trật tự từ tiếng Trung S-T-P-M-V-O-C"
+          >
+            <span>📐 Trật tự từ</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -824,6 +838,12 @@ export const WordListView: React.FC<WordListViewProps> = ({
           const match = words.find((w) => w.hanzi.includes(char));
           if (match) onSelectWordForWriting(match);
         } : undefined}
+      />
+
+      {/* Chinese Word Order & Sentence Syntax Modal */}
+      <WordOrderModal
+        isOpen={isWordOrderOpen}
+        onClose={() => setIsWordOrderOpen(false)}
       />
     </div>
   );
