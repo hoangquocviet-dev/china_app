@@ -172,7 +172,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
             audioService.playClick();
             setIsAddModalOpen(true);
           }}
-          className="flex-1 py-2.5 px-4 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition-all active:scale-95 shadow-md shadow-rose-900/30"
+          className="flex-1 min-h-[46px] py-2.5 px-4 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition-all active:scale-95 shadow-md shadow-rose-900/30 touch-manipulation select-none"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
           <span>Tìm & Thêm từ vựng</span>
@@ -183,7 +183,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
             audioService.playClick();
             setIsAddModalOpen(true);
           }}
-          className="py-2.5 px-3.5 rounded-2xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition-colors"
+          className="min-h-[46px] py-2.5 px-3.5 rounded-2xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition-all active:scale-95 touch-manipulation select-none"
           title="Mở kho từ điển tra cứu"
         >
           <BookOpen className="w-3.5 h-3.5 text-amber-400" />
@@ -205,7 +205,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
           <button
             type="button"
             onClick={() => setSearchQuery('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-200 transition-colors"
+            className="absolute right-1 top-1/2 -translate-y-1/2 min-w-[40px] min-h-[40px] flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors touch-manipulation"
             title="Xóa tìm kiếm"
             aria-label="Xóa tìm kiếm"
           >
@@ -215,7 +215,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
       </div>
 
       {/* Level Filter Chips */}
-      <div className="flex items-center space-x-1.5 mb-3 overflow-x-auto pb-1 text-xs select-none scrollbar-none">
+      <div className="flex items-center space-x-1.5 mb-3 overflow-x-auto touch-scroll-x pb-1 text-xs select-none scrollbar-none">
         {[
           { id: 'ALL', label: `Tất cả (${levelCounts.all})` },
           { id: 'HSK1', label: `HSK 1 (${levelCounts.hsk1})` },
@@ -229,7 +229,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setSelectedLevel(tab.id as any);
             }}
-            className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all border ${
+            className={`min-h-[40px] px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all border active:scale-95 touch-manipulation select-none ${
               selectedLevel === tab.id
                 ? 'bg-rose-600 text-white border-rose-500 shadow-sm'
                 : 'bg-slate-800/80 text-slate-400 hover:text-slate-200 border-slate-700/80'
@@ -242,19 +242,19 @@ export const WordListView: React.FC<WordListViewProps> = ({
 
       {/* Stats & Multi-Format Backup Toolbar */}
       <div className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-800/50 border border-slate-800 mb-3 text-xs text-slate-400">
-        <div className="flex items-center space-x-1.5 font-medium text-slate-300">
+        <div className="flex items-center space-x-1.5 font-medium text-slate-300 shrink-0 mr-2">
           <Sparkles className="w-3.5 h-3.5 text-rose-400" />
           <span>Sổ từ: {words.length} từ</span>
         </div>
 
-        <div className="flex items-center space-x-1.5">
+        <div className="flex items-center space-x-1.5 overflow-x-auto touch-scroll-x pb-0.5 scrollbar-none">
           <button
             data-testid="library-radicals-btn"
             onClick={() => {
               audioService.playClick();
               setIsRadicalsModalOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Khám phá 50 bộ thủ chữ Hán thông dụng"
           >
             <span>🏮 Bộ thủ</span>
@@ -266,7 +266,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsMeasureWordsModalOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Tra cứu 16 lượng từ thiết yếu HSK 1 - 2"
           >
             <span>📏 Lượng từ</span>
@@ -278,7 +278,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsGrammarHandbookOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-blue-300 border border-blue-500/20 hover:border-blue-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-blue-300 border border-blue-500/20 hover:border-blue-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Sổ tay 20 cấu trúc ngữ pháp trọng điểm HSK 1 - 2"
           >
             <span>📘 Ngữ pháp</span>
@@ -290,7 +290,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsAntonymsModalOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-teal-300 border border-teal-500/20 hover:border-teal-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-teal-300 border border-teal-500/20 hover:border-teal-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Tra cứu 24 cặp từ trái nghĩa HSK 1 - 2 & Quiz phản xạ"
           >
             <span>↔️ Từ trái nghĩa</span>
@@ -302,7 +302,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsConfusingWordsOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-violet-300 border border-violet-500/20 hover:border-violet-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-violet-300 border border-violet-500/20 hover:border-violet-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Bí kíp phân biệt 16 cặp từ dễ nhầm lẫn HSK 1 - 2"
           >
             <span>🔍 Phân biệt từ</span>
@@ -314,7 +314,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsDialoguesModalOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-emerald-300 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-emerald-300 border border-emerald-500/20 hover:border-emerald-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Hội thoại 10 tình huống thực tế HSK 1 - 2"
           >
             <span>💬 Hội thoại</span>
@@ -326,7 +326,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsDecompositionOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Chiết tự chữ Hán & bí quyết ghi nhớ liên tưởng"
           >
             <span>🧩 Chiết tự</span>
@@ -338,7 +338,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsChengyuOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-rose-300 border border-rose-500/20 hover:border-rose-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-rose-300 border border-rose-500/20 hover:border-rose-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Kho tàng thành ngữ Hán - Việt 4 chữ & điển cố"
           >
             <span>🏮 Thành ngữ</span>
@@ -350,7 +350,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsNumbersTimeOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-cyan-300 border border-cyan-500/20 hover:border-cyan-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-cyan-300 border border-cyan-500/20 hover:border-cyan-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Số đếm, đổi số, xem giờ giấc & tiền tệ"
           >
             <span>⏰ Số & Giờ</span>
@@ -362,7 +362,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsSpokenModalOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-emerald-300 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-emerald-300 border border-emerald-500/20 hover:border-emerald-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Khẩu ngữ giao tiếp & phản xạ ứng đáp"
           >
             <span>💬 Khẩu ngữ</span>
@@ -374,7 +374,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsParticlesModalOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-violet-300 border border-violet-500/20 hover:border-violet-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-violet-300 border border-violet-500/20 hover:border-violet-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Bí kíp 3 chữ ĐÍCH (的·得·地) & Trợ từ tiếng Trung"
           >
             <span>🔤 Trợ từ</span>
@@ -386,7 +386,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsPolyphonicOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Chữ Hán đa âm tiết (多音字) - 1 chữ nhiều cách đọc"
           >
             <span>🎭 Đa âm</span>
@@ -398,7 +398,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsConnectorsOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Kho 18 cặp liên từ nối câu HSK 1 - 3"
           >
             <span>🔗 Liên từ</span>
@@ -410,7 +410,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsReduplicationOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-emerald-300 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-emerald-300 border border-emerald-500/20 hover:border-emerald-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Bí kíp trùng điệp từ & từ láy HSK (AA, ABAB, AAB, AABB)"
           >
             <span>✨ Trùng điệp</span>
@@ -422,7 +422,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsComplementsOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-cyan-300 border border-cyan-500/20 hover:border-cyan-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-cyan-300 border border-cyan-500/20 hover:border-cyan-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Kho 4 dạng bổ ngữ trọng yếu HSK 1 - 3"
           >
             <span>🎯 Bổ ngữ</span>
@@ -434,7 +434,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsBaBeiOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-rose-300 border border-rose-500/20 hover:border-rose-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-rose-300 border border-rose-500/20 hover:border-rose-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Bí kíp câu chữ 把 & câu chữ 被 HSK 2 - 3"
           >
             <span>🛡️ 把·被</span>
@@ -446,7 +446,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsComparativesOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-sky-300 border border-sky-500/20 hover:border-sky-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-sky-300 border border-sky-500/20 hover:border-sky-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Bí kíp câu so sánh HSK (比, 没有, 一样, 最, 越来越)"
           >
             <span>⚖️ So sánh</span>
@@ -458,7 +458,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsSpatialOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-teal-300 border border-teal-500/20 hover:border-teal-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-teal-300 border border-teal-500/20 hover:border-teal-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Phương vị từ & Câu tồn hiện HSK 2 - 3 (方位词与存现句)"
           >
             <span>🧭 Vị trí</span>
@@ -470,7 +470,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               audioService.playClick();
               setIsQuestionsOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Bảo điển câu hỏi & đại từ nghi vấn HSK (疑问句)"
           >
             <span>❓ Câu hỏi</span>
@@ -483,7 +483,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               setImportExportTab('export');
               setIsImportExportOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-rose-300 border border-rose-500/20 hover:border-rose-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-rose-300 border border-rose-500/20 hover:border-rose-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Xuất từ vựng: Excel CSV, Anki TSV, Markdown, JSON"
           >
             <Download className="w-3 h-3 text-rose-400" />
@@ -497,7 +497,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
               setImportExportTab('import');
               setIsImportExportOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-colors shadow-xs"
+            className="flex items-center space-x-1 shrink-0 min-h-[36px] px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-all active:scale-95 shadow-xs touch-manipulation select-none"
             title="Nhập từ vựng: CSV, TSV Anki, văn bản hoặc sao lưu JSON"
           >
             <Upload className="w-3 h-3 text-amber-400" />
@@ -608,7 +608,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
                     audioService.playClick();
                     audioService.speakChinese(word.hanzi);
                   }}
-                  className="p-2 rounded-xl bg-slate-750 hover:bg-slate-700 text-slate-300 transition-colors"
+                  className="w-11 h-11 rounded-xl bg-slate-750 hover:bg-slate-700 text-slate-300 transition-all active:scale-90 flex items-center justify-center touch-manipulation select-none"
                   title="Nghe phát âm"
                 >
                   <Volume2 className="w-4 h-4" />
@@ -619,7 +619,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
                       audioService.playClick();
                       onSelectWordForWriting(word);
                     }}
-                    className="p-2 rounded-xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors border border-rose-500/20"
+                    className="w-11 h-11 rounded-xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-all border border-rose-500/20 active:scale-90 flex items-center justify-center touch-manipulation select-none"
                     title="Luyện viết từ này"
                   >
                     <PenTool className="w-4 h-4" />
@@ -627,7 +627,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
                 )}
                 <button
                   onClick={() => handleDeleteWord(word.id, word.hanzi)}
-                  className="p-2 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors border border-slate-700/60"
+                  className="w-11 h-11 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-all border border-slate-700/60 active:scale-90 flex items-center justify-center touch-manipulation select-none"
                   title="Xóa từ này"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -642,7 +642,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
           <div ref={sentinelRef} className="pt-2 text-center">
             <button
               onClick={() => setDisplayLimit((prev) => Math.min(filteredWords.length, prev + PAGE_SIZE))}
-              className="py-2.5 px-5 rounded-2xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-xs font-semibold inline-flex items-center space-x-2 transition-all active:scale-95 shadow-sm"
+              className="min-h-[44px] py-2.5 px-6 rounded-2xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-xs font-semibold inline-flex items-center space-x-2 transition-all active:scale-95 shadow-sm touch-manipulation select-none"
             >
               <span>Xem thêm từ ({displayLimit} / {filteredWords.length})</span>
               <ChevronDown className="w-3.5 h-3.5 text-rose-400" />

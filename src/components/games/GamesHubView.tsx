@@ -356,7 +356,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
       </div>
 
       {/* Quick Reference Tools: Pinyin, Radicals, Stroke Rules, Measure Words, Grammar & Antonyms */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+      <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-6 gap-2 overflow-x-auto sm:overflow-x-visible touch-scroll-x pb-2 sm:pb-0 scrollbar-none px-0.5 sm:px-0">
         <button
           type="button"
           data-testid="games-pinyin-chart-btn"
@@ -364,7 +364,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsPinyinModalOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-rose-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-rose-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             🔤
@@ -382,7 +382,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsRadicalsModalOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-amber-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-amber-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             🏮
@@ -400,7 +400,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsStrokeRulesModalOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-emerald-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-emerald-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             ✍️
@@ -418,7 +418,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsMeasureWordsModalOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-indigo-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-indigo-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             📏
@@ -436,7 +436,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsGrammarHandbookOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-blue-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-blue-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             📘
@@ -454,7 +454,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsAntonymsModalOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-teal-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-teal-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             ↔️
@@ -472,7 +472,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsConfusingWordsOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-violet-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-violet-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-violet-500/10 text-violet-400 border border-violet-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             🔍
@@ -490,7 +490,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsDialoguesModalOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-emerald-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-emerald-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             💬
@@ -508,7 +508,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsDecompositionOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-amber-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-amber-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             🧩
@@ -526,7 +526,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsChengyuOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-rose-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-rose-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             🏮
@@ -544,7 +544,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsNumbersTimeOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-cyan-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-cyan-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             ⏰
@@ -562,7 +562,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsSpokenModalOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-emerald-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-emerald-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             💬
@@ -580,7 +580,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsParticlesModalOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-violet-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-violet-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-violet-500/10 text-violet-400 border border-violet-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             🔤
@@ -598,7 +598,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsPolyphonicOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-amber-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-amber-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             🎭
@@ -616,7 +616,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsConnectorsOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-indigo-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-indigo-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             🔗
@@ -634,7 +634,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsReduplicationOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-emerald-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-emerald-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             ✨
@@ -652,7 +652,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsComplementsOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-blue-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-blue-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             🎯
@@ -670,7 +670,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsBaBeiOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-rose-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-rose-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             🛡️
@@ -688,7 +688,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsComparativesOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-sky-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-sky-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             ⚖️
@@ -706,7 +706,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsSpatialOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-teal-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-teal-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             🧭
@@ -724,7 +724,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setIsQuestionsOpen(true);
           }}
-          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-indigo-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+          className="min-h-[48px] min-w-[138px] shrink-0 sm:min-w-0 sm:shrink p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-indigo-500/40 text-left transition-all active:scale-95 shadow-xs flex items-center space-x-2 touch-manipulation select-none"
         >
           <div className="w-7 h-7 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold text-xs shrink-0">
             ❓
@@ -751,7 +751,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
               audioService.playClick();
               setShowPinyinHint((prev) => !prev);
             }}
-            className={`inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl text-[11px] font-bold border transition-colors ${
+            className={`inline-flex items-center space-x-1 min-h-[38px] px-3 py-1.5 rounded-xl text-[11px] font-bold border transition-colors touch-manipulation select-none active:scale-95 ${
               showPinyinHint
                 ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
                 : 'bg-slate-900 border-slate-700 text-slate-400'
@@ -769,7 +769,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
               audioService.playClick();
               setPoolSource('active');
             }}
-            className={`py-1.5 px-2 rounded-xl font-semibold border transition-all ${
+            className={`min-h-[42px] py-2 px-2.5 rounded-xl font-semibold border transition-all active:scale-95 touch-manipulation select-none ${
               poolSource === 'active'
                 ? 'bg-rose-600 text-white border-rose-500 shadow-sm'
                 : 'bg-slate-850 text-slate-400 border-slate-750 hover:text-slate-200'
@@ -783,7 +783,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
               audioService.playClick();
               setPoolSource('notebook');
             }}
-            className={`py-1.5 px-2 rounded-xl font-semibold border transition-all ${
+            className={`min-h-[42px] py-2 px-2.5 rounded-xl font-semibold border transition-all active:scale-95 touch-manipulation select-none ${
               poolSource === 'notebook'
                 ? 'bg-rose-600 text-white border-rose-500 shadow-sm'
                 : 'bg-slate-850 text-slate-400 border-slate-750 hover:text-slate-200'
@@ -797,7 +797,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
               audioService.playClick();
               setPoolSource('dictionary');
             }}
-            className={`py-1.5 px-2 rounded-xl font-semibold border transition-all ${
+            className={`min-h-[42px] py-2 px-2.5 rounded-xl font-semibold border transition-all active:scale-95 touch-manipulation select-none ${
               poolSource === 'dictionary'
                 ? 'bg-rose-600 text-white border-rose-500 shadow-sm'
                 : 'bg-slate-850 text-slate-400 border-slate-750 hover:text-slate-200'
@@ -815,7 +815,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
           audioService.playClick();
           setSelectedGame('exam');
         }}
-        className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-amber-950/40 via-slate-850 to-rose-950/40 border-2 border-amber-500/40 hover:border-amber-400 shadow-xl transition-all active:scale-[0.98]"
+        className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-amber-950/40 via-slate-850 to-rose-950/40 border-2 border-amber-500/40 hover:border-amber-400 shadow-xl transition-all active:scale-95 touch-manipulation select-none"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 via-rose-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-amber-950/50 shrink-0">
@@ -860,7 +860,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setSelectedGame('listening');
           }}
-          className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-slate-800/95 to-indigo-950/30 border border-indigo-500/25 hover:border-indigo-400/60 shadow-md transition-all active:scale-[0.98]"
+          className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-slate-800/95 to-indigo-950/30 border border-indigo-500/25 hover:border-indigo-400/60 shadow-md transition-all active:scale-95 touch-manipulation select-none"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-950/50 shrink-0">
@@ -903,7 +903,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setSelectedGame('tone');
           }}
-          className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-slate-800/95 to-amber-950/30 border border-amber-500/25 hover:border-amber-400/60 shadow-md transition-all active:scale-[0.98]"
+          className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-slate-800/95 to-amber-950/30 border border-amber-500/25 hover:border-amber-400/60 shadow-md transition-all active:scale-95 touch-manipulation select-none"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-rose-600 flex items-center justify-center text-white shadow-md shadow-amber-950/50 shrink-0">
@@ -946,7 +946,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setSelectedGame('blitz');
           }}
-          className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-slate-800/95 to-rose-950/30 border border-rose-500/25 hover:border-rose-400/60 shadow-md transition-all active:scale-[0.98]"
+          className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-slate-800/95 to-rose-950/30 border border-rose-500/25 hover:border-rose-400/60 shadow-md transition-all active:scale-95 touch-manipulation select-none"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-rose-600 flex items-center justify-center text-white shadow-md shadow-rose-950/50 shrink-0">
@@ -995,7 +995,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setSelectedGame('match');
           }}
-          className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-slate-800/95 to-indigo-950/35 border border-indigo-500/25 hover:border-indigo-400/60 shadow-md transition-all active:scale-[0.98]"
+          className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-slate-800/95 to-indigo-950/35 border border-indigo-500/25 hover:border-indigo-400/60 shadow-md transition-all active:scale-95 touch-manipulation select-none"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md shadow-indigo-950/50 shrink-0">
@@ -1045,7 +1045,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             audioService.playClick();
             setSelectedGame('runner');
           }}
-          className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-slate-800/95 to-cyan-950/35 border border-cyan-500/25 hover:border-cyan-400/60 shadow-md transition-all active:scale-[0.98]"
+          className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-slate-800/95 to-cyan-950/35 border border-cyan-500/25 hover:border-cyan-400/60 shadow-md transition-all active:scale-95 touch-manipulation select-none"
         >
           <div className="flex items-start justify-between gap-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-cyan-950/50 shrink-0">

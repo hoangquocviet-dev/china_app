@@ -360,7 +360,7 @@ export const ToneMasterGame: React.FC<ToneMasterGameProps> = ({ words, onBack })
           <button
             data-testid="tone-listen-audio-btn"
             onClick={handleReplaySpeech}
-            className="flex items-center space-x-1.5 py-2 px-4 rounded-2xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 font-semibold text-xs transition-all active:scale-95 shadow-md"
+            className="flex items-center space-x-1.5 min-h-[44px] py-2.5 px-4 rounded-2xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 font-semibold text-xs transition-all active:scale-90 shadow-md touch-manipulation select-none"
             title="Nghe lại phát âm"
           >
             <Volume2 className="w-4 h-4 text-rose-400" />
@@ -429,7 +429,7 @@ export const ToneMasterGame: React.FC<ToneMasterGameProps> = ({ words, onBack })
               data-testid={`tone-choice-btn-${def.id}`}
               disabled={isAnswered}
               onClick={() => handleSelectTone(def.id)}
-              className={`p-3 rounded-2xl flex flex-col justify-between transition-all active:scale-98 text-left ${btnStyle}`}
+              className={`min-h-[76px] p-3.5 rounded-2xl flex flex-col justify-between transition-all active:scale-95 text-left touch-manipulation select-none ${btnStyle}`}
             >
               <div className="flex items-center justify-between w-full mb-1">
                 <span className="text-xs font-black">{def.label}</span>
@@ -489,7 +489,7 @@ export const ToneMasterGame: React.FC<ToneMasterGameProps> = ({ words, onBack })
           <button
             data-testid="tone-next-btn"
             onClick={handleNextQuestion}
-            className="py-2 px-3.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs shadow-md shadow-rose-900/30 active:scale-95 transition-all shrink-0"
+            className="min-h-[44px] py-2 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs shadow-md shadow-rose-900/30 active:scale-95 transition-all shrink-0 touch-manipulation select-none"
           >
             {currentIndex < questions.length - 1 ? 'Câu tiếp' : 'Xem điểm'}
           </button>

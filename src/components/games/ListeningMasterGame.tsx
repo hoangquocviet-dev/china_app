@@ -305,7 +305,7 @@ export const ListeningMasterGame: React.FC<ListeningMasterGameProps> = ({
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold transition-all active:scale-95"
+          className="flex items-center gap-1.5 min-h-[40px] px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold transition-all active:scale-95 touch-manipulation select-none"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Thoát</span>
@@ -347,17 +347,17 @@ export const ListeningMasterGame: React.FC<ListeningMasterGameProps> = ({
             onClick={() => handlePlayAudio(1.0)}
             data-testid="replay-audio-btn"
             title="Bấm để nghe lại"
-            className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-xl shadow-indigo-500/25 flex items-center justify-center hover:scale-105 active:scale-95 transition-all group"
+            className="w-28 h-28 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-xl shadow-indigo-500/30 flex items-center justify-center hover:scale-105 active:scale-90 transition-all group touch-manipulation select-none"
           >
-            <Volume2 className="w-12 h-12 group-hover:scale-110 transition-transform" />
+            <Volume2 className="w-14 h-14 group-hover:scale-110 transition-transform" />
           </button>
         </div>
 
         {/* Audio control pill buttons */}
-        <div className="flex items-center justify-center gap-2 pt-1">
+        <div className="flex items-center justify-center gap-2 pt-1 flex-wrap">
           <button
             onClick={() => handlePlayAudio(1.0)}
-            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
+            className="min-h-[40px] px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 border border-slate-700 touch-manipulation select-none"
           >
             <Volume2 className="w-3.5 h-3.5 text-indigo-400" />
             <span>Nghe lại (1.0x)</span>
@@ -365,7 +365,7 @@ export const ListeningMasterGame: React.FC<ListeningMasterGameProps> = ({
 
           <button
             onClick={() => handlePlayAudio(0.75)}
-            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
+            className="min-h-[40px] px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 border border-slate-700 touch-manipulation select-none"
             title="Phát âm chậm 0.75x để nghe rõ thanh điệu"
           >
             <Snail className="w-3.5 h-3.5 text-amber-400" />
@@ -374,7 +374,7 @@ export const ListeningMasterGame: React.FC<ListeningMasterGameProps> = ({
 
           <button
             onClick={() => setShowPinyinHint(!showPinyinHint)}
-            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700"
+            className="min-h-[40px] px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95 border border-slate-700 touch-manipulation select-none"
           >
             {showPinyinHint ? <EyeOff className="w-3.5 h-3.5 text-rose-400" /> : <Eye className="w-3.5 h-3.5 text-sky-400" />}
             <span>{showPinyinHint ? 'Ẩn Pinyin' : 'Gợi ý Pinyin'}</span>
@@ -396,11 +396,11 @@ export const ListeningMasterGame: React.FC<ListeningMasterGameProps> = ({
           const isCorrect = option.id === currentRound.targetWord.id;
 
           let btnClass =
-            'p-4 rounded-2xl border text-left transition-all flex flex-col justify-between space-y-1 relative ';
+            'min-h-[68px] p-4 rounded-2xl border text-left transition-all flex flex-col justify-between space-y-1 relative touch-manipulation select-none ';
 
           if (!isAnswerChecked) {
             btnClass +=
-              'bg-slate-850 hover:bg-slate-800 border-slate-750 hover:border-indigo-500/50 text-slate-100 active:scale-[0.98] shadow-sm';
+              'bg-slate-850 hover:bg-slate-800 border-slate-750 hover:border-indigo-500/50 text-slate-100 active:scale-95 shadow-sm';
           } else if (isCorrect) {
             btnClass +=
               'bg-emerald-950/40 border-emerald-500 text-white font-bold ring-2 ring-emerald-500/50';
@@ -447,7 +447,7 @@ export const ListeningMasterGame: React.FC<ListeningMasterGameProps> = ({
           <button
             onClick={handleNextRound}
             data-testid="next-round-btn"
-            className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+            className="w-full min-h-[50px] py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 active:scale-95 touch-manipulation select-none"
           >
             <span>{currentRoundIdx + 1 < rounds.length ? 'Câu tiếp theo' : 'Xem bảng kết quả'}</span>
             <ArrowRight className="w-4 h-4" />

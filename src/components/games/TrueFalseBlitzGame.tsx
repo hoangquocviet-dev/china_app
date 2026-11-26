@@ -402,7 +402,7 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
           <button
             data-testid="blitz-start-btn"
             onClick={handleStartGame}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white font-extrabold text-sm shadow-lg shadow-rose-900/40 transition-all active:scale-95 flex items-center justify-center space-x-2"
+            className="w-full min-h-[50px] py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white font-extrabold text-sm shadow-lg shadow-rose-900/40 transition-all active:scale-95 flex items-center justify-center space-x-2 touch-manipulation select-none"
           >
             <Zap className="w-4 h-4 fill-white" />
             <span>BẮT ĐẦU PHẢN XẠ NGAY</span>
@@ -545,7 +545,7 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
               type="button"
               data-testid="blitz-btn-false"
               onClick={() => handleAnswer(false)}
-              className="py-4 rounded-2xl bg-rose-600/90 hover:bg-rose-500 active:scale-95 text-white font-extrabold text-base flex items-center justify-center space-x-2 shadow-lg shadow-rose-950/50 border border-rose-400/30 transition-all"
+              className="min-h-[64px] py-4 rounded-2xl bg-rose-600/90 hover:bg-rose-500 active:scale-95 text-white font-extrabold text-base flex items-center justify-center space-x-2 shadow-lg shadow-rose-950/50 border border-rose-400/30 transition-all touch-manipulation select-none"
             >
               <X className="w-6 h-6 stroke-[3]" />
               <span>SAI</span>
@@ -555,7 +555,7 @@ export const TrueFalseBlitzGame: React.FC<TrueFalseBlitzGameProps> = ({
               type="button"
               data-testid="blitz-btn-true"
               onClick={() => handleAnswer(true)}
-              className="py-4 rounded-2xl bg-emerald-600/90 hover:bg-emerald-500 active:scale-95 text-white font-extrabold text-base flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950/50 border border-emerald-400/30 transition-all"
+              className="min-h-[64px] py-4 rounded-2xl bg-emerald-600/90 hover:bg-emerald-500 active:scale-95 text-white font-extrabold text-base flex items-center justify-center space-x-2 shadow-lg shadow-emerald-950/50 border border-emerald-400/30 transition-all touch-manipulation select-none"
             >
               <Check className="w-6 h-6 stroke-[3]" />
               <span>ĐÚNG</span>

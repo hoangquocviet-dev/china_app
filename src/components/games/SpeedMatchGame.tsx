@@ -471,7 +471,7 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
           <button
             data-testid="match-start-btn"
             onClick={handleStartGame}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-rose-600 hover:from-indigo-500 hover:to-rose-500 text-white font-extrabold text-sm shadow-lg shadow-indigo-950/50 transition-all active:scale-95 flex items-center justify-center space-x-2"
+            className="w-full min-h-[50px] py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-rose-600 hover:from-indigo-500 hover:to-rose-500 text-white font-extrabold text-sm shadow-lg shadow-indigo-950/50 transition-all active:scale-95 flex items-center justify-center space-x-2 touch-manipulation select-none"
           >
             <Sparkles className="w-4 h-4" />
             <span>BẮT ĐẦU ĐẾM NGƯỢC 60S</span>
@@ -557,7 +557,7 @@ export const SpeedMatchGame: React.FC<SpeedMatchGameProps> = ({
                   data-card-type={card.type}
                   data-matched="false"
                   onClick={() => handleCardClick(card)}
-                  className={`relative p-2 rounded-2xl border-2 flex flex-col items-center justify-center text-center transition-all active:scale-95 overflow-hidden ${
+                  className={`relative min-h-[72px] p-2 rounded-2xl border-2 flex flex-col items-center justify-center text-center transition-all active:scale-95 overflow-hidden touch-manipulation select-none ${
                     isMismatch
                       ? 'bg-rose-950/60 border-rose-500 text-rose-200 scale-95'
                       : isSelected
