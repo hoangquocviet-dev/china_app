@@ -15,6 +15,7 @@ import { NumbersTimeModal } from '../common/NumbersTimeModal';
 import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 import { ParticlesModal } from '../common/ParticlesModal';
 import { PolyphonicModal } from '../common/PolyphonicModal';
+import { ConnectorsModal } from '../common/ConnectorsModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -55,6 +56,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
   const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
   const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
+  const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -757,6 +759,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>🎭 Đa âm</span>
           </button>
+          <button
+            data-testid="open-connectors-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsConnectorsOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Kho 18 cặp liên từ nối câu HSK 1 - 3"
+          >
+            <span>🔗 Liên từ</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -857,6 +870,12 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       <PolyphonicModal
         isOpen={isPolyphonicOpen}
         onClose={() => setIsPolyphonicOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+      />
+      {/* Connectors & Conjunctions Modal */}
+      <ConnectorsModal
+        isOpen={isConnectorsOpen}
+        onClose={() => setIsConnectorsOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>

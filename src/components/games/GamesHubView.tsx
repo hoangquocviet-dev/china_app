@@ -42,6 +42,7 @@ import { NumbersTimeModal } from '../common/NumbersTimeModal';
 import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 import { ParticlesModal } from '../common/ParticlesModal';
 import { PolyphonicModal } from '../common/PolyphonicModal';
+import { ConnectorsModal } from '../common/ConnectorsModal';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -102,6 +103,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
   const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
   const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
+  const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
 
   const refreshLeaderboard = useCallback(async () => {
     setLoadingBoard(true);
@@ -592,6 +594,24 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
           <div className="min-w-0">
             <div className="font-bold text-xs text-slate-100 truncate">Đa âm tiết</div>
             <div className="text-[10px] text-slate-400 truncate">多音字</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          data-testid="games-connectors-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsConnectorsOpen(true);
+          }}
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-indigo-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+        >
+          <div className="w-7 h-7 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+            🔗
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-slate-100 truncate">Liên từ</div>
+            <div className="text-[10px] text-slate-400 truncate">关联词</div>
           </div>
         </button>
       </div>
@@ -1130,6 +1150,10 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
       <PolyphonicModal
         isOpen={isPolyphonicOpen}
         onClose={() => setIsPolyphonicOpen(false)}
+      />
+      <ConnectorsModal
+        isOpen={isConnectorsOpen}
+        onClose={() => setIsConnectorsOpen(false)}
       />
     </div>
   );

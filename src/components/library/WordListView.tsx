@@ -32,6 +32,7 @@ import { NumbersTimeModal } from '../common/NumbersTimeModal';
 import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 import { ParticlesModal } from '../common/ParticlesModal';
 import { PolyphonicModal } from '../common/PolyphonicModal';
+import { ConnectorsModal } from '../common/ConnectorsModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -73,6 +74,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
   const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
   const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
+  const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -379,6 +381,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-connectors-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsConnectorsOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40 transition-colors shadow-xs"
+            title="Kho 18 cặp liên từ nối câu HSK 1 - 3"
+          >
+            <span>🔗 Liên từ</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -652,6 +666,16 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <PolyphonicModal
         isOpen={isPolyphonicOpen}
         onClose={() => setIsPolyphonicOpen(false)}
+        onSelectCharacter={onSelectWordForWriting ? (char) => {
+          const match = words.find((w) => w.hanzi.includes(char));
+          if (match) onSelectWordForWriting(match);
+        } : undefined}
+      />
+
+      {/* Connectors & Conjunctions Modal */}
+      <ConnectorsModal
+        isOpen={isConnectorsOpen}
+        onClose={() => setIsConnectorsOpen(false)}
         onSelectCharacter={onSelectWordForWriting ? (char) => {
           const match = words.find((w) => w.hanzi.includes(char));
           if (match) onSelectWordForWriting(match);

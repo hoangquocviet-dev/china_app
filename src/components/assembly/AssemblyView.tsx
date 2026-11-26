@@ -7,6 +7,7 @@ import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
 import { MeasureWordsModal } from '../common/MeasureWordsModal';
 import { GrammarHandbookModal } from '../common/GrammarHandbookModal';
+import { ConnectorsModal } from '../common/ConnectorsModal';
 
 interface AssemblyViewProps {
   sentences?: SentenceExercise[];
@@ -33,6 +34,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const [showGrammarHint, setShowGrammarHint] = useState(false);
   const [isMeasureWordsOpen, setIsMeasureWordsOpen] = useState(false);
   const [isGrammarHandbookOpen, setIsGrammarHandbookOpen] = useState(false);
+  const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
 
   useEffect(() => {
     setExerciseIndex(0);
@@ -161,6 +163,18 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
             title="Tra cứu lượng từ chuẩn ngữ pháp HSK 1 - 2"
           >
             <span>📏 Lượng từ</span>
+          </button>
+          <button
+            type="button"
+            data-testid="assembly-connectors-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsConnectorsOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 hover:text-purple-200 border border-purple-500/20 font-medium transition-colors"
+            title="Kho 18 cặp liên từ nối câu kinh điển HSK 1 - 3"
+          >
+            <span>🔗 Liên từ</span>
           </button>
           <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
             Sắp xếp câu
@@ -378,6 +392,12 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
       <GrammarHandbookModal
         isOpen={isGrammarHandbookOpen}
         onClose={() => setIsGrammarHandbookOpen(false)}
+      />
+
+      {/* 18 Chinese Connectors & Conjunctions Modal */}
+      <ConnectorsModal
+        isOpen={isConnectorsOpen}
+        onClose={() => setIsConnectorsOpen(false)}
       />
     </div>
   );

@@ -12,6 +12,7 @@ import { NumbersTimeModal } from '../common/NumbersTimeModal';
 import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 import { ParticlesModal } from '../common/ParticlesModal';
 import { PolyphonicModal } from '../common/PolyphonicModal';
+import { ConnectorsModal } from '../common/ConnectorsModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -60,6 +61,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
   const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
   const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
+  const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -505,6 +507,17 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             <span>🎭 Đa âm</span>
           </button>
           <button
+            data-testid="open-connectors-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsConnectorsOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Kho 18 cặp liên từ nối câu HSK 1 - 3"
+          >
+            <span>🔗 Liên từ</span>
+          </button>
+          <button
             onClick={() => setShowPermissionGuide(true)}
             className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
             title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
@@ -824,6 +837,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <PolyphonicModal
         isOpen={isPolyphonicOpen}
         onClose={() => setIsPolyphonicOpen(false)}
+      />
+      {/* Connectors & Conjunctions Modal */}
+      <ConnectorsModal
+        isOpen={isConnectorsOpen}
+        onClose={() => setIsConnectorsOpen(false)}
       />
     </div>
   );
