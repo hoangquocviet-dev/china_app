@@ -24,6 +24,7 @@ import { RadicalsModal } from '../writer/RadicalsModal';
 import { MeasureWordsModal } from '../common/MeasureWordsModal';
 import { GrammarHandbookModal } from '../common/GrammarHandbookModal';
 import { AntonymsModal } from '../common/AntonymsModal';
+import { ConfusingWordsModal } from '../common/ConfusingWordsModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -57,6 +58,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isMeasureWordsModalOpen, setIsMeasureWordsModalOpen] = useState(false);
   const [isGrammarHandbookOpen, setIsGrammarHandbookOpen] = useState(false);
   const [isAntonymsModalOpen, setIsAntonymsModalOpen] = useState(false);
+  const [isConfusingWordsOpen, setIsConfusingWordsOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -264,6 +266,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
             title="Tra cứu 24 cặp từ trái nghĩa HSK 1 - 2 & Quiz phản xạ"
           >
             <span>↔️ Từ trái nghĩa</span>
+          </button>
+
+          <button
+            data-testid="open-confusing-words-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsConfusingWordsOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-violet-300 border border-violet-500/20 hover:border-violet-500/40 transition-colors shadow-xs"
+            title="Bí kíp phân biệt 16 cặp từ dễ nhầm lẫn HSK 1 - 2"
+          >
+            <span>🔍 Phân biệt từ</span>
           </button>
 
           <button
@@ -484,6 +498,12 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <AntonymsModal
         isOpen={isAntonymsModalOpen}
         onClose={() => setIsAntonymsModalOpen(false)}
+      />
+
+      {/* 16 Confusing Words & Near-Synonyms Modal */}
+      <ConfusingWordsModal
+        isOpen={isConfusingWordsOpen}
+        onClose={() => setIsConfusingWordsOpen(false)}
       />
     </div>
   );
