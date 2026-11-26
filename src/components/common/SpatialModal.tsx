@@ -111,29 +111,29 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
   const currentQ = SPATIAL_QUIZ_QUESTIONS[quizIndex];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white dark:bg-gray-900 border border-teal-100 dark:border-teal-900/40 rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white dark:bg-gray-900 border border-teal-100 dark:border-teal-900/40 rounded-2xl sm:rounded-3xl w-full max-w-4xl h-[94dvh] sm:max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 text-white shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-md shadow-inner">
-              <Compass className="w-6 h-6 text-white animate-spin-slow" />
+        <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 sm:py-4 bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 text-white shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="p-2 sm:p-2.5 bg-white/20 rounded-xl backdrop-blur-md shadow-inner shrink-0">
+              <Compass className="w-5 h-5 sm:w-6 sm:h-6 text-white animate-spin-slow" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold tracking-tight">Phương Vị Từ & Câu Tồn Hiện</h2>
-                <span className="px-2 py-0.5 text-xs font-semibold bg-white/25 rounded-full uppercase tracking-wider">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h2 className="text-base sm:text-xl font-bold tracking-tight truncate">Phương Vị Từ & Câu Tồn Hiện</h2>
+                <span className="hidden sm:inline-block px-2 py-0.5 text-xs font-semibold bg-white/25 rounded-full uppercase tracking-wider shrink-0">
                   方位词与存现句
                 </span>
               </div>
-              <p className="text-xs text-teal-100 mt-0.5">
-                Bảo điển 16 phương vị từ, la bàn không gian, câu tồn hiện V+着/了 và 4 đại kỵ HSK 2 - 3
+              <p className="text-[11px] sm:text-xs text-teal-100 mt-0.5 truncate">
+                16 phương vị từ, la bàn không gian, câu tồn hiện V+着/了 và 4 đại kỵ HSK 2 - 3
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-xl transition-colors"
+            className="w-11 h-11 flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 active:scale-90 rounded-xl transition-all touch-manipulation shrink-0 ml-2"
             title="Đóng"
           >
             <X className="w-5 h-5" />
@@ -141,55 +141,55 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/50 px-4 pt-2 gap-2 overflow-x-auto shrink-0 scrollbar-none">
+        <div className="flex border-b border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/50 px-3 sm:px-4 pt-1.5 sm:pt-2 gap-1.5 sm:gap-2 overflow-x-auto touch-pan-x shrink-0 scrollbar-none">
           <button
             onClick={() => setActiveTab('directions')}
-            className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm rounded-t-xl transition-all border-b-2 whitespace-nowrap ${
+            className={`min-h-[44px] flex items-center gap-2 px-3.5 sm:px-4 py-2 font-medium text-xs sm:text-sm rounded-t-xl transition-all border-b-2 whitespace-nowrap touch-manipulation active:scale-95 ${
               activeTab === 'directions'
-                ? 'border-teal-600 text-teal-600 dark:text-teal-400 bg-white dark:bg-gray-900 shadow-sm'
+                ? 'border-teal-600 text-teal-600 dark:text-teal-400 bg-white dark:bg-gray-900 shadow-sm font-bold'
                 : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
-            <Navigation className="w-4 h-4" />
+            <Navigation className="w-4 h-4 shrink-0" />
             La Bàn & 16 Phương Vị
           </button>
           <button
             onClick={() => setActiveTab('existential')}
-            className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm rounded-t-xl transition-all border-b-2 whitespace-nowrap ${
+            className={`min-h-[44px] flex items-center gap-2 px-3.5 sm:px-4 py-2 font-medium text-xs sm:text-sm rounded-t-xl transition-all border-b-2 whitespace-nowrap touch-manipulation active:scale-95 ${
               activeTab === 'existential'
-                ? 'border-teal-600 text-teal-600 dark:text-teal-400 bg-white dark:bg-gray-900 shadow-sm'
+                ? 'border-teal-600 text-teal-600 dark:text-teal-400 bg-white dark:bg-gray-900 shadow-sm font-bold'
                 : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
-            <BookOpen className="w-4 h-4" />
+            <BookOpen className="w-4 h-4 shrink-0" />
             Câu Tồn Hiện (存现句)
           </button>
           <button
             onClick={() => setActiveTab('rules')}
-            className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm rounded-t-xl transition-all border-b-2 whitespace-nowrap ${
+            className={`min-h-[44px] flex items-center gap-2 px-3.5 sm:px-4 py-2 font-medium text-xs sm:text-sm rounded-t-xl transition-all border-b-2 whitespace-nowrap touch-manipulation active:scale-95 ${
               activeTab === 'rules'
-                ? 'border-teal-600 text-teal-600 dark:text-teal-400 bg-white dark:bg-gray-900 shadow-sm'
+                ? 'border-teal-600 text-teal-600 dark:text-teal-400 bg-white dark:bg-gray-900 shadow-sm font-bold'
                 : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-            4 Đại Kỵ Bất Di Bất Dịch
+            <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+            4 Đại Kỵ
           </button>
           <button
             onClick={() => setActiveTab('quiz')}
-            className={`flex items-center gap-2 px-4 py-2.5 font-medium text-sm rounded-t-xl transition-all border-b-2 whitespace-nowrap ${
+            className={`min-h-[44px] flex items-center gap-2 px-3.5 sm:px-4 py-2 font-medium text-xs sm:text-sm rounded-t-xl transition-all border-b-2 whitespace-nowrap touch-manipulation active:scale-95 ${
               activeTab === 'quiz'
-                ? 'border-teal-600 text-teal-600 dark:text-teal-400 bg-white dark:bg-gray-900 shadow-sm'
+                ? 'border-teal-600 text-teal-600 dark:text-teal-400 bg-white dark:bg-gray-900 shadow-sm font-bold'
                 : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
-            <Sparkles className="w-4 h-4 text-emerald-500" />
+            <Sparkles className="w-4 h-4 text-emerald-500 shrink-0" />
             Đố Vui Điền Câu ⚡
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 sm:p-6 space-y-4 sm:space-y-6">
           {/* TAB 1: DIRECTIONS & COMPASS */}
           {activeTab === 'directions' && (
             <div className="space-y-6">
@@ -207,7 +207,7 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-3 max-w-sm mx-auto gap-2 text-center py-2">
+                <div className="grid grid-cols-3 max-w-sm mx-auto gap-2.5 text-center py-2">
                   <div />
                   <button
                     onClick={() => {
@@ -215,7 +215,7 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                       setSelectedWord(w);
                       audioService.speakChinese(w.hanzi);
                     }}
-                    className={`p-2.5 rounded-xl border transition-all text-xs font-semibold ${
+                    className={`min-h-[52px] p-2.5 rounded-xl border transition-all text-xs font-semibold active:scale-95 touch-manipulation flex flex-col items-center justify-center ${
                       selectedWord.id === 'bei'
                         ? 'bg-teal-600 text-white shadow-md border-teal-600 scale-105'
                         : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-teal-400 text-gray-700 dark:text-gray-200'
@@ -232,7 +232,7 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                       setSelectedWord(w);
                       audioService.speakChinese(w.hanzi);
                     }}
-                    className={`p-2.5 rounded-xl border transition-all text-xs font-semibold ${
+                    className={`min-h-[52px] p-2.5 rounded-xl border transition-all text-xs font-semibold active:scale-95 touch-manipulation flex flex-col items-center justify-center ${
                       selectedWord.id === 'xi'
                         ? 'bg-teal-600 text-white shadow-md border-teal-600 scale-105'
                         : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-teal-400 text-gray-700 dark:text-gray-200'
@@ -248,7 +248,7 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                       setSelectedWord(w);
                       audioService.speakChinese(w.hanzi);
                     }}
-                    className={`p-2.5 rounded-xl border transition-all text-xs font-bold ${
+                    className={`min-h-[52px] p-2.5 rounded-xl border transition-all text-xs font-bold active:scale-95 touch-manipulation flex flex-col items-center justify-center ${
                       selectedWord.id === 'zhongjian'
                         ? 'bg-emerald-600 text-white shadow-md border-emerald-600 scale-105'
                         : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
@@ -264,7 +264,7 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                       setSelectedWord(w);
                       audioService.speakChinese(w.hanzi);
                     }}
-                    className={`p-2.5 rounded-xl border transition-all text-xs font-semibold ${
+                    className={`min-h-[52px] p-2.5 rounded-xl border transition-all text-xs font-semibold active:scale-95 touch-manipulation flex flex-col items-center justify-center ${
                       selectedWord.id === 'dong'
                         ? 'bg-teal-600 text-white shadow-md border-teal-600 scale-105'
                         : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-teal-400 text-gray-700 dark:text-gray-200'
@@ -281,7 +281,7 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                       setSelectedWord(w);
                       audioService.speakChinese(w.hanzi);
                     }}
-                    className={`p-2.5 rounded-xl border transition-all text-xs font-semibold ${
+                    className={`min-h-[52px] p-2.5 rounded-xl border transition-all text-xs font-semibold active:scale-95 touch-manipulation flex flex-col items-center justify-center ${
                       selectedWord.id === 'nan'
                         ? 'bg-teal-600 text-white shadow-md border-teal-600 scale-105'
                         : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-teal-400 text-gray-700 dark:text-gray-200'
@@ -306,7 +306,7 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                     className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 text-gray-900 dark:text-gray-100"
                   />
                 </div>
-                <div className="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                <div className="flex gap-1.5 overflow-x-auto touch-pan-x pb-1 sm:pb-0 scrollbar-none">
                   {[
                     { id: 'all', label: 'Tất cả (16)' },
                     { id: 'vertical', label: 'Cao thấp' },
@@ -318,7 +318,7 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                     <button
                       key={cat.id}
                       onClick={() => setSelectedCategory(cat.id)}
-                      className={`px-3 py-1.5 text-xs rounded-xl font-medium whitespace-nowrap transition-all ${
+                      className={`min-h-[40px] px-3.5 py-2 text-xs rounded-xl font-semibold whitespace-nowrap transition-all touch-manipulation active:scale-95 flex items-center ${
                         selectedCategory === cat.id
                           ? 'bg-teal-600 text-white shadow-sm'
                           : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -368,7 +368,7 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={(e) => handleSpeak(e, word.hanzi)}
-                            className="p-2 rounded-xl bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/30 dark:hover:bg-teal-900/50 text-teal-600 dark:text-teal-300 transition-colors"
+                            className="min-w-[42px] min-h-[42px] flex items-center justify-center rounded-xl bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-300 transition-all touch-manipulation active:scale-90"
                             title="Phát âm từ"
                           >
                             <Volume2 className="w-4 h-4" />
@@ -380,7 +380,7 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                                 onSelectCharacter(word.hanzi);
                                 onClose();
                               }}
-                              className="p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:hover:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300 transition-colors"
+                              className="min-w-[42px] min-h-[42px] flex items-center justify-center rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 transition-all touch-manipulation active:scale-90"
                               title="Tập viết chữ này"
                             >
                               <PenTool className="w-4 h-4" />
@@ -415,10 +415,10 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                           </span>
                           <button
                             onClick={(e) => handleSpeak(e, word.example.sentence)}
-                            className="text-teal-600 dark:text-teal-400 hover:scale-110 transition-transform ml-2"
+                            className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg bg-teal-100/60 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400 active:scale-90 touch-manipulation transition-all ml-2"
                             title="Nghe câu ví dụ"
                           >
-                            <Volume2 className="w-3.5 h-3.5" />
+                            <Volume2 className="w-4 h-4" />
                           </button>
                         </div>
                         <div className="text-[11px] text-teal-700 dark:text-teal-400 font-mono mt-0.5">
@@ -703,14 +703,14 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
                             key={idx}
                             onClick={() => handleSelectQuizOption(idx)}
                             disabled={isQuizChecked}
-                            className={`p-3 rounded-xl border text-left text-xs transition-all flex items-center justify-between ${btnStyle}`}
+                            className={`min-h-[50px] p-3.5 rounded-xl border text-left text-xs sm:text-sm font-medium transition-all active:scale-[0.98] touch-manipulation flex items-center justify-between shadow-xs ${btnStyle}`}
                           >
                             <span>{opt}</span>
                             {isQuizChecked && idx === currentQ.correctIndex && (
-                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 ml-1" />
+                              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 ml-1.5" />
                             )}
                             {isQuizChecked && idx === selectedOption && idx !== currentQ.correctIndex && (
-                              <XCircle className="w-4 h-4 text-red-600 shrink-0 ml-1" />
+                              <XCircle className="w-5 h-5 text-red-600 shrink-0 ml-1.5" />
                             )}
                           </button>
                         );
@@ -719,7 +719,7 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
 
                     {/* Explanation Box */}
                     {isQuizChecked && (
-                      <div className="p-3.5 rounded-xl bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800 text-xs text-teal-900 dark:text-teal-200 animate-fadeIn">
+                      <div className="p-3.5 rounded-xl bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800 text-xs sm:text-sm text-teal-900 dark:text-teal-200 animate-fadeIn">
                         <div className="font-bold mb-1 flex items-center gap-1.5 text-teal-700 dark:text-teal-400">
                           <Lightbulb className="w-4 h-4" />
                           <span>Giải thích chi tiết:</span>
@@ -731,10 +731,10 @@ export const SpatialModal: React.FC<SpatialModalProps> = ({
 
                   {/* Next Question Button */}
                   {isQuizChecked && (
-                    <div className="flex justify-end">
+                    <div className="flex justify-end pt-1">
                       <button
                         onClick={handleNextQuizQuestion}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all"
+                        className="min-h-[48px] w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all active:scale-95 touch-manipulation"
                       >
                         <span>{quizIndex + 1 < SPATIAL_QUIZ_QUESTIONS.length ? 'Câu tiếp theo' : 'Xem kết quả'}</span>
                         <ArrowRight className="w-4 h-4" />

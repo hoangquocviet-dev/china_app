@@ -111,3 +111,37 @@
     background: #ffffff !important;
   }
 }
+
+/* Mobile Touch & Touchscreen Phone Optimization */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  .pt-safe {
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+}
+
+/* Touch targets optimization: ensures at least 44x44px ergonomic touch area */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth kinetic scrolling for mobile overflow */
+.touch-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.touch-scroll-x::-webkit-scrollbar {
+  display: none;
+}
+
+.touch-scroll-y {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
