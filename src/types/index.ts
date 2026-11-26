@@ -45,7 +45,7 @@ export interface LessonCustomConfig {
 
 export type ActiveTab = 'flashcard' | 'writing' | 'assembly' | 'speaking' | 'games' | 'library';
 
-export type MiniGameId = 'blitz' | 'match' | 'runner' | 'exam' | 'tone';
+export type MiniGameId = 'blitz' | 'match' | 'runner' | 'exam' | 'tone' | 'listening';
 
 export interface GameScores {
   blitzBestScore: number;
@@ -54,6 +54,7 @@ export interface GameScores {
   matchBestWaves: number;
   runnerBestScore: number;
   runnerBestDistance: number;
+  listeningBestScore?: number;
   totalGamesPlayed: number;
 }
 
