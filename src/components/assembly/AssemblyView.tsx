@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, Check, RotateCcw, ChevronLeft, ChevronRight, HelpCircle } from 'lucide-react';
+import { Volume2, Check, RotateCcw, ChevronLeft, ChevronRight, HelpCircle, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { INITIAL_SENTENCES } from '../../data/hsk1Sentences';
 import type { SentenceExercise } from '../../types';
@@ -28,6 +28,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
   const [isEvaluated, setIsEvaluated] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [showGrammarHint, setShowGrammarHint] = useState(false);
 
   useEffect(() => {
     setExerciseIndex(0);
@@ -35,6 +36,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
     setSelectedTokens([]);
     setIsEvaluated(false);
     setIsCorrect(false);
+    setShowGrammarHint(false);
   }, [sentences]);
 
   const currentExercise = activeSentences[exerciseIndex] || activeSentences[0];
@@ -45,6 +47,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
     setSelectedTokens([]);
     setIsEvaluated(false);
     setIsCorrect(false);
+    setShowGrammarHint(false);
   };
 
   const handleSelectToken = (token: string, tokenIndex: number) => {
@@ -53,6 +56,10 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
     try {
       navigator.vibrate?.(12);
     } catch {}
+    // Phát âm chữ Hán khi chọn mảnh ghép để vừa ghép vừa học phát âm
+    if (/[\u3400-\u9fff]/.test(token)) {
+      audioService.speakChinese(token);
+    }
     setSelectedTokens((prev) => [...prev, token]);
     setAvailableTokens((prev) => prev.filter((_, idx) => idx !== tokenIndex));
   };
@@ -122,7 +129,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   return (
     <div className="flex flex-col flex-1 max-w-md w-full mx-auto p-4 pb-24">
       {/* Header bar */}
-      <div className="flex items-center justify-between mb-3 text-xs text-slate-400">
+      <div className="flex items-center justify-between mb-2 text-xs text-slate-400">
         <span className="font-medium text-slate-300">
           Bài tập {exerciseIndex + 1} / {activeSentences.length}
         </span>
@@ -131,32 +138,70 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
         </span>
       </div>
 
+      {/* Progress Bar */}
+      <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
+        <div
+          className="bg-gradient-to-r from-rose-500 to-amber-500 h-full transition-all duration-300 rounded-full"
+          style={{ width: `${((exerciseIndex + 1) / activeSentences.length) * 100}%` }}
+        />
+      </div>
+
       {/* Target prompt with listening support */}
-      <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700/80 mb-4 shadow-lg shadow-black/20 flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="text-xs uppercase tracking-wider text-slate-400 mb-1 font-semibold">
-            Câu tiếng Việt:
-          </div>
-          <div className="text-base sm:text-lg font-bold text-slate-100">{currentExercise.sourceSentence}</div>
-          {currentExercise.pinyin && (
-            <div className="text-xs text-rose-400/90 mt-1 pinyin-text tracking-normal">
-              {currentExercise.pinyin}
+      <div className="p-4 rounded-2xl bg-slate-800/90 border border-slate-700/80 mb-4 shadow-lg shadow-black/20 flex flex-col gap-2">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="text-xs uppercase tracking-wider text-slate-400 mb-1 font-semibold">
+              Câu tiếng Việt:
             </div>
-          )}
+            <div className="text-base sm:text-lg font-bold text-slate-100">{currentExercise.sourceSentence}</div>
+            {currentExercise.pinyin && (
+              <div className="text-xs text-rose-400/90 mt-1 pinyin-text tracking-normal">
+                {currentExercise.pinyin}
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              audioService.playClick();
+              audioService.speakChinese(currentExercise.targetSentence);
+            }}
+            className="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-all active:scale-95 shrink-0 flex items-center space-x-1.5 shadow-xs"
+            title="Nghe câu mẫu tiếng Trung để vừa nghe vừa sắp xếp"
+          >
+            <Volume2 className="w-4 h-4" />
+            <span className="text-xs font-semibold">Nghe câu</span>
+          </button>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            audioService.playClick();
-            audioService.speakChinese(currentExercise.targetSentence);
-          }}
-          className="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-all active:scale-95 shrink-0 flex items-center space-x-1.5 shadow-xs"
-          title="Nghe câu mẫu tiếng Trung để vừa nghe vừa sắp xếp"
-        >
-          <Volume2 className="w-4 h-4" />
-          <span className="text-xs font-semibold">Nghe câu</span>
-        </button>
+        {/* Grammar Structure Hint Toggle */}
+        {currentExercise.grammarNote && (
+          <div className="mt-1 pt-2 border-t border-slate-750/80">
+            <button
+              type="button"
+              data-testid="toggle-grammar-hint-btn"
+              onClick={() => {
+                audioService.playClick();
+                setShowGrammarHint(!showGrammarHint);
+              }}
+              className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
+            >
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>{showGrammarHint ? 'Ẩn cấu trúc gợi ý' : '💡 Xem cấu trúc ngữ pháp'}</span>
+            </button>
+
+            {showGrammarHint && (
+              <div
+                data-testid="grammar-hint-content"
+                className="mt-1.5 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-1.5 animate-fadeIn"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                <span>{currentExercise.grammarNote}</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* RESULT TILE DROP ZONE (Upper Tray) */}
