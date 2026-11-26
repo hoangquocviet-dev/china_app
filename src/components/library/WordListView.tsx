@@ -13,6 +13,7 @@ import {
   ChevronDown,
   X,
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
@@ -140,6 +141,20 @@ export const WordListView: React.FC<WordListViewProps> = ({
     }
   };
 
+  const handleImportHsk2Pack = () => {
+    audioService.playClick();
+    audioService.playSuccessChime();
+    const result = storageService.importHsk2Pack();
+    onRefreshWords();
+    setImportMessage(`Đã thêm thành công ${result.addedCount} từ vựng HSK 2 vào sổ học!`);
+    setTimeout(() => setImportMessage(null), 4000);
+    confetti({
+      particleCount: 50,
+      spread: 80,
+      origin: { y: 0.6 },
+    });
+  };
+
   return (
     <div className="flex-1 max-w-md mx-auto w-full p-4 flex flex-col pb-24 animate-fadeIn">
       {/* Top Banner: Add Word Primary CTA */}
@@ -252,23 +267,45 @@ export const WordListView: React.FC<WordListViewProps> = ({
       {/* Word List with progressive chunk rendering & content-visibility optimization */}
       <div className="space-y-2.5 overflow-y-auto">
         {filteredWords.length === 0 ? (
-          <div className="text-center py-12 px-4 rounded-3xl bg-slate-850/50 border border-dashed border-slate-800 text-slate-400 text-xs space-y-3">
-            <p>
-              {searchQuery
-                ? `Không tìm thấy từ vựng nào phù hợp với "${searchQuery}".`
-                : 'Sổ từ vựng của bạn đang trống.'}
-            </p>
-            <button
-              onClick={() => {
-                audioService.playClick();
-                setIsAddModalOpen(true);
-              }}
-              className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs transition-transform active:scale-95"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Tra từ điển hoặc Thêm từ mới</span>
-            </button>
-          </div>
+          selectedLevel === 'HSK2' && levelCounts.hsk2 === 0 ? (
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-950/40 via-slate-850 to-slate-900 border border-amber-500/30 text-center my-2 shadow-xl animate-fadeIn">
+              <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center shadow-lg">
+                <BookOpen className="w-7 h-7" />
+              </div>
+              <h3 className="text-base font-bold text-slate-100">
+                Sổ học chưa có từ vựng HSK 2
+              </h3>
+              <p className="text-xs text-slate-400 mt-1.5 max-w-sm mx-auto leading-relaxed">
+                Bạn đã sẵn sàng nâng cấp lên HSK 2? Nhập ngay trọn bộ 127 từ vựng HSK 2 chuẩn vào sổ học để mở rộng Flashcard, Luyện viết & Mini-games ngay!
+              </p>
+              <button
+                data-testid="import-hsk2-pack-btn"
+                onClick={handleImportHsk2Pack}
+                className="mt-4 py-2.5 px-5 rounded-2xl bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-950/40 flex items-center gap-1.5 mx-auto active:scale-95 transition-all"
+              >
+                <Sparkles className="w-4 h-4 fill-slate-950" />
+                <span>+ Nhập Trọn Bộ 127 Từ HSK 2 (1-Click)</span>
+              </button>
+            </div>
+          ) : (
+            <div className="text-center py-12 px-4 rounded-3xl bg-slate-850/50 border border-dashed border-slate-800 text-slate-400 text-xs space-y-3">
+              <p>
+                {searchQuery
+                  ? `Không tìm thấy từ vựng nào phù hợp với "${searchQuery}".`
+                  : 'Sổ từ vựng của bạn đang trống.'}
+              </p>
+              <button
+                onClick={() => {
+                  audioService.playClick();
+                  setIsAddModalOpen(true);
+                }}
+                className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs transition-transform active:scale-95"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Tra từ điển hoặc Thêm từ mới</span>
+              </button>
+            </div>
+          )
         ) : (
           visibleWords.map((word) => (
             <div

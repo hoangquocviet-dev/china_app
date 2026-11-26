@@ -294,6 +294,22 @@ class SafeStorageService {
     }
   }
 
+  // --- Official HSK 2 Pack Import ---
+  public importHsk2Pack(): { addedCount: number; totalHsk2: number } {
+    const hsk2Words = DICTIONARY_WORDS.filter((w) => w.level === 'HSK2');
+    const currentWords = this.getWords();
+    const existingHanzis = new Set(currentWords.map((w) => w.hanzi.trim()));
+    const toAdd = hsk2Words.filter((w) => !existingHanzis.has(w.hanzi.trim()));
+
+    if (toAdd.length > 0) {
+      const updated = [...currentWords, ...toAdd];
+      this.saveWords(updated);
+      this.recordStudyActivity();
+      this.notifyMutations();
+    }
+    return { addedCount: toAdd.length, totalHsk2: hsk2Words.length };
+  }
+
   // --- Mastered Flashcards Management ---
   public getMasteredFlashcardIds(): string[] {
     return this.get<string[]>(STORAGE_KEYS.MASTERED_FLASHCARDS, []);
