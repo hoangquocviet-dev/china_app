@@ -111,7 +111,7 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
                   audioService.playClick();
                   setScope('deck');
                 }}
-                className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
+                className={`min-h-[36px] px-3 py-1.5 rounded-lg font-semibold transition-all touch-manipulation active:scale-95 ${
                   scope === 'deck'
                     ? 'bg-rose-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-slate-200'
@@ -130,7 +130,7 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
                   audioService.playClick();
                   setGridStyle('mi');
                 }}
-                className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
+                className={`min-h-[36px] px-3 py-1.5 rounded-lg font-semibold transition-all touch-manipulation active:scale-95 ${
                   gridStyle === 'mi'
                     ? 'bg-rose-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-slate-200'
@@ -143,7 +143,7 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
                   audioService.playClick();
                   setGridStyle('tian');
                 }}
-                className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
+                className={`min-h-[36px] px-3 py-1.5 rounded-lg font-semibold transition-all touch-manipulation active:scale-95 ${
                   gridStyle === 'tian'
                     ? 'bg-rose-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-slate-200'
@@ -157,7 +157,7 @@ export const WorksheetModal: React.FC<WorksheetModalProps> = ({
           <button
             data-testid="print-worksheet-btn"
             onClick={handlePrint}
-            className="flex items-center space-x-1.5 py-1.5 px-3.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold shadow-md shadow-rose-900/30 active:scale-95 transition-all ml-auto"
+            className="flex items-center space-x-1.5 min-h-[40px] py-2 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold shadow-md shadow-rose-900/30 active:scale-95 transition-all ml-auto touch-manipulation select-none"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>In / Lưu PDF</span>

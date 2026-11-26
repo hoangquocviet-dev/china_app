@@ -177,7 +177,7 @@ export const StreakModal: React.FC<StreakModalProps> = ({ isOpen, onClose }) => 
               audioService.playClick();
               onClose();
             }}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-semibold text-xs shadow-md shadow-rose-900/30 transition-all active:scale-95"
+            className="min-h-[44px] px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-semibold text-xs shadow-md shadow-rose-900/30 transition-all active:scale-95 touch-manipulation select-none"
           >
             Tiếp tục học
           </button>

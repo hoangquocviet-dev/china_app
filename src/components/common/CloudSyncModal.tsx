@@ -309,7 +309,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
                     type="button"
                     data-testid="copy-sync-code-btn"
                     onClick={handleCopyCode}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all active:scale-95"
+                    className="min-h-[38px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all active:scale-95 touch-manipulation select-none"
                   >
                     {copiedCode ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedCode ? 'Đã chép' : 'Chép mã'}</span>
@@ -333,7 +333,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
                       type="button"
                       data-testid="copy-magic-link-btn"
                       onClick={handleCopyLink}
-                      className="mt-1.5 inline-flex items-center gap-1 text-xs font-bold text-rose-400 hover:text-rose-300 transition-colors"
+                      className="mt-1.5 min-h-[36px] inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-rose-400 hover:text-rose-300 transition-colors active:scale-95 touch-manipulation select-none"
                     >
                       {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
                       <span>{copiedLink ? 'Đã chép đường link!' : 'Sao chép Link mở nhanh'}</span>
@@ -366,7 +366,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
                     type="submit"
                     disabled={busy}
                     data-testid="save-nickname-btn"
-                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs font-bold transition-colors disabled:opacity-50"
+                    className="min-h-[42px] px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs font-bold transition-colors disabled:opacity-50 active:scale-95 touch-manipulation select-none"
                   >
                     Lưu
                   </button>
@@ -379,7 +379,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
                 disabled={busy}
                 data-testid="cloud-push-now-btn"
                 onClick={handleManualPush}
-                className="w-full py-3 rounded-2xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60"
+                className="w-full min-h-[48px] py-3 rounded-2xl bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-950/40 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-60 touch-manipulation select-none"
               >
                 <RefreshCw className={`w-4 h-4 ${busy ? 'animate-spin' : ''}`} />
                 <span>Đồng bộ lên Cloud ngay</span>
@@ -416,7 +416,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
                 type="submit"
                 disabled={busy || !restoreInput.trim()}
                 data-testid="restore-submit-btn"
-                className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+                className="w-full min-h-[48px] py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 touch-manipulation select-none"
               >
                 <DownloadCloud className={`w-4 h-4 ${busy ? 'animate-bounce' : ''}`} />
                 <span>{busy ? 'Đang tải từ Cloud...' : 'Khôi phục dữ liệu từ Cloud'}</span>

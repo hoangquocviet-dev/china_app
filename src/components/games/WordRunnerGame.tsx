@@ -803,7 +803,7 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
           <button
             data-testid="runner-start-btn"
             onClick={handleStartGame}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-extrabold text-sm shadow-lg shadow-cyan-950/50 transition-all active:scale-95 flex items-center justify-center space-x-2"
+            className="w-full min-h-[50px] py-3.5 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-extrabold text-sm shadow-lg shadow-cyan-950/50 transition-all active:scale-95 flex items-center justify-center space-x-2 touch-manipulation select-none"
           >
             <Rocket className="w-4 h-4" />
             <span>XUẤT PHÁT ĐUA VƯỢT CỔNG</span>
@@ -874,10 +874,10 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
             <button
               type="button"
               onClick={() => audioService.speakChinese(currentWave.word.hanzi)}
-              className="p-2 rounded-xl bg-slate-750 hover:bg-slate-700 text-cyan-300 border border-slate-600/60 shrink-0"
+              className="w-11 h-11 rounded-xl bg-slate-750 hover:bg-slate-700 text-cyan-300 border border-slate-600/60 shrink-0 flex items-center justify-center transition-all active:scale-90 touch-manipulation select-none"
               title="Nghe phát âm"
             >
-              <Volume2 className="w-4 h-4" />
+              <Volume2 className="w-5 h-5" />
             </button>
           </div>
 
@@ -950,7 +950,7 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
                   data-testid={`runner-lane-${laneIdx}`}
                   data-is-correct={laneIdx === currentWave.correctLane ? 'true' : 'false'}
                   onClick={() => handleSelectLane(laneIdx, true)}
-                  className={`p-2.5 rounded-2xl border-2 text-center transition-all active:scale-95 flex flex-col items-center justify-center min-h-[60px] ${
+                  className={`p-2.5 rounded-2xl border-2 text-center transition-all active:scale-95 flex flex-col items-center justify-center min-h-[64px] touch-manipulation select-none ${
                     isSelected
                       ? 'bg-cyan-500/20 border-cyan-400 text-white shadow-md shadow-cyan-950/50'
                       : 'bg-slate-800/90 hover:bg-slate-800 border-slate-700 text-slate-200'
@@ -975,7 +975,7 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
             type="button"
             data-testid="runner-dash-btn"
             onClick={handleTriggerTurboDash}
-            className="w-full py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 active:scale-95 text-slate-950 font-black text-xs flex items-center justify-center space-x-1.5 shadow-md shadow-amber-950/30 transition-all"
+            className="w-full min-h-[48px] py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 active:scale-95 text-slate-950 font-black text-xs flex items-center justify-center space-x-1.5 shadow-md shadow-amber-950/30 transition-all touch-manipulation select-none"
           >
             <Zap className="w-4 h-4 fill-slate-950" />
             <span>PHÓNG TURBO XUYÊN CỔNG (+35Đ)</span>
@@ -1036,9 +1036,9 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
                     <button
                       type="button"
                       onClick={() => audioService.speakChinese(w.hanzi)}
-                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 shrink-0"
+                      className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 shrink-0 flex items-center justify-center transition-all active:scale-90 touch-manipulation select-none"
                     >
-                      <Volume2 className="w-3.5 h-3.5" />
+                      <Volume2 className="w-4 h-4" />
                     </button>
                   </div>
                 ))}
@@ -1053,14 +1053,14 @@ export const WordRunnerGame: React.FC<WordRunnerGameProps> = ({
                 audioService.playClick();
                 onBack();
               }}
-              className="py-3 rounded-2xl bg-slate-750 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-600/60 transition-all active:scale-95"
+              className="min-h-[48px] py-3 px-4 rounded-2xl bg-slate-750 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-600/60 transition-all active:scale-95 touch-manipulation select-none"
             >
               Đổi trò chơi
             </button>
             <button
               type="button"
               onClick={handleStartGame}
-              className="py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-extrabold text-xs flex items-center justify-center space-x-1.5 shadow-md shadow-cyan-950/40 transition-all active:scale-95"
+              className="min-h-[48px] py-3 px-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-extrabold text-xs flex items-center justify-center space-x-1.5 shadow-md shadow-cyan-950/40 transition-all active:scale-95 touch-manipulation select-none"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Đua lại ngay</span>
