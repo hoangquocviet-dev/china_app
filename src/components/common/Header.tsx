@@ -96,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
             <h1 className="text-sm sm:text-base font-semibold text-slate-100 flex items-center gap-1 sm:gap-1.5 leading-tight">
               <span className="truncate">{title}</span>
               <span className="inline-flex items-center px-1 sm:px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20 shrink-0">
-                <Sparkles className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5" /> HSK 1
+                <Sparkles className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5" /> HSK 1-2
               </span>
             </h1>
             {subtitle && (

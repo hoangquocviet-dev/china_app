@@ -20,6 +20,7 @@ import { storageService } from '../../utils/storage';
 import { matchesWordSearch } from '../../utils/pinyinHelper';
 import { AddWordModal } from './AddWordModal';
 import { ImportExportModal } from './ImportExportModal';
+import { RadicalsModal } from '../writer/RadicalsModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -49,6 +50,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isImportExportOpen, setIsImportExportOpen] = useState(false);
+  const [isRadicalsModalOpen, setIsRadicalsModalOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -210,6 +212,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
         </div>
 
         <div className="flex items-center space-x-1.5">
+          <button
+            data-testid="library-radicals-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsRadicalsModalOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-colors shadow-xs"
+            title="Khám phá 50 bộ thủ chữ Hán thông dụng"
+          >
+            <span>🏮 Bộ thủ</span>
+          </button>
+
           <button
             data-testid="open-export-modal-btn"
             onClick={() => {
@@ -403,6 +417,13 @@ export const WordListView: React.FC<WordListViewProps> = ({
         words={words}
         initialTab={importExportTab}
         onDataChanged={onRefreshWords}
+      />
+
+      {/* 50 Common Radicals Modal */}
+      <RadicalsModal
+        isOpen={isRadicalsModalOpen}
+        onClose={() => setIsRadicalsModalOpen(false)}
+        onSelectCharacter={(ch) => setSearchQuery(ch)}
       />
     </div>
   );

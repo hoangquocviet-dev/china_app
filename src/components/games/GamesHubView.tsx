@@ -26,6 +26,8 @@ import { SpeedMatchGame } from './SpeedMatchGame';
 import { WordRunnerGame } from './WordRunnerGame';
 import { MiniExamGame } from './MiniExamGame';
 import { ToneMasterGame } from './ToneMasterGame';
+import { PinyinChartModal } from '../speaking/PinyinChartModal';
+import { RadicalsModal } from '../writer/RadicalsModal';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -65,6 +67,8 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [myPlayerTag, setMyPlayerTag] = useState<string>('');
   const [myNickname, setMyNickname] = useState<string>(() => cloudSyncService.getNickname());
   const [dictTick, setDictTick] = useState(0);
+  const [isPinyinModalOpen, setIsPinyinModalOpen] = useState(false);
+  const [isRadicalsModalOpen, setIsRadicalsModalOpen] = useState(false);
 
   const refreshLeaderboard = useCallback(async () => {
     setLoadingBoard(true);
@@ -284,6 +288,45 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             {scores.totalGamesPlayed} trận
           </div>
         </div>
+      </div>
+
+      {/* Quick Reference Tools: Pinyin & Radicals */}
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          data-testid="games-pinyin-chart-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsPinyinModalOpen(true);
+          }}
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-rose-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2.5"
+        >
+          <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+            🔤
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-slate-100 truncate">Bảng Pinyin Chuẩn</div>
+            <div className="text-[10px] text-slate-400 truncate">Thanh mẫu, vận mẫu & thanh điệu</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          data-testid="games-radicals-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsRadicalsModalOpen(true);
+          }}
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-amber-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2.5"
+        >
+          <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+            🏮
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-slate-100 truncate">50 Bộ Thủ Gốc</div>
+            <div className="text-[10px] text-slate-400 truncate">Nguồn gốc cấu tạo chữ Hán</div>
+          </div>
+        </button>
       </div>
 
       {/* Game Deck Source & Pinyin Hint Controls */}
@@ -720,6 +763,16 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
           </div>
         )}
       </div>
+
+      {/* Quick Study Modals */}
+      <PinyinChartModal
+        isOpen={isPinyinModalOpen}
+        onClose={() => setIsPinyinModalOpen(false)}
+      />
+      <RadicalsModal
+        isOpen={isRadicalsModalOpen}
+        onClose={() => setIsRadicalsModalOpen(false)}
+      />
     </div>
   );
 };
