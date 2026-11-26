@@ -11,6 +11,7 @@ import { ConnectorsModal } from '../common/ConnectorsModal';
 import { ReduplicationModal } from '../common/ReduplicationModal';
 import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
+import { ComparativesModal } from '../common/ComparativesModal';
 
 interface AssemblyViewProps {
   sentences?: SentenceExercise[];
@@ -41,6 +42,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
   const [isComplementsOpen, setIsComplementsOpen] = useState(false);
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
+  const [isComparativesOpen, setIsComparativesOpen] = useState(false);
 
   useEffect(() => {
     setExerciseIndex(0);
@@ -217,6 +219,18 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
             title="Bí kíp câu chữ 把 & câu chữ 被 HSK 2 - 3 (Câu xử lý & Bị động)"
           >
             <span>🛡️ 把·被</span>
+          </button>
+          <button
+            type="button"
+            data-testid="assembly-comparatives-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsComparativesOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-300 hover:text-sky-200 border border-sky-500/20 font-medium transition-colors"
+            title="Bí kíp câu so sánh HSK (比, 没有, 一样, 最, 越来越)"
+          >
+            <span>⚖️ So sánh</span>
           </button>
           <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
             Sắp xếp câu
@@ -458,6 +472,12 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
       <BaBeiModal
         isOpen={isBaBeiOpen}
         onClose={() => setIsBaBeiOpen(false)}
+      />
+
+      {/* Chinese Comparative Sentences Modal */}
+      <ComparativesModal
+        isOpen={isComparativesOpen}
+        onClose={() => setIsComparativesOpen(false)}
       />
     </div>
   );

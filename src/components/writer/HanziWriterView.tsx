@@ -19,6 +19,7 @@ import { ConnectorsModal } from '../common/ConnectorsModal';
 import { ReduplicationModal } from '../common/ReduplicationModal';
 import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
+import { ComparativesModal } from '../common/ComparativesModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -63,6 +64,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
   const [isComplementsOpen, setIsComplementsOpen] = useState(false);
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
+  const [isComparativesOpen, setIsComparativesOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -809,6 +811,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>🛡️ 把·被</span>
           </button>
+          <button
+            data-testid="open-comparatives-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsComparativesOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Bí kíp câu so sánh HSK (比, 没有, 一样, 最, 越来越)"
+          >
+            <span>⚖️ So sánh</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -933,6 +946,12 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       <BaBeiModal
         isOpen={isBaBeiOpen}
         onClose={() => setIsBaBeiOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+      />
+      {/* Comparative Sentences Modal */}
+      <ComparativesModal
+        isOpen={isComparativesOpen}
+        onClose={() => setIsComparativesOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>

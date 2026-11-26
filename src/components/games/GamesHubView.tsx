@@ -46,6 +46,7 @@ import { ConnectorsModal } from '../common/ConnectorsModal';
 import { ReduplicationModal } from '../common/ReduplicationModal';
 import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
+import { ComparativesModal } from '../common/ComparativesModal';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -110,6 +111,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
   const [isComplementsOpen, setIsComplementsOpen] = useState(false);
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
+  const [isComparativesOpen, setIsComparativesOpen] = useState(false);
 
   const refreshLeaderboard = useCallback(async () => {
     setLoadingBoard(true);
@@ -674,6 +676,24 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             <div className="text-[10px] text-slate-400 truncate">把字与被字</div>
           </div>
         </button>
+
+        <button
+          type="button"
+          data-testid="games-comparatives-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsComparativesOpen(true);
+          }}
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-sky-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+        >
+          <div className="w-7 h-7 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+            ⚖️
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-slate-100 truncate">So sánh</div>
+            <div className="text-[10px] text-slate-400 truncate">比较句</div>
+          </div>
+        </button>
       </div>
 
       {/* Game Deck Source & Pinyin Hint Controls */}
@@ -1226,6 +1246,10 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
       <BaBeiModal
         isOpen={isBaBeiOpen}
         onClose={() => setIsBaBeiOpen(false)}
+      />
+      <ComparativesModal
+        isOpen={isComparativesOpen}
+        onClose={() => setIsComparativesOpen(false)}
       />
     </div>
   );
