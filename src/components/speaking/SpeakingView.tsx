@@ -5,6 +5,7 @@ import type { ChineseWord, SentenceExercise } from '../../types';
 import { INITIAL_SENTENCES } from '../../data/hsk1Sentences';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
+import { PinyinChartModal } from './PinyinChartModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -46,6 +47,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isSpeechSupported, setIsSpeechSupported] = useState(true);
   const [showPermissionGuide, setShowPermissionGuide] = useState(false);
   const [hasPermissionError, setHasPermissionError] = useState(false);
+  const [isPinyinChartOpen, setIsPinyinChartOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -412,14 +414,27 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             ? `Từ ${wordIndex + 1} / ${words.length || 1}`
             : `Câu ${sentenceIndex + 1} / ${activeSentences.length}`}
         </span>
-        <button
-          onClick={() => setShowPermissionGuide(true)}
-          className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
-          title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
-        >
-          <HelpCircle className="w-3 h-3 text-sky-400" />
-          <span>Trợ giúp Micro</span>
-        </button>
+        <div className="flex items-center space-x-1.5">
+          <button
+            data-testid="open-pinyin-chart-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsPinyinChartOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Mở Bảng tra & Luyện phát âm Pinyin chuẩn: 23 Thanh mẫu, 24 Vận mẫu & 4 Thanh điệu"
+          >
+            <span>🔤 Bảng Pinyin</span>
+          </button>
+          <button
+            onClick={() => setShowPermissionGuide(true)}
+            className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
+            title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
+          >
+            <HelpCircle className="w-3 h-3 text-sky-400" />
+            <span>Trợ giúp Micro</span>
+          </button>
+        </div>
       </div>
 
       {/* Permission / Overlay Error Alert Banner */}
@@ -697,6 +712,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
           </div>
         </div>
       )}
+      {/* Pinyin Interactive Chart Modal */}
+      <PinyinChartModal
+        isOpen={isPinyinChartOpen}
+        onClose={() => setIsPinyinChartOpen(false)}
+      />
     </div>
   );
 };
