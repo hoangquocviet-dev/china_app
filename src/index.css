@@ -83,3 +83,31 @@
   line-height: 1 !important;
   text-align: center !important;
 }
+
+/* Print Worksheet Optimization for A4 Paper */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 1cm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  header, nav, footer, #bottom-nav, .print\:hidden {
+    display: none !important;
+  }
+
+  #printable-hanzi-worksheet {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+}

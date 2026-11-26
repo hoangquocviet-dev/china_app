@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import HanziWriter from 'hanzi-writer';
-import { Play, RotateCcw, HelpCircle, Volume2, CheckCircle2, AlertCircle, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { Play, RotateCcw, HelpCircle, Volume2, CheckCircle2, AlertCircle, ChevronLeft, ChevronRight, Sparkles, Printer } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
 import bundledStrokes from '../../data/bundledStrokes.json';
+import { WorksheetModal } from './WorksheetModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -37,6 +38,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
     typeof window !== 'undefined' ? window.innerWidth : 375
   );
   const [hintMessage, setHintMessage] = useState<string | null>(null);
+  const [isWorksheetOpen, setIsWorksheetOpen] = useState(false);
 
   useEffect(() => {
     if (initialWordId) {
@@ -627,6 +629,19 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             {mode === 'quiz' ? '🧠 Tự nhớ' : '✍️ Nét mờ'}
           </button>
+
+          <button
+            data-testid="open-worksheet-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsWorksheetOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Mở bảng tập viết ô Mễ khổ A4 để in hoặc xuất PDF"
+          >
+            <Printer className="w-3.5 h-3.5 text-rose-400" />
+            <span>In ô Mễ</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -664,6 +679,15 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           <span>Gợi ý nét</span>
         </button>
       </div>
+
+      {currentWord && (
+        <WorksheetModal
+          isOpen={isWorksheetOpen}
+          onClose={() => setIsWorksheetOpen(false)}
+          currentWord={currentWord}
+          words={words}
+        />
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Volume2, Eye, EyeOff, Check, RotateCcw, ChevronLeft, ChevronRight, ChevronUp, Sparkles } from 'lucide-react';
+import { Volume2, Eye, EyeOff, Check, RotateCcw, ChevronLeft, ChevronRight, ChevronUp, Sparkles, Headphones, Pause } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
@@ -22,6 +22,12 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   const [hideHanviet, setHideHanviet] = useState(false);
   const [lastMasteredWord, setLastMasteredWord] = useState<ChineseWord | null>(null);
   const undoTimerRef = useRef<number | null>(null);
+
+  // Hands-free Audio Player state
+  const [isAutoPlay, setIsAutoPlay] = useState(false);
+  const [autoPlaySpeed, setAutoPlaySpeed] = useState<'normal' | 'slow'>('normal');
+  const autoPlayTimerRef = useRef<number | null>(null);
+  const isAutoPlayRef = useRef<boolean>(false);
 
   // Swipe gesture state
   const [dragOffset, setDragOffset] = useState(0);
@@ -126,6 +132,74 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
     setDragOffsetY(0);
     setCurrentIndex((safeIndex - 1 + unmasteredWords.length) % unmasteredWords.length);
   };
+
+  // Hands-free Audio Player loop
+  useEffect(() => {
+    isAutoPlayRef.current = isAutoPlay;
+    if (!isAutoPlay || !currentWord || isDeckCompleted) {
+      if (autoPlayTimerRef.current) {
+        window.clearTimeout(autoPlayTimerRef.current);
+        autoPlayTimerRef.current = null;
+      }
+      if (!isAutoPlay) {
+        audioService.stopSpeech();
+      }
+      return;
+    }
+
+    let isMounted = true;
+    storageService.recordStudyActivity();
+
+    // Step 1: Speak character on front
+    audioService.speakChinese(currentWord.hanzi);
+
+    // MediaSession metadata
+    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: `${currentWord.hanzi} (${currentWord.pinyin})`,
+          artist: currentWord.meaning,
+          album: 'HanziFlow HSK 1 Luyện Nghe',
+        });
+      } catch {}
+    }
+
+    const flipDelay = autoPlaySpeed === 'slow' ? 2400 : 1800;
+    const nextCardDelay = autoPlaySpeed === 'slow' ? 3600 : 2800;
+
+    autoPlayTimerRef.current = window.setTimeout(() => {
+      if (!isMounted || !isAutoPlayRef.current) return;
+      setIsFlipped(true);
+
+      // Read example if exists
+      if (currentWord.examples && currentWord.examples.length > 0) {
+        audioService.speakChinese(currentWord.examples[0].zh);
+      }
+
+      autoPlayTimerRef.current = window.setTimeout(() => {
+        if (!isMounted || !isAutoPlayRef.current) return;
+        setIsFlipped(false);
+        setCurrentIndex((prev) => {
+          if (unmasteredWords.length === 0) return 0;
+          return (prev + 1) % unmasteredWords.length;
+        });
+      }, nextCardDelay);
+    }, flipDelay);
+
+    return () => {
+      isMounted = false;
+      if (autoPlayTimerRef.current) {
+        window.clearTimeout(autoPlayTimerRef.current);
+        autoPlayTimerRef.current = null;
+      }
+    };
+  }, [isAutoPlay, safeIndex, unmasteredWords.length, autoPlaySpeed, isDeckCompleted, currentWord]);
+
+  useEffect(() => {
+    if (isDeckCompleted && isAutoPlay) {
+      setIsAutoPlay(false);
+    }
+  }, [isDeckCompleted, isAutoPlay]);
 
   const handleAnswer = (isCorrect: boolean) => {
     if (!currentWord) return;
@@ -377,6 +451,32 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
             {hideHanviet ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
             <span>Hán Việt</span>
           </button>
+
+          <button
+            data-testid="toggle-autoplay-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsAutoPlay(!isAutoPlay);
+            }}
+            className={`flex items-center space-x-1 px-2 py-1 rounded-lg border font-semibold text-[11px] transition-colors active:scale-95 ${
+              isAutoPlay
+                ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                : 'bg-slate-800 border-slate-700 text-slate-400'
+            }`}
+            title={isAutoPlay ? 'Đang chạy rảnh tay. Bấm để dừng' : 'Bật chế độ tự động chạy thẻ rảnh tay'}
+          >
+            {isAutoPlay ? (
+              <>
+                <Pause className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                <span>Dừng</span>
+              </>
+            ) : (
+              <>
+                <Headphones className="w-3.5 h-3.5 text-rose-400" />
+                <span>Rảnh tay</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
 
@@ -387,6 +487,72 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
           style={{ width: `${words.length > 0 ? Math.min(100, (deckMasteredCount / words.length) * 100) : 0}%` }}
         />
       </div>
+
+      {/* Hands-free Audio Player Banner */}
+      {isAutoPlay && currentWord && (
+        <div
+          data-testid="autoplay-active-banner"
+          className="mb-3 p-2.5 rounded-2xl bg-gradient-to-r from-emerald-950/70 via-slate-850 to-slate-900 border border-emerald-500/40 flex items-center justify-between shadow-lg text-xs animate-in fade-in duration-200"
+        >
+          <div className="flex items-center space-x-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="font-semibold text-emerald-300 flex items-center gap-1">
+              <span>Đang nghe rảnh tay</span>
+              <span className="text-slate-400 font-normal">
+                ({safeIndex + 1}/{unmasteredWords.length})
+              </span>
+            </span>
+          </div>
+
+          <div className="flex items-center space-x-1.5">
+            <button
+              onClick={() => {
+                audioService.playClick();
+                handlePrev();
+              }}
+              className="p-1 rounded bg-slate-800 text-slate-300 hover:text-white border border-slate-700 active:scale-95"
+              title="Từ trước"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              onClick={() => {
+                audioService.playClick();
+                setAutoPlaySpeed(autoPlaySpeed === 'normal' ? 'slow' : 'normal');
+              }}
+              className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-750 text-slate-300 text-[10px] border border-slate-700 font-medium active:scale-95"
+              title="Đổi nhịp độ lật thẻ"
+            >
+              {autoPlaySpeed === 'normal' ? 'Vừa' : 'Chậm'}
+            </button>
+
+            <button
+              onClick={() => {
+                audioService.playClick();
+                handleNext();
+              }}
+              className="p-1 rounded bg-slate-800 text-slate-300 hover:text-white border border-slate-700 active:scale-95"
+              title="Từ sau"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+
+            <button
+              onClick={() => {
+                audioService.playClick();
+                setIsAutoPlay(false);
+              }}
+              className="px-2 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-[10px] border border-rose-500/30 font-semibold active:scale-95"
+            >
+              Dừng
+            </button>
+          </div>
+        </div>
+      )}
 
       {currentWord && (
         <>
