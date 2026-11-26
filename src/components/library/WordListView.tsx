@@ -25,6 +25,7 @@ import { MeasureWordsModal } from '../common/MeasureWordsModal';
 import { GrammarHandbookModal } from '../common/GrammarHandbookModal';
 import { AntonymsModal } from '../common/AntonymsModal';
 import { ConfusingWordsModal } from '../common/ConfusingWordsModal';
+import { DialoguesModal } from '../common/DialoguesModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -59,6 +60,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isGrammarHandbookOpen, setIsGrammarHandbookOpen] = useState(false);
   const [isAntonymsModalOpen, setIsAntonymsModalOpen] = useState(false);
   const [isConfusingWordsOpen, setIsConfusingWordsOpen] = useState(false);
+  const [isDialoguesModalOpen, setIsDialoguesModalOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -278,6 +280,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
             title="Bí kíp phân biệt 16 cặp từ dễ nhầm lẫn HSK 1 - 2"
           >
             <span>🔍 Phân biệt từ</span>
+          </button>
+
+          <button
+            data-testid="open-dialogues-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsDialoguesModalOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-emerald-300 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors shadow-xs"
+            title="Hội thoại 10 tình huống thực tế HSK 1 - 2"
+          >
+            <span>💬 Hội thoại</span>
           </button>
 
           <button
@@ -504,6 +518,12 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <ConfusingWordsModal
         isOpen={isConfusingWordsOpen}
         onClose={() => setIsConfusingWordsOpen(false)}
+      />
+
+      {/* 10 Real-world Situational Dialogues Modal */}
+      <DialoguesModal
+        isOpen={isDialoguesModalOpen}
+        onClose={() => setIsDialoguesModalOpen(false)}
       />
     </div>
   );

@@ -6,6 +6,7 @@ import { INITIAL_SENTENCES } from '../../data/hsk1Sentences';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
 import { PinyinChartModal } from './PinyinChartModal';
+import { DialoguesModal } from '../common/DialoguesModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -48,6 +49,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [showPermissionGuide, setShowPermissionGuide] = useState(false);
   const [hasPermissionError, setHasPermissionError] = useState(false);
   const [isPinyinChartOpen, setIsPinyinChartOpen] = useState(false);
+  const [isDialoguesModalOpen, setIsDialoguesModalOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -414,7 +416,18 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             ? `Từ ${wordIndex + 1} / ${words.length || 1}`
             : `Câu ${sentenceIndex + 1} / ${activeSentences.length}`}
         </span>
-        <div className="flex items-center space-x-1.5">
+        <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
+          <button
+            data-testid="open-dialogues-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsDialoguesModalOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Khám phá 10 tình huống hội thoại thực tế HSK 1 - 2"
+          >
+            <span>💬 Hội thoại HSK</span>
+          </button>
           <button
             data-testid="open-pinyin-chart-btn"
             onClick={() => {
@@ -424,7 +437,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             className="text-[11px] px-2.5 py-0.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
             title="Mở Bảng tra & Luyện phát âm Pinyin chuẩn: Thanh mẫu, Vận mẫu, Thanh điệu & Quy tắc biến điệu"
           >
-            <span>🔤 Bảng Pinyin & Biến điệu</span>
+            <span>🔤 Pinyin</span>
           </button>
           <button
             onClick={() => setShowPermissionGuide(true)}
@@ -716,6 +729,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <PinyinChartModal
         isOpen={isPinyinChartOpen}
         onClose={() => setIsPinyinChartOpen(false)}
+      />
+      {/* 10 Real-world Situational Dialogues Modal */}
+      <DialoguesModal
+        isOpen={isDialoguesModalOpen}
+        onClose={() => setIsDialoguesModalOpen(false)}
       />
     </div>
   );
