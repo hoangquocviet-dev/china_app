@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('=== RUNNING ENGLISH APP TEST CASE MATRIX FOR HANZIFLOW ===\n');
+console.log('=== RUNNING HANZIFLOW PWA QUALITY TEST MATRIX ===\n');
 
 let passed = 0;
 let failed = 0;
