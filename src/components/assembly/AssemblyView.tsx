@@ -6,6 +6,7 @@ import type { SentenceExercise } from '../../types';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
 import { MeasureWordsModal } from '../common/MeasureWordsModal';
+import { GrammarHandbookModal } from '../common/GrammarHandbookModal';
 
 interface AssemblyViewProps {
   sentences?: SentenceExercise[];
@@ -31,6 +32,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const [isCorrect, setIsCorrect] = useState(false);
   const [showGrammarHint, setShowGrammarHint] = useState(false);
   const [isMeasureWordsOpen, setIsMeasureWordsOpen] = useState(false);
+  const [isGrammarHandbookOpen, setIsGrammarHandbookOpen] = useState(false);
 
   useEffect(() => {
     setExerciseIndex(0);
@@ -135,7 +137,19 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
         <span className="font-medium text-slate-300">
           Bài tập {exerciseIndex + 1} / {activeSentences.length}
         </span>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1.5">
+          <button
+            type="button"
+            data-testid="assembly-grammar-handbook-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsGrammarHandbookOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-300 hover:text-blue-200 border border-blue-500/20 font-medium transition-colors"
+            title="Sổ tay 20 cấu trúc ngữ pháp trọng điểm HSK 1 - 2"
+          >
+            <span>📘 Ngữ pháp</span>
+          </button>
           <button
             type="button"
             data-testid="assembly-measure-words-btn"
@@ -148,8 +162,8 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
           >
             <span>📏 Lượng từ</span>
           </button>
-          <span className="px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
-            Sắp xếp trật tự câu
+          <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
+            Sắp xếp câu
           </span>
         </div>
       </div>
@@ -358,6 +372,12 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
       <MeasureWordsModal
         isOpen={isMeasureWordsOpen}
         onClose={() => setIsMeasureWordsOpen(false)}
+      />
+
+      {/* 20 Core Grammar Patterns Handbook Modal */}
+      <GrammarHandbookModal
+        isOpen={isGrammarHandbookOpen}
+        onClose={() => setIsGrammarHandbookOpen(false)}
       />
     </div>
   );

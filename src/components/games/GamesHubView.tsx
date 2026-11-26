@@ -30,6 +30,7 @@ import { PinyinChartModal } from '../speaking/PinyinChartModal';
 import { RadicalsModal } from '../writer/RadicalsModal';
 import { StrokeRulesModal } from '../writer/StrokeRulesModal';
 import { MeasureWordsModal } from '../common/MeasureWordsModal';
+import { GrammarHandbookModal } from '../common/GrammarHandbookModal';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -73,6 +74,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [isRadicalsModalOpen, setIsRadicalsModalOpen] = useState(false);
   const [isStrokeRulesModalOpen, setIsStrokeRulesModalOpen] = useState(false);
   const [isMeasureWordsModalOpen, setIsMeasureWordsModalOpen] = useState(false);
+  const [isGrammarHandbookOpen, setIsGrammarHandbookOpen] = useState(false);
 
   const refreshLeaderboard = useCallback(async () => {
     setLoadingBoard(true);
@@ -294,8 +296,8 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
         </div>
       </div>
 
-      {/* Quick Reference Tools: Pinyin, Radicals, Stroke Rules & Measure Words */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      {/* Quick Reference Tools: Pinyin, Radicals, Stroke Rules, Measure Words & Grammar */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
         <button
           type="button"
           data-testid="games-pinyin-chart-btn"
@@ -365,6 +367,24 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
           <div className="min-w-0">
             <div className="font-bold text-xs text-slate-100 truncate">Lượng Từ</div>
             <div className="text-[10px] text-slate-400 truncate">16 Loại HSK</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          data-testid="games-grammar-handbook-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsGrammarHandbookOpen(true);
+          }}
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-blue-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2 col-span-2 sm:col-span-1"
+        >
+          <div className="w-7 h-7 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+            📘
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-slate-100 truncate">Ngữ Pháp</div>
+            <div className="text-[10px] text-slate-400 truncate">20 Cấu trúc</div>
           </div>
         </button>
       </div>
@@ -820,6 +840,10 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
       <MeasureWordsModal
         isOpen={isMeasureWordsModalOpen}
         onClose={() => setIsMeasureWordsModalOpen(false)}
+      />
+      <GrammarHandbookModal
+        isOpen={isGrammarHandbookOpen}
+        onClose={() => setIsGrammarHandbookOpen(false)}
       />
     </div>
   );

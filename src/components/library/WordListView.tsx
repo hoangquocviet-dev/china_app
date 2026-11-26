@@ -22,6 +22,7 @@ import { AddWordModal } from './AddWordModal';
 import { ImportExportModal } from './ImportExportModal';
 import { RadicalsModal } from '../writer/RadicalsModal';
 import { MeasureWordsModal } from '../common/MeasureWordsModal';
+import { GrammarHandbookModal } from '../common/GrammarHandbookModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -53,6 +54,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isImportExportOpen, setIsImportExportOpen] = useState(false);
   const [isRadicalsModalOpen, setIsRadicalsModalOpen] = useState(false);
   const [isMeasureWordsModalOpen, setIsMeasureWordsModalOpen] = useState(false);
+  const [isGrammarHandbookOpen, setIsGrammarHandbookOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -236,6 +238,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
             title="Tra cứu 16 lượng từ thiết yếu HSK 1 - 2"
           >
             <span>📏 Lượng từ</span>
+          </button>
+
+          <button
+            data-testid="open-grammar-handbook-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsGrammarHandbookOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-blue-300 border border-blue-500/20 hover:border-blue-500/40 transition-colors shadow-xs"
+            title="Sổ tay 20 cấu trúc ngữ pháp trọng điểm HSK 1 - 2"
+          >
+            <span>📘 Ngữ pháp</span>
           </button>
 
           <button
@@ -444,6 +458,12 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <MeasureWordsModal
         isOpen={isMeasureWordsModalOpen}
         onClose={() => setIsMeasureWordsModalOpen(false)}
+      />
+
+      {/* 20 Core Grammar Patterns Handbook Modal */}
+      <GrammarHandbookModal
+        isOpen={isGrammarHandbookOpen}
+        onClose={() => setIsGrammarHandbookOpen(false)}
       />
     </div>
   );
