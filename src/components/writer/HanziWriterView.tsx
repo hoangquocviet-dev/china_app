@@ -583,29 +583,58 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       )}
 
       {/* Grid Switch & Canvas Controls */}
-      <div className="flex items-center justify-between mb-3 text-xs text-slate-400 px-1">
-        <div className="flex items-center space-x-2">
-          <span>Khung kẻ:</span>
+      <div className="flex items-center justify-between mb-3 text-xs text-slate-400 px-1 gap-1 flex-wrap">
+        <div className="flex items-center space-x-1.5">
           <button
             onClick={() => {
               audioService.playClick();
               setGridType(gridType === 'mi' ? 'tian' : 'mi');
             }}
-            className="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-medium"
+            className="px-2 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-medium"
+            title="Đổi loại khung kẻ lưới"
           >
             {gridType === 'mi' ? 'Ô Mễ (米)' : 'Ô Điền (田)'}
           </button>
+
+          <button
+            data-testid="toggle-writer-mode"
+            onClick={() => {
+              audioService.playClick();
+              if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+                try {
+                  navigator.vibrate?.(12);
+                } catch {}
+              }
+              const nextMode = mode === 'guide' ? 'quiz' : 'guide';
+              setMode(nextMode);
+              if (writerRef.current) {
+                if (nextMode === 'guide') {
+                  writerRef.current.showOutline();
+                  setHintMessage('Đã bật nét mờ hướng dẫn.');
+                } else {
+                  writerRef.current.hideOutline();
+                  setHintMessage('Đã chuyển chế độ Thử thách: Tự nhớ nét!');
+                }
+                setTimeout(() => setHintMessage(null), 2500);
+              }
+            }}
+            className={`px-2 py-1 rounded-lg border font-semibold transition-all active:scale-95 ${
+              mode === 'quiz'
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                : 'bg-slate-800 text-slate-300 border-slate-700'
+            }`}
+            title={mode === 'quiz' ? 'Đang ẩn nét mờ. Bấm để bật nét mờ' : 'Đang bật nét mờ. Bấm để thử thách tự nhớ nét'}
+          >
+            {mode === 'quiz' ? '🧠 Tự nhớ' : '✍️ Nét mờ'}
+          </button>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1.5">
           {mode !== 'animate' && totalStrokes > 0 && (
             <span className="text-xs font-semibold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">
               Nét {Math.min(currentStroke, totalStrokes)} / {totalStrokes}
             </span>
           )}
-          <span className="text-slate-500">
-            {mode === 'quiz' ? 'Tự viết từ trí nhớ' : mode === 'guide' ? 'Đồ theo nét mờ' : 'Xem thứ tự nét'}
-          </span>
         </div>
       </div>
 

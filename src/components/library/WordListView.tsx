@@ -43,6 +43,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   onWordAdded,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedLevel, setSelectedLevel] = useState<'ALL' | 'HSK1' | 'HSK2' | 'TOPIC'>('ALL');
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
@@ -50,9 +51,24 @@ export const WordListView: React.FC<WordListViewProps> = ({
   // useDeferredValue ensures typing remains 120Hz smooth even across thousands of words
   const deferredQuery = useDeferredValue(searchQuery);
 
+  const levelCounts = useMemo(() => {
+    let hsk1 = 0;
+    let hsk2 = 0;
+    let topic = 0;
+    for (const w of words) {
+      if (w.level === 'HSK1') hsk1++;
+      else if (w.level === 'HSK2') hsk2++;
+      else topic++;
+    }
+    return { all: words.length, hsk1, hsk2, topic };
+  }, [words]);
+
   const filteredWords = useMemo(() => {
-    return words.filter((w) => matchesWordSearch(w, deferredQuery));
-  }, [words, deferredQuery]);
+    return words.filter((w) => {
+      if (selectedLevel !== 'ALL' && w.level !== selectedLevel) return false;
+      return matchesWordSearch(w, deferredQuery);
+    });
+  }, [words, deferredQuery, selectedLevel]);
 
   // Reset display chunk when search query changes
   useEffect(() => {
@@ -173,6 +189,32 @@ export const WordListView: React.FC<WordListViewProps> = ({
             <X className="w-4 h-4" />
           </button>
         )}
+      </div>
+
+      {/* Level Filter Chips */}
+      <div className="flex items-center space-x-1.5 mb-3 overflow-x-auto pb-1 text-xs select-none scrollbar-none">
+        {[
+          { id: 'ALL', label: `Tất cả (${levelCounts.all})` },
+          { id: 'HSK1', label: `HSK 1 (${levelCounts.hsk1})` },
+          { id: 'HSK2', label: `HSK 2 (${levelCounts.hsk2})` },
+          { id: 'TOPIC', label: `Chủ đề (${levelCounts.topic})` },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            data-testid={`level-filter-${tab.id.toLowerCase()}`}
+            onClick={() => {
+              audioService.playClick();
+              setSelectedLevel(tab.id as any);
+            }}
+            className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all border ${
+              selectedLevel === tab.id
+                ? 'bg-rose-600 text-white border-rose-500 shadow-sm'
+                : 'bg-slate-800/80 text-slate-400 hover:text-slate-200 border-slate-700/80'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Stats & Backup Toolbar */}
