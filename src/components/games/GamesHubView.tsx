@@ -13,6 +13,7 @@ import {
   Crown,
   RefreshCw,
   Cloud,
+  Award,
 } from 'lucide-react';
 import type { ChineseWord, MiniGameId, GameScores, HanziLeaderboardEntry } from '../../types';
 import { storageService } from '../../utils/storage';
@@ -22,6 +23,7 @@ import { INITIAL_WORDS } from '../../data/hsk1Words';
 import { TrueFalseBlitzGame } from './TrueFalseBlitzGame';
 import { SpeedMatchGame } from './SpeedMatchGame';
 import { WordRunnerGame } from './WordRunnerGame';
+import { MiniExamGame } from './MiniExamGame';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -42,6 +44,13 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [poolSource, setPoolSource] = useState<WordPoolSource>('active');
   const [showPinyinHint, setShowPinyinHint] = useState<boolean>(true);
   const [scores, setScores] = useState<GameScores>(() => storageService.getGameScores());
+  const [bestExamScore, setBestExamScore] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = window.localStorage.getItem('hanziflow_exam_best_score');
+      if (saved) return parseInt(saved, 10) || 0;
+    }
+    return 0;
+  });
   const [leaderboard, setLeaderboard] = useState<HanziLeaderboardEntry[]>([]);
   const [loadingBoard, setLoadingBoard] = useState<boolean>(true);
   const [myPlayerTag, setMyPlayerTag] = useState<string>('');
@@ -213,6 +222,19 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
     );
   }
 
+  if (selectedGame === 'exam') {
+    return (
+      <MiniExamGame
+        words={effectivePlayWords}
+        bestScore={bestExamScore}
+        onBack={() => setSelectedGame(null)}
+        onFinishExam={(finalScore) => {
+          setBestExamScore((prev) => Math.max(prev, finalScore));
+        }}
+      />
+    );
+  }
+
   const totalRecordScore =
     scores.blitzBestScore + scores.matchBestScore + scores.runnerBestScore;
 
@@ -309,6 +331,49 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
           >
             Từ điển ({dictionaryWords.length}+)
           </button>
+        </div>
+      </div>
+
+      {/* FEATURED: KỲ THI THỬ HSK 1 TỔNG HỢP (10 CÂU) */}
+      <div
+        data-testid="game-card-exam"
+        onClick={() => {
+          audioService.playClick();
+          setSelectedGame('exam');
+        }}
+        className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-amber-950/40 via-slate-850 to-rose-950/40 border-2 border-amber-500/40 hover:border-amber-400 shadow-xl transition-all active:scale-[0.98]"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 via-rose-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-amber-950/50 shrink-0">
+            <Award className="w-6 h-6 text-white" />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h3 className="text-sm sm:text-base font-extrabold text-amber-200 flex items-center gap-1">
+                Thi Thử HSK 1 Tổng Hợp
+              </h3>
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-500/25 text-amber-300 border border-amber-400/40 animate-pulse">
+                HOT
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+              Đề thi 10 câu ngẫu nhiên phối hợp 4 kỹ năng: Nhận diện chữ Hán, Nghe phát âm, Ghép câu & Phản xạ Đúng/Sai.
+            </p>
+
+            <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-slate-700/60">
+              <div className="flex items-center space-x-2 text-[11px]">
+                <span className="text-amber-300 font-bold">
+                  🏆 Điểm cao nhất: {bestExamScore}/100
+                </span>
+              </div>
+
+              <span className="inline-flex items-center space-x-1 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-rose-600 group-hover:from-amber-400 group-hover:to-rose-500 text-slate-950 text-xs font-black shadow-md shadow-amber-950/40">
+                <Play className="w-3 h-3 fill-slate-950" />
+                <span>Vào thi</span>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
