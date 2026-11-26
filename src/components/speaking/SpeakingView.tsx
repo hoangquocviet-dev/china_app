@@ -9,6 +9,7 @@ import { PinyinChartModal } from './PinyinChartModal';
 import { DialoguesModal } from '../common/DialoguesModal';
 import { ChengyuModal } from '../common/ChengyuModal';
 import { NumbersTimeModal } from '../common/NumbersTimeModal';
+import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -54,6 +55,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isDialoguesModalOpen, setIsDialoguesModalOpen] = useState(false);
   const [isChengyuOpen, setIsChengyuOpen] = useState(false);
   const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
+  const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -466,6 +468,17 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             <span>⏰ Số & Giờ</span>
           </button>
           <button
+            data-testid="open-spoken-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsSpokenModalOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Khẩu ngữ giao tiếp & phản xạ ứng đáp"
+          >
+            <span>💬 Khẩu ngữ</span>
+          </button>
+          <button
             onClick={() => setShowPermissionGuide(true)}
             className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
             title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
@@ -770,6 +783,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <NumbersTimeModal
         isOpen={isNumbersTimeOpen}
         onClose={() => setIsNumbersTimeOpen(false)}
+      />
+      {/* Spoken Responses & Reflex Modal */}
+      <SpokenResponsesModal
+        isOpen={isSpokenModalOpen}
+        onClose={() => setIsSpokenModalOpen(false)}
       />
     </div>
   );

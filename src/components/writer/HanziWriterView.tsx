@@ -12,6 +12,7 @@ import { StrokeRulesModal } from './StrokeRulesModal';
 import { HanziDecompositionModal } from '../common/HanziDecompositionModal';
 import { ChengyuModal } from '../common/ChengyuModal';
 import { NumbersTimeModal } from '../common/NumbersTimeModal';
+import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -49,6 +50,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isDecompositionOpen, setIsDecompositionOpen] = useState(false);
   const [isChengyuOpen, setIsChengyuOpen] = useState(false);
   const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
+  const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -718,6 +720,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>⏰ Số & Giờ</span>
           </button>
+          <button
+            data-testid="open-spoken-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsSpokenModalOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Khẩu ngữ giao tiếp & phản xạ ứng đáp"
+          >
+            <span>💬 Khẩu ngữ</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -798,6 +811,13 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       <NumbersTimeModal
         isOpen={isNumbersTimeOpen}
         onClose={() => setIsNumbersTimeOpen(false)}
+      />
+
+      {/* Spoken Responses & Reflex Modal */}
+      <SpokenResponsesModal
+        isOpen={isSpokenModalOpen}
+        onClose={() => setIsSpokenModalOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>
   );

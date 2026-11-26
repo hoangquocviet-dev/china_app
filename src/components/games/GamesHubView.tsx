@@ -37,6 +37,7 @@ import { DialoguesModal } from '../common/DialoguesModal';
 import { HanziDecompositionModal } from '../common/HanziDecompositionModal';
 import { ChengyuModal } from '../common/ChengyuModal';
 import { NumbersTimeModal } from '../common/NumbersTimeModal';
+import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -87,6 +88,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [isDecompositionOpen, setIsDecompositionOpen] = useState(false);
   const [isChengyuOpen, setIsChengyuOpen] = useState(false);
   const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
+  const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
 
   const refreshLeaderboard = useCallback(async () => {
     setLoadingBoard(true);
@@ -505,6 +507,24 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
           <div className="min-w-0">
             <div className="font-bold text-xs text-slate-100 truncate">Số & Giờ</div>
             <div className="text-[10px] text-slate-400 truncate">Tiền tệ RMB</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          data-testid="games-spoken-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsSpokenModalOpen(true);
+          }}
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-emerald-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+        >
+          <div className="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+            💬
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-slate-100 truncate">Khẩu ngữ</div>
+            <div className="text-[10px] text-slate-400 truncate">Hỏi & Đáp</div>
           </div>
         </button>
       </div>
@@ -988,6 +1008,10 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
       <NumbersTimeModal
         isOpen={isNumbersTimeOpen}
         onClose={() => setIsNumbersTimeOpen(false)}
+      />
+      <SpokenResponsesModal
+        isOpen={isSpokenModalOpen}
+        onClose={() => setIsSpokenModalOpen(false)}
       />
     </div>
   );

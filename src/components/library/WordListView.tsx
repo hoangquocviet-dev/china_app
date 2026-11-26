@@ -29,6 +29,7 @@ import { DialoguesModal } from '../common/DialoguesModal';
 import { HanziDecompositionModal } from '../common/HanziDecompositionModal';
 import { ChengyuModal } from '../common/ChengyuModal';
 import { NumbersTimeModal } from '../common/NumbersTimeModal';
+import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -67,6 +68,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isDecompositionOpen, setIsDecompositionOpen] = useState(false);
   const [isChengyuOpen, setIsChengyuOpen] = useState(false);
   const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
+  const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -337,6 +339,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-spoken-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsSpokenModalOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-emerald-300 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors shadow-xs"
+            title="Khẩu ngữ giao tiếp & phản xạ ứng đáp"
+          >
+            <span>💬 Khẩu ngữ</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -584,6 +598,16 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <NumbersTimeModal
         isOpen={isNumbersTimeOpen}
         onClose={() => setIsNumbersTimeOpen(false)}
+      />
+
+      {/* Spoken Responses & Reflex Modal */}
+      <SpokenResponsesModal
+        isOpen={isSpokenModalOpen}
+        onClose={() => setIsSpokenModalOpen(false)}
+        onSelectCharacter={onSelectWordForWriting ? (char) => {
+          const match = words.find((w) => w.hanzi.includes(char));
+          if (match) onSelectWordForWriting(match);
+        } : undefined}
       />
     </div>
   );
