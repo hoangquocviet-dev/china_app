@@ -14,6 +14,7 @@ import {
   RefreshCw,
   Cloud,
   Award,
+  Volume2,
 } from 'lucide-react';
 import type { ChineseWord, MiniGameId, GameScores, HanziLeaderboardEntry } from '../../types';
 import { storageService } from '../../utils/storage';
@@ -24,6 +25,7 @@ import { TrueFalseBlitzGame } from './TrueFalseBlitzGame';
 import { SpeedMatchGame } from './SpeedMatchGame';
 import { WordRunnerGame } from './WordRunnerGame';
 import { MiniExamGame } from './MiniExamGame';
+import { ToneMasterGame } from './ToneMasterGame';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -47,6 +49,13 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [bestExamScore, setBestExamScore] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const saved = window.localStorage.getItem('hanziflow_exam_best_score');
+      if (saved) return parseInt(saved, 10) || 0;
+    }
+    return 0;
+  });
+  const [bestToneScore, setBestToneScore] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = window.localStorage.getItem('hanziflow_tone_best_score');
       if (saved) return parseInt(saved, 10) || 0;
     }
     return 0;
@@ -235,6 +244,21 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
     );
   }
 
+  if (selectedGame === 'tone') {
+    return (
+      <ToneMasterGame
+        words={effectivePlayWords}
+        onBack={() => {
+          setSelectedGame(null);
+          if (typeof window !== 'undefined') {
+            const saved = window.localStorage.getItem('hanziflow_tone_best_score');
+            if (saved) setBestToneScore(parseInt(saved, 10) || 0);
+          }
+        }}
+      />
+    );
+  }
+
   const totalRecordScore =
     scores.blitzBestScore + scores.matchBestScore + scores.runnerBestScore;
 
@@ -377,8 +401,51 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
         </div>
       </div>
 
-      {/* 3 MINI-GAME CARDS */}
+      {/* 4 MINI-GAME CARDS */}
       <div className="space-y-3">
+        {/* GAME 0: Luyện Phản Xạ 4 Thanh Điệu (Tone Master) */}
+        <div
+          data-testid="game-card-tone"
+          onClick={() => {
+            audioService.playClick();
+            setSelectedGame('tone');
+          }}
+          className="group cursor-pointer p-4 rounded-3xl bg-gradient-to-br from-slate-800/95 to-amber-950/30 border border-amber-500/25 hover:border-amber-400/60 shadow-md transition-all active:scale-[0.98]"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-rose-600 flex items-center justify-center text-white shadow-md shadow-amber-950/50 shrink-0">
+              <Volume2 className="w-6 h-6" />
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h3 className="text-sm sm:text-base font-extrabold text-white">
+                  Luyện Phản Xạ 4 Thanh Điệu
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/25">
+                  Tone Master
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                Nghe phát âm, nhận diện 4 thanh điệu (1, 2, 3, 4) và khắc sâu ngữ điệu qua sơ đồ cao độ trực quan!
+              </p>
+
+              <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-slate-700/60">
+                <div className="flex items-center space-x-3 text-[11px]">
+                  <span className="text-amber-300 font-bold">
+                    🏆 Kỷ lục: {bestToneScore}đ
+                  </span>
+                </div>
+
+                <span className="inline-flex items-center space-x-1 px-3 py-1 rounded-xl bg-amber-600 group-hover:bg-amber-500 text-white text-xs font-bold shadow-sm">
+                  <Play className="w-3 h-3 fill-white" />
+                  <span>Luyện ngay</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* GAME 1 (Option 2): Chớp Nhoáng 2 Giây */}
         <div
           data-testid="game-card-blitz"
