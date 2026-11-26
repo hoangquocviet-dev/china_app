@@ -28,6 +28,7 @@ import { ConfusingWordsModal } from '../common/ConfusingWordsModal';
 import { DialoguesModal } from '../common/DialoguesModal';
 import { HanziDecompositionModal } from '../common/HanziDecompositionModal';
 import { ChengyuModal } from '../common/ChengyuModal';
+import { NumbersTimeModal } from '../common/NumbersTimeModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -65,6 +66,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isDialoguesModalOpen, setIsDialoguesModalOpen] = useState(false);
   const [isDecompositionOpen, setIsDecompositionOpen] = useState(false);
   const [isChengyuOpen, setIsChengyuOpen] = useState(false);
+  const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -323,6 +325,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-numbers-time-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsNumbersTimeOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-cyan-300 border border-cyan-500/20 hover:border-cyan-500/40 transition-colors shadow-xs"
+            title="Số đếm, đổi số, xem giờ giấc & tiền tệ"
+          >
+            <span>⏰ Số & Giờ</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -564,6 +578,12 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <ChengyuModal
         isOpen={isChengyuOpen}
         onClose={() => setIsChengyuOpen(false)}
+      />
+
+      {/* Numbers, Time, Dates & Currency Modal */}
+      <NumbersTimeModal
+        isOpen={isNumbersTimeOpen}
+        onClose={() => setIsNumbersTimeOpen(false)}
       />
     </div>
   );

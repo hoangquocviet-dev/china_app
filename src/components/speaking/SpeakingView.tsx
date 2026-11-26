@@ -8,6 +8,7 @@ import { storageService } from '../../utils/storage';
 import { PinyinChartModal } from './PinyinChartModal';
 import { DialoguesModal } from '../common/DialoguesModal';
 import { ChengyuModal } from '../common/ChengyuModal';
+import { NumbersTimeModal } from '../common/NumbersTimeModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -52,6 +53,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isPinyinChartOpen, setIsPinyinChartOpen] = useState(false);
   const [isDialoguesModalOpen, setIsDialoguesModalOpen] = useState(false);
   const [isChengyuOpen, setIsChengyuOpen] = useState(false);
+  const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -453,6 +455,17 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             <span>🏮 Thành ngữ</span>
           </button>
           <button
+            data-testid="open-numbers-time-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsNumbersTimeOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Số đếm, đổi số, xem giờ giấc & tiền tệ"
+          >
+            <span>⏰ Số & Giờ</span>
+          </button>
+          <button
             onClick={() => setShowPermissionGuide(true)}
             className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
             title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
@@ -752,6 +765,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <ChengyuModal
         isOpen={isChengyuOpen}
         onClose={() => setIsChengyuOpen(false)}
+      />
+      {/* Numbers, Time, Dates & Currency Modal */}
+      <NumbersTimeModal
+        isOpen={isNumbersTimeOpen}
+        onClose={() => setIsNumbersTimeOpen(false)}
       />
     </div>
   );
