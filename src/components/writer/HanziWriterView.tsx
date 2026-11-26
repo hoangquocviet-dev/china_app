@@ -9,6 +9,7 @@ import bundledStrokes from '../../data/bundledStrokes.json';
 import { WorksheetModal } from './WorksheetModal';
 import { RadicalsModal } from './RadicalsModal';
 import { StrokeRulesModal } from './StrokeRulesModal';
+import { HanziDecompositionModal } from '../common/HanziDecompositionModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -43,6 +44,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isWorksheetOpen, setIsWorksheetOpen] = useState(false);
   const [isRadicalsOpen, setIsRadicalsOpen] = useState(false);
   const [isStrokeRulesOpen, setIsStrokeRulesOpen] = useState(false);
+  const [isDecompositionOpen, setIsDecompositionOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -679,6 +681,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>✍️ Bút thuận</span>
           </button>
+          <button
+            data-testid="open-decomposition-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsDecompositionOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Chiết tự chữ Hán & bí quyết ghi nhớ liên tưởng"
+          >
+            <span>🧩 Chiết tự</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -738,6 +751,14 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
         isOpen={isStrokeRulesOpen}
         onClose={() => setIsStrokeRulesOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
+      />
+
+      {/* Hanzi Decomposition & Mnemonics Modal */}
+      <HanziDecompositionModal
+        isOpen={isDecompositionOpen}
+        onClose={() => setIsDecompositionOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+        initialHanzi={currentChar}
       />
     </div>
   );

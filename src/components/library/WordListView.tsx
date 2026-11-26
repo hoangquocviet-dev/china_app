@@ -26,6 +26,7 @@ import { GrammarHandbookModal } from '../common/GrammarHandbookModal';
 import { AntonymsModal } from '../common/AntonymsModal';
 import { ConfusingWordsModal } from '../common/ConfusingWordsModal';
 import { DialoguesModal } from '../common/DialoguesModal';
+import { HanziDecompositionModal } from '../common/HanziDecompositionModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -61,6 +62,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isAntonymsModalOpen, setIsAntonymsModalOpen] = useState(false);
   const [isConfusingWordsOpen, setIsConfusingWordsOpen] = useState(false);
   const [isDialoguesModalOpen, setIsDialoguesModalOpen] = useState(false);
+  const [isDecompositionOpen, setIsDecompositionOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -295,6 +297,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-decomposition-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsDecompositionOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-colors shadow-xs"
+            title="Chiết tự chữ Hán & bí quyết ghi nhớ liên tưởng"
+          >
+            <span>🧩 Chiết tự</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -524,6 +538,12 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <DialoguesModal
         isOpen={isDialoguesModalOpen}
         onClose={() => setIsDialoguesModalOpen(false)}
+      />
+
+      {/* Hanzi Decomposition & Mnemonics Modal */}
+      <HanziDecompositionModal
+        isOpen={isDecompositionOpen}
+        onClose={() => setIsDecompositionOpen(false)}
       />
     </div>
   );
