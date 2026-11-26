@@ -573,7 +573,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-750 rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden text-slate-100">
+      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-750 rounded-3xl shadow-2xl flex flex-col max-h-[94dvh] h-[94dvh] sm:h-auto overflow-hidden text-slate-100">
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-850/80">
           <div className="flex items-center space-x-2.5">
@@ -590,7 +590,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
               audioService.playClick();
               onClose();
             }}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+            className="w-11 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors active:scale-90 flex items-center justify-center touch-manipulation select-none"
             title="Đóng bảng tùy chỉnh"
           >
             <X className="w-5 h-5" />
@@ -606,7 +606,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
               setActiveTab('flashcard');
               setSearchQuery('');
             }}
-            className={`py-2 px-1.5 rounded-xl font-semibold flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-1.5 transition-all ${
+            className={`min-h-[44px] py-2 px-1.5 rounded-xl font-semibold flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-1.5 transition-all active:scale-95 touch-manipulation select-none ${
               activeTab === 'flashcard'
                 ? 'bg-rose-600 text-white shadow-sm shadow-rose-900/40'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
@@ -623,7 +623,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
               setActiveTab('writing');
               setSearchQuery('');
             }}
-            className={`py-2 px-1.5 rounded-xl font-semibold flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-1.5 transition-all ${
+            className={`min-h-[44px] py-2 px-1.5 rounded-xl font-semibold flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-1.5 transition-all active:scale-95 touch-manipulation select-none ${
               activeTab === 'writing'
                 ? 'bg-rose-600 text-white shadow-sm shadow-rose-900/40'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
@@ -640,7 +640,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
               setActiveTab('assembly');
               setSearchQuery('');
             }}
-            className={`py-2 px-1.5 rounded-xl font-semibold flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-1.5 transition-all ${
+            className={`min-h-[44px] py-2 px-1.5 rounded-xl font-semibold flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-1.5 transition-all active:scale-95 touch-manipulation select-none ${
               activeTab === 'assembly'
                 ? 'bg-rose-600 text-white shadow-sm shadow-rose-900/40'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
@@ -657,7 +657,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
               setActiveTab('speaking');
               setSearchQuery('');
             }}
-            className={`py-2 px-1.5 rounded-xl font-semibold flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-1.5 transition-all ${
+            className={`min-h-[44px] py-2 px-1.5 rounded-xl font-semibold flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-1.5 transition-all active:scale-95 touch-manipulation select-none ${
               activeTab === 'speaking'
                 ? 'bg-rose-600 text-white shadow-sm shadow-rose-900/40'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
@@ -702,14 +702,14 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSelectAllWords(activeTab)}
-                    className="text-[11px] px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 transition-colors"
+                    className="min-h-[38px] text-[11px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 transition-colors active:scale-95 touch-manipulation select-none"
                   >
                     Chọn tất cả
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDeselectAllWords(activeTab)}
-                    className="text-[11px] px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-rose-300 border border-slate-700 transition-colors"
+                    className="min-h-[38px] text-[11px] px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-rose-300 border border-slate-700 transition-colors active:scale-95 touch-manipulation select-none"
                   >
                     Bỏ chọn hết
                   </button>
@@ -721,7 +721,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                 type="button"
                 data-testid="toggle-add-word-btn"
                 onClick={() => setIsWordFormOpen(!isWordFormOpen)}
-                className="w-full py-2 px-3 rounded-2xl bg-rose-600/10 hover:bg-rose-600/20 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center justify-between transition-all"
+                className="w-full min-h-[44px] py-2.5 px-3.5 rounded-2xl bg-rose-600/10 hover:bg-rose-600/20 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center justify-between transition-all active:scale-95 touch-manipulation select-none"
               >
                 <span className="flex items-center space-x-1.5">
                   <Plus className="w-4 h-4 text-rose-400" />
@@ -1504,7 +1504,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
                 showToast('Đã khôi phục bài học về mặc định.');
               }
             }}
-            className="text-xs text-slate-400 hover:text-slate-200 flex items-center space-x-1 transition-colors"
+            className="min-h-[44px] px-3.5 py-2 rounded-xl text-xs text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 transition-colors active:scale-95 touch-manipulation select-none"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Mặc định</span>
@@ -1516,7 +1516,7 @@ export const CustomLessonModal: React.FC<CustomLessonModalProps> = ({
               audioService.playClick();
               onClose();
             }}
-            className="px-5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-bold shadow-lg shadow-rose-900/30 transition-all active:scale-95"
+            className="min-h-[44px] px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-bold shadow-lg shadow-rose-900/30 transition-all active:scale-95 touch-manipulation select-none"
           >
             Hoàn tất & Áp dụng
           </button>

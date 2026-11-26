@@ -363,7 +363,7 @@ export const MiniExamGame: React.FC<MiniExamGameProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={handleRestart}
-              className="flex items-center justify-center space-x-1.5 py-3 px-4 rounded-2xl bg-slate-800 hover:bg-slate-750 text-slate-200 font-bold text-xs border border-slate-700 transition-all active:scale-95"
+              className="flex items-center justify-center space-x-1.5 min-h-[50px] py-3.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-750 text-slate-200 font-bold text-xs border border-slate-700 transition-all active:scale-95 touch-manipulation select-none"
             >
               <RotateCcw className="w-4 h-4 text-amber-400" />
               <span>Thi Đề Mới</span>
@@ -371,7 +371,7 @@ export const MiniExamGame: React.FC<MiniExamGameProps> = ({
 
             <button
               onClick={onBack}
-              className="flex items-center justify-center space-x-1.5 py-3 px-4 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs shadow-md shadow-rose-950/40 transition-all active:scale-95"
+              className="flex items-center justify-center space-x-1.5 min-h-[50px] py-3.5 px-4 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs shadow-md shadow-rose-950/40 transition-all active:scale-95 touch-manipulation select-none"
             >
               <CheckCircle2 className="w-4 h-4 text-white" />
               <span>Hoàn Thành</span>
@@ -391,7 +391,7 @@ export const MiniExamGame: React.FC<MiniExamGameProps> = ({
             audioService.playClick();
             onBack();
           }}
-          className="flex items-center space-x-1 p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors"
+          className="flex items-center space-x-1 min-h-[40px] px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all active:scale-95 touch-manipulation select-none"
           aria-label="Thoát bài thi"
         >
           <ChevronLeft className="w-4 h-4 text-slate-400" />
@@ -438,7 +438,7 @@ export const MiniExamGame: React.FC<MiniExamGameProps> = ({
                 audioService.playClick();
                 audioService.speakChinese(currentQ.audioText!);
               }}
-              className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-400 transition-colors"
+              className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-400 transition-all active:scale-90 flex items-center justify-center touch-manipulation select-none"
               title="Nghe phát âm"
               aria-label="Phát âm"
             >
@@ -490,7 +490,7 @@ export const MiniExamGame: React.FC<MiniExamGameProps> = ({
                 key={option.id}
                 disabled={isAnswered}
                 onClick={() => handleSelectOption(option)}
-                className={`w-full p-3.5 rounded-2xl border text-left flex items-center justify-between gap-2 text-xs transition-all active:scale-[0.99] ${btnStyle}`}
+                className={`w-full min-h-[56px] p-3.5 rounded-2xl border text-left flex items-center justify-between gap-2 text-xs transition-all active:scale-95 touch-manipulation select-none ${btnStyle}`}
               >
                 <div className="flex items-center space-x-2.5">
                   <span className="w-5 h-5 rounded-full bg-slate-900/60 border border-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-400 shrink-0">
@@ -530,7 +530,7 @@ export const MiniExamGame: React.FC<MiniExamGameProps> = ({
 
             <button
               onClick={handleNextQuestion}
-              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-xs shadow-lg shadow-rose-950/40 flex items-center justify-center space-x-2 transition-all active:scale-95"
+              className="w-full min-h-[50px] py-3.5 px-4 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-sm shadow-lg shadow-rose-950/40 flex items-center justify-center space-x-2 transition-all active:scale-95 touch-manipulation select-none"
             >
               <span>{currentIndex + 1 === questions.length ? 'Xem Kết Quả' : 'Câu Tiếp Theo'}</span>
               <ArrowRight className="w-4 h-4 text-white" />

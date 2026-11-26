@@ -238,7 +238,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-lg max-h-[90vh] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-lg max-h-[94dvh] h-[94dvh] sm:h-auto bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-800 shrink-0">
           <div className="flex items-center space-x-2">
@@ -255,7 +255,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
               audioService.playClick();
               onClose();
             }}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+            className="w-11 h-11 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all active:scale-90 flex items-center justify-center touch-manipulation select-none"
             title="Đóng"
           >
             <X className="w-5 h-5" />
@@ -263,14 +263,14 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
         </div>
 
         {/* Mode Selector Tabs */}
-        <div className="flex p-2 bg-slate-900 border-b border-slate-800 shrink-0">
+        <div className="flex p-2 bg-slate-900 border-b border-slate-800 shrink-0 gap-1.5">
           <button
             type="button"
             onClick={() => {
               audioService.playClick();
               setActiveMode('dictionary');
             }}
-            className={`flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all ${
+            className={`flex-1 min-h-[44px] py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all active:scale-95 touch-manipulation select-none ${
               activeMode === 'dictionary'
                 ? 'bg-rose-600 text-white shadow-sm shadow-rose-900/30'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -285,7 +285,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
               audioService.playClick();
               setActiveMode('custom');
             }}
-            className={`flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all ${
+            className={`flex-1 min-h-[44px] py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all active:scale-95 touch-manipulation select-none ${
               activeMode === 'custom'
                 ? 'bg-rose-600 text-white shadow-sm shadow-rose-900/30'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -310,12 +310,12 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Tìm theo chữ Hán, Pinyin, Hán Việt, nghĩa..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-2xl text-xs sm:text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-rose-500 font-medium"
+                  className="w-full pl-10 pr-10 py-2.5 bg-slate-800 border border-slate-700 rounded-2xl text-xs sm:text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-rose-500 font-medium"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 min-w-[40px] min-h-[40px] flex items-center justify-center text-slate-400 hover:text-slate-200 touch-manipulation"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -323,7 +323,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
               </div>
 
               {/* Level Filter Chips */}
-              <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs">
+              <div className="flex items-center space-x-1.5 overflow-x-auto touch-scroll-x pb-1 text-xs scrollbar-none">
                 {['ALL', 'HSK1', 'HSK2', 'HSK3'].map((lvl) => (
                   <button
                     key={lvl}
@@ -331,9 +331,9 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
                       audioService.playClick();
                       setSelectedLevel(lvl);
                     }}
-                    className={`px-3 py-1 rounded-lg font-medium transition-colors ${
+                    className={`min-h-[38px] px-3.5 py-1.5 rounded-xl font-bold transition-all active:scale-95 touch-manipulation select-none whitespace-nowrap ${
                       selectedLevel === lvl
-                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-xs'
                         : 'bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-750'
                     }`}
                   >
@@ -408,14 +408,14 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
                             <button
                               type="button"
                               onClick={() => audioService.speakChinese(item.hanzi)}
-                              className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
+                              className="w-11 h-11 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 flex items-center justify-center transition-all active:scale-90 touch-manipulation select-none"
                               title="Phát âm"
                             >
                               <Volume2 className="w-4 h-4" />
                             </button>
 
                             {isSaved ? (
-                              <span className="px-2.5 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-medium flex items-center space-x-1">
+                              <span className="min-h-[40px] px-3 py-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold flex items-center space-x-1">
                                 <Check className="w-3.5 h-3.5" />
                                 <span>Đã có</span>
                               </span>
@@ -423,7 +423,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleAddFromDictionary(item)}
-                                className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold flex items-center space-x-1 transition-all active:scale-95 shadow-sm shadow-rose-900/30"
+                                className="min-h-[40px] px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center space-x-1 transition-all active:scale-95 shadow-sm shadow-rose-900/30 touch-manipulation select-none"
                               >
                                 <Plus className="w-3.5 h-3.5" />
                                 <span>Thêm</span>
@@ -439,7 +439,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
                         <button
                           type="button"
                           onClick={() => setDisplayLimit((prev) => Math.min(searchResults.length, prev + 35))}
-                          className="py-2.5 px-5 rounded-2xl bg-slate-850 hover:bg-slate-800 text-slate-300 border border-slate-750 text-xs font-semibold inline-flex items-center space-x-2 transition-all active:scale-95 shadow-sm"
+                          className="min-h-[44px] py-2.5 px-6 rounded-2xl bg-slate-850 hover:bg-slate-800 text-slate-300 border border-slate-750 text-xs font-semibold inline-flex items-center space-x-2 transition-all active:scale-95 shadow-sm touch-manipulation select-none"
                         >
                           <span>Xem thêm từ ({displayLimit} / {searchResults.length})</span>
                           <ChevronDown className="w-3.5 h-3.5 text-rose-400" />
@@ -623,7 +623,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({
 
               <button
                 type="submit"
-                className="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all active:scale-95 shadow-md shadow-rose-900/30 flex items-center justify-center space-x-1.5"
+                className="w-full min-h-[48px] py-3 px-4 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white text-sm font-bold transition-all active:scale-95 shadow-md shadow-rose-900/30 flex items-center justify-center space-x-1.5 touch-manipulation select-none"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>Lưu vào sổ từ vựng</span>

@@ -181,7 +181,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-750 rounded-3xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-slate-900 border border-slate-750 rounded-3xl w-full max-w-lg max-h-[94dvh] h-[94dvh] sm:h-auto flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-2.5">
@@ -198,7 +198,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
               audioService.playClick();
               onClose();
             }}
-            className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all"
+            className="w-11 h-11 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all active:scale-90 flex items-center justify-center touch-manipulation select-none"
             aria-label="Đóng"
           >
             <X className="w-4 h-4" />
@@ -207,14 +207,14 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
 
         {/* Tab switchers */}
         <div className="p-3 bg-slate-850/60 border-b border-slate-800 shrink-0">
-          <div className="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-2xl border border-slate-750">
+          <div className="grid grid-cols-2 gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-750">
             <button
               data-testid="tab-export-btn"
               onClick={() => {
                 audioService.playClick();
                 setActiveTab('export');
               }}
-              className={`py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+              className={`min-h-[44px] py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5 touch-manipulation select-none ${
                 activeTab === 'export'
                   ? 'bg-rose-600 text-white shadow-md shadow-rose-900/30'
                   : 'text-slate-400 hover:text-slate-200'
@@ -229,7 +229,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
                 audioService.playClick();
                 setActiveTab('import');
               }}
-              className={`py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+              className={`min-h-[44px] py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5 touch-manipulation select-none ${
                 activeTab === 'import'
                   ? 'bg-rose-600 text-white shadow-md shadow-rose-900/30'
                   : 'text-slate-400 hover:text-slate-200'
@@ -264,7 +264,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
                       audioService.playClick();
                       setExportFormat('csv');
                     }}
-                    className={`p-2.5 rounded-2xl border text-left transition-all ${
+                    className={`min-h-[64px] p-3 rounded-2xl border text-left transition-all active:scale-95 touch-manipulation select-none ${
                       exportFormat === 'csv'
                         ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
                         : 'bg-slate-800/80 border-slate-750 text-slate-300 hover:border-slate-700'
@@ -287,7 +287,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
                       audioService.playClick();
                       setExportFormat('tsv');
                     }}
-                    className={`p-2.5 rounded-2xl border text-left transition-all ${
+                    className={`min-h-[64px] p-3 rounded-2xl border text-left transition-all active:scale-95 touch-manipulation select-none ${
                       exportFormat === 'tsv'
                         ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
                         : 'bg-slate-800/80 border-slate-750 text-slate-300 hover:border-slate-700'
@@ -310,7 +310,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
                       audioService.playClick();
                       setExportFormat('md');
                     }}
-                    className={`p-2.5 rounded-2xl border text-left transition-all ${
+                    className={`min-h-[64px] p-3 rounded-2xl border text-left transition-all active:scale-95 touch-manipulation select-none ${
                       exportFormat === 'md'
                         ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
                         : 'bg-slate-800/80 border-slate-750 text-slate-300 hover:border-slate-700'
@@ -328,7 +328,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
                       audioService.playClick();
                       setExportFormat('json');
                     }}
-                    className={`p-2.5 rounded-2xl border text-left transition-all ${
+                    className={`min-h-[64px] p-3 rounded-2xl border text-left transition-all active:scale-95 touch-manipulation select-none ${
                       exportFormat === 'json'
                         ? 'bg-rose-500/10 border-rose-500/40 text-rose-300'
                         : 'bg-slate-800/80 border-slate-750 text-slate-300 hover:border-slate-700'
@@ -370,7 +370,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-rose-400 border border-slate-700 font-semibold inline-flex items-center gap-1.5 transition-all"
+                    className="min-h-[40px] px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-rose-400 border border-slate-700 font-semibold inline-flex items-center gap-1.5 transition-all active:scale-95 touch-manipulation select-none"
                   >
                     <Upload className="w-3.5 h-3.5" />
                     <span>Tải tệp (.csv, .tsv, .json, .txt)</span>
@@ -452,7 +452,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
               <button
                 type="button"
                 onClick={handleCopy}
-                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 font-semibold flex items-center gap-1.5 transition-all active:scale-95 shadow-xs"
+                className="min-h-[44px] px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 font-semibold flex items-center gap-1.5 transition-all active:scale-95 touch-manipulation select-none shadow-xs"
               >
                 {isCopied ? (
                   <>
@@ -470,7 +470,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
                 type="button"
                 data-testid="export-download-btn"
                 onClick={handleDownload}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-md shadow-rose-900/30"
+                className="min-h-[44px] px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold flex items-center gap-1.5 transition-all active:scale-95 touch-manipulation select-none shadow-md shadow-rose-900/30"
               >
                 <Download className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>Tải tệp .{exportFormat}</span>
@@ -482,7 +482,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
                 type="button"
                 onClick={() => setImportText('')}
                 disabled={!importText}
-                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 disabled:opacity-50 text-slate-300 border border-slate-700 font-semibold transition-all"
+                className="min-h-[44px] px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 disabled:opacity-50 text-slate-300 border border-slate-700 font-semibold transition-all active:scale-95 touch-manipulation select-none"
               >
                 Xóa văn bản
               </button>
@@ -491,7 +491,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({
                 data-testid="execute-import-btn"
                 onClick={handleExecuteImport}
                 disabled={!parseResult || parseResult.words.length === 0}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold flex items-center gap-1.5 transition-all active:scale-95 shadow-md shadow-emerald-900/30"
+                className="min-h-[44px] px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold flex items-center gap-1.5 transition-all active:scale-95 touch-manipulation select-none shadow-md shadow-emerald-900/30"
               >
                 <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>Nhập {parseResult?.words.length || 0} từ vào sổ học</span>
