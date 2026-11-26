@@ -11,6 +11,7 @@ import { ChengyuModal } from '../common/ChengyuModal';
 import { NumbersTimeModal } from '../common/NumbersTimeModal';
 import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 import { ParticlesModal } from '../common/ParticlesModal';
+import { PolyphonicModal } from '../common/PolyphonicModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -58,6 +59,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
   const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
   const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
+  const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -492,6 +494,17 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             <span>🔤 Trợ từ</span>
           </button>
           <button
+            data-testid="open-polyphonic-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsPolyphonicOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Chữ Hán đa âm tiết (多音字) - 1 chữ nhiều cách đọc"
+          >
+            <span>🎭 Đa âm</span>
+          </button>
+          <button
             onClick={() => setShowPermissionGuide(true)}
             className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
             title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
@@ -806,6 +819,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <ParticlesModal
         isOpen={isParticlesModalOpen}
         onClose={() => setIsParticlesModalOpen(false)}
+      />
+      {/* Polyphonic Characters Modal */}
+      <PolyphonicModal
+        isOpen={isPolyphonicOpen}
+        onClose={() => setIsPolyphonicOpen(false)}
       />
     </div>
   );

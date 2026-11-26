@@ -31,6 +31,7 @@ import { ChengyuModal } from '../common/ChengyuModal';
 import { NumbersTimeModal } from '../common/NumbersTimeModal';
 import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 import { ParticlesModal } from '../common/ParticlesModal';
+import { PolyphonicModal } from '../common/PolyphonicModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -71,6 +72,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
   const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
   const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
+  const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -365,6 +367,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-polyphonic-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsPolyphonicOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-colors shadow-xs"
+            title="Chữ Hán đa âm tiết (多音字) - 1 chữ nhiều cách đọc"
+          >
+            <span>🎭 Đa âm</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -628,6 +642,16 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <ParticlesModal
         isOpen={isParticlesModalOpen}
         onClose={() => setIsParticlesModalOpen(false)}
+        onSelectCharacter={onSelectWordForWriting ? (char) => {
+          const match = words.find((w) => w.hanzi.includes(char));
+          if (match) onSelectWordForWriting(match);
+        } : undefined}
+      />
+
+      {/* Polyphonic Characters Modal */}
+      <PolyphonicModal
+        isOpen={isPolyphonicOpen}
+        onClose={() => setIsPolyphonicOpen(false)}
         onSelectCharacter={onSelectWordForWriting ? (char) => {
           const match = words.find((w) => w.hanzi.includes(char));
           if (match) onSelectWordForWriting(match);

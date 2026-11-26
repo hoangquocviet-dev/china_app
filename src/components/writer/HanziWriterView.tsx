@@ -14,6 +14,7 @@ import { ChengyuModal } from '../common/ChengyuModal';
 import { NumbersTimeModal } from '../common/NumbersTimeModal';
 import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 import { ParticlesModal } from '../common/ParticlesModal';
+import { PolyphonicModal } from '../common/PolyphonicModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -53,6 +54,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
   const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
   const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
+  const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -744,6 +746,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>🔤 Trợ từ</span>
           </button>
+          <button
+            data-testid="open-polyphonic-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsPolyphonicOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Chữ Hán đa âm tiết (多音字) - 1 chữ nhiều cách đọc"
+          >
+            <span>🎭 Đa âm</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -837,6 +850,13 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       <ParticlesModal
         isOpen={isParticlesModalOpen}
         onClose={() => setIsParticlesModalOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+      />
+
+      {/* Polyphonic Characters Modal */}
+      <PolyphonicModal
+        isOpen={isPolyphonicOpen}
+        onClose={() => setIsPolyphonicOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>
