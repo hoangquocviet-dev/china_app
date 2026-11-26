@@ -28,6 +28,7 @@ import { MiniExamGame } from './MiniExamGame';
 import { ToneMasterGame } from './ToneMasterGame';
 import { PinyinChartModal } from '../speaking/PinyinChartModal';
 import { RadicalsModal } from '../writer/RadicalsModal';
+import { StrokeRulesModal } from '../writer/StrokeRulesModal';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -69,6 +70,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [dictTick, setDictTick] = useState(0);
   const [isPinyinModalOpen, setIsPinyinModalOpen] = useState(false);
   const [isRadicalsModalOpen, setIsRadicalsModalOpen] = useState(false);
+  const [isStrokeRulesModalOpen, setIsStrokeRulesModalOpen] = useState(false);
 
   const refreshLeaderboard = useCallback(async () => {
     setLoadingBoard(true);
@@ -290,8 +292,8 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
         </div>
       </div>
 
-      {/* Quick Reference Tools: Pinyin & Radicals */}
-      <div className="grid grid-cols-2 gap-2">
+      {/* Quick Reference Tools: Pinyin, Radicals & Stroke Rules */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <button
           type="button"
           data-testid="games-pinyin-chart-btn"
@@ -305,8 +307,8 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             🔤
           </div>
           <div className="min-w-0">
-            <div className="font-bold text-xs text-slate-100 truncate">Bảng Pinyin & Biến Điệu</div>
-            <div className="text-[10px] text-slate-400 truncate">Thanh mẫu, vận mẫu & quy tắc biến điệu</div>
+            <div className="font-bold text-xs text-slate-100 truncate">Pinyin & Biến Điệu</div>
+            <div className="text-[10px] text-slate-400 truncate">Thanh mẫu, vận mẫu & biến điệu</div>
           </div>
         </button>
 
@@ -325,6 +327,24 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
           <div className="min-w-0">
             <div className="font-bold text-xs text-slate-100 truncate">50 Bộ Thủ Gốc</div>
             <div className="text-[10px] text-slate-400 truncate">Nguồn gốc cấu tạo chữ Hán</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          data-testid="games-stroke-rules-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsStrokeRulesModalOpen(true);
+          }}
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-indigo-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2.5"
+        >
+          <div className="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+            ✍️
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-slate-100 truncate">Quy Tắc Bút Thuận</div>
+            <div className="text-[10px] text-slate-400 truncate">7 Quy tắc & 8 nét chuẩn</div>
           </div>
         </button>
       </div>
@@ -772,6 +792,10 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
       <RadicalsModal
         isOpen={isRadicalsModalOpen}
         onClose={() => setIsRadicalsModalOpen(false)}
+      />
+      <StrokeRulesModal
+        isOpen={isStrokeRulesModalOpen}
+        onClose={() => setIsStrokeRulesModalOpen(false)}
       />
     </div>
   );

@@ -8,6 +8,7 @@ import { storageService } from '../../utils/storage';
 import bundledStrokes from '../../data/bundledStrokes.json';
 import { WorksheetModal } from './WorksheetModal';
 import { RadicalsModal } from './RadicalsModal';
+import { StrokeRulesModal } from './StrokeRulesModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -41,6 +42,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [hintMessage, setHintMessage] = useState<string | null>(null);
   const [isWorksheetOpen, setIsWorksheetOpen] = useState(false);
   const [isRadicalsOpen, setIsRadicalsOpen] = useState(false);
+  const [isStrokeRulesOpen, setIsStrokeRulesOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -666,6 +668,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>🏮 Bộ thủ</span>
           </button>
+          <button
+            data-testid="open-stroke-rules-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsStrokeRulesOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Quy tắc bút thuận và 8 nét cơ bản trong chữ Hán"
+          >
+            <span>✍️ Bút thuận</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -717,6 +730,13 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       <RadicalsModal
         isOpen={isRadicalsOpen}
         onClose={() => setIsRadicalsOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+      />
+
+      {/* 7 Stroke Order Rules & 8 Basic Strokes Modal */}
+      <StrokeRulesModal
+        isOpen={isStrokeRulesOpen}
+        onClose={() => setIsStrokeRulesOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>
