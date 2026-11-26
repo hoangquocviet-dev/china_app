@@ -18,6 +18,7 @@ import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
 import { SpatialModal } from '../common/SpatialModal';
+import { QuestionsModal } from '../common/QuestionsModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -72,6 +73,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
   const [isSpatialOpen, setIsSpatialOpen] = useState(false);
+  const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -583,6 +585,18 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
           >
             <span>🧭 Vị trí</span>
           </button>
+
+          <button
+            data-testid="open-questions-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsQuestionsOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Bảo điển câu hỏi & đại từ nghi vấn HSK (疑问句)"
+          >
+            <span>❓ Câu hỏi</span>
+          </button>
           <button
             onClick={() => setShowPermissionGuide(true)}
             className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
@@ -934,6 +948,12 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <SpatialModal
         isOpen={isSpatialOpen}
         onClose={() => setIsSpatialOpen(false)}
+      />
+
+      {/* Chinese Questions & Interrogative Pronouns Modal */}
+      <QuestionsModal
+        isOpen={isQuestionsOpen}
+        onClose={() => setIsQuestionsOpen(false)}
       />
     </div>
   );

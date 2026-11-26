@@ -48,6 +48,7 @@ import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
 import { SpatialModal } from '../common/SpatialModal';
+import { QuestionsModal } from '../common/QuestionsModal';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -114,6 +115,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
   const [isSpatialOpen, setIsSpatialOpen] = useState(false);
+  const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
 
   const refreshLeaderboard = useCallback(async () => {
     setLoadingBoard(true);
@@ -714,6 +716,24 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             <div className="text-[10px] text-slate-400 truncate">存现句</div>
           </div>
         </button>
+
+        <button
+          type="button"
+          data-testid="games-questions-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsQuestionsOpen(true);
+          }}
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-indigo-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+        >
+          <div className="w-7 h-7 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+            ❓
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-slate-100 truncate">Câu Hỏi</div>
+            <div className="text-[10px] text-slate-400 truncate">疑问句</div>
+          </div>
+        </button>
       </div>
 
       {/* Game Deck Source & Pinyin Hint Controls */}
@@ -1274,6 +1294,10 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
       <SpatialModal
         isOpen={isSpatialOpen}
         onClose={() => setIsSpatialOpen(false)}
+      />
+      <QuestionsModal
+        isOpen={isQuestionsOpen}
+        onClose={() => setIsQuestionsOpen(false)}
       />
     </div>
   );

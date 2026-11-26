@@ -38,6 +38,7 @@ import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
 import { SpatialModal } from '../common/SpatialModal';
+import { QuestionsModal } from '../common/QuestionsModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -85,6 +86,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
   const [isSpatialOpen, setIsSpatialOpen] = useState(false);
+  const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -463,6 +465,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-questions-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsQuestionsOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40 transition-colors shadow-xs"
+            title="Bảo điển câu hỏi & đại từ nghi vấn HSK (疑问句)"
+          >
+            <span>❓ Câu hỏi</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -796,6 +810,16 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <SpatialModal
         isOpen={isSpatialOpen}
         onClose={() => setIsSpatialOpen(false)}
+        onSelectCharacter={onSelectWordForWriting ? (char) => {
+          const match = words.find((w) => w.hanzi.includes(char));
+          if (match) onSelectWordForWriting(match);
+        } : undefined}
+      />
+
+      {/* Chinese Questions & Interrogative Pronouns Modal */}
+      <QuestionsModal
+        isOpen={isQuestionsOpen}
+        onClose={() => setIsQuestionsOpen(false)}
         onSelectCharacter={onSelectWordForWriting ? (char) => {
           const match = words.find((w) => w.hanzi.includes(char));
           if (match) onSelectWordForWriting(match);

@@ -13,6 +13,7 @@ import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
 import { SpatialModal } from '../common/SpatialModal';
+import { QuestionsModal } from '../common/QuestionsModal';
 
 interface AssemblyViewProps {
   sentences?: SentenceExercise[];
@@ -45,6 +46,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
   const [isSpatialOpen, setIsSpatialOpen] = useState(false);
+  const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
 
   useEffect(() => {
     setExerciseIndex(0);
@@ -245,6 +247,18 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
             title="Phương vị từ & Câu tồn hiện HSK 2 - 3 (方位词与存现句)"
           >
             <span>🧭 Vị trí</span>
+          </button>
+          <button
+            type="button"
+            data-testid="assembly-questions-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsQuestionsOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 hover:text-indigo-200 border border-indigo-500/20 font-medium transition-colors"
+            title="Bảo điển câu hỏi & đại từ nghi vấn HSK (疑问句)"
+          >
+            <span>❓ Câu hỏi</span>
           </button>
           <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
             Sắp xếp câu
@@ -498,6 +512,12 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
       <SpatialModal
         isOpen={isSpatialOpen}
         onClose={() => setIsSpatialOpen(false)}
+      />
+
+      {/* Chinese Questions & Interrogative Pronouns Modal */}
+      <QuestionsModal
+        isOpen={isQuestionsOpen}
+        onClose={() => setIsQuestionsOpen(false)}
       />
     </div>
   );

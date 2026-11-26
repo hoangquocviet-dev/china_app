@@ -21,6 +21,7 @@ import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
 import { SpatialModal } from '../common/SpatialModal';
+import { QuestionsModal } from '../common/QuestionsModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -67,6 +68,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
   const [isSpatialOpen, setIsSpatialOpen] = useState(false);
+  const [isQuestionsOpen, setIsQuestionsOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -836,6 +838,18 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>🧭 Vị trí</span>
           </button>
+
+          <button
+            data-testid="open-questions-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsQuestionsOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Bảo điển câu hỏi & đại từ nghi vấn HSK (疑问句)"
+          >
+            <span>❓ Câu hỏi</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -973,6 +987,13 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       <SpatialModal
         isOpen={isSpatialOpen}
         onClose={() => setIsSpatialOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+      />
+
+      {/* Chinese Questions & Interrogative Pronouns Modal */}
+      <QuestionsModal
+        isOpen={isQuestionsOpen}
+        onClose={() => setIsQuestionsOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>
