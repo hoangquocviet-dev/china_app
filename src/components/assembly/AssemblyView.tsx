@@ -8,6 +8,7 @@ import { storageService } from '../../utils/storage';
 import { MeasureWordsModal } from '../common/MeasureWordsModal';
 import { GrammarHandbookModal } from '../common/GrammarHandbookModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
+import { ReduplicationModal } from '../common/ReduplicationModal';
 
 interface AssemblyViewProps {
   sentences?: SentenceExercise[];
@@ -35,6 +36,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const [isMeasureWordsOpen, setIsMeasureWordsOpen] = useState(false);
   const [isGrammarHandbookOpen, setIsGrammarHandbookOpen] = useState(false);
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
+  const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
 
   useEffect(() => {
     setExerciseIndex(0);
@@ -175,6 +177,18 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
             title="Kho 18 cặp liên từ nối câu kinh điển HSK 1 - 3"
           >
             <span>🔗 Liên từ</span>
+          </button>
+          <button
+            type="button"
+            data-testid="assembly-reduplication-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsReduplicationOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 hover:text-emerald-200 border border-emerald-500/20 font-medium transition-colors"
+            title="Bí kíp trùng điệp từ & từ láy HSK (AA, ABAB, AAB, AABB)"
+          >
+            <span>✨ Trùng điệp</span>
           </button>
           <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
             Sắp xếp câu
@@ -398,6 +412,12 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
       <ConnectorsModal
         isOpen={isConnectorsOpen}
         onClose={() => setIsConnectorsOpen(false)}
+      />
+
+      {/* Chinese Reduplication Master Modal */}
+      <ReduplicationModal
+        isOpen={isReduplicationOpen}
+        onClose={() => setIsReduplicationOpen(false)}
       />
     </div>
   );

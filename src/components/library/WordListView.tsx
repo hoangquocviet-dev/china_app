@@ -33,6 +33,7 @@ import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 import { ParticlesModal } from '../common/ParticlesModal';
 import { PolyphonicModal } from '../common/PolyphonicModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
+import { ReduplicationModal } from '../common/ReduplicationModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -75,6 +76,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
   const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
+  const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -393,6 +395,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-reduplication-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsReduplicationOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-emerald-300 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors shadow-xs"
+            title="Bí kíp trùng điệp từ & từ láy HSK (AA, ABAB, AAB, AABB)"
+          >
+            <span>✨ Trùng điệp</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -676,6 +690,16 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <ConnectorsModal
         isOpen={isConnectorsOpen}
         onClose={() => setIsConnectorsOpen(false)}
+        onSelectCharacter={onSelectWordForWriting ? (char) => {
+          const match = words.find((w) => w.hanzi.includes(char));
+          if (match) onSelectWordForWriting(match);
+        } : undefined}
+      />
+
+      {/* Reduplication & Word Duplication Modal */}
+      <ReduplicationModal
+        isOpen={isReduplicationOpen}
+        onClose={() => setIsReduplicationOpen(false)}
         onSelectCharacter={onSelectWordForWriting ? (char) => {
           const match = words.find((w) => w.hanzi.includes(char));
           if (match) onSelectWordForWriting(match);

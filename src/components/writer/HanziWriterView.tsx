@@ -16,6 +16,7 @@ import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 import { ParticlesModal } from '../common/ParticlesModal';
 import { PolyphonicModal } from '../common/PolyphonicModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
+import { ReduplicationModal } from '../common/ReduplicationModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -57,6 +58,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
   const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
+  const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -770,6 +772,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>🔗 Liên từ</span>
           </button>
+          <button
+            data-testid="open-reduplication-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsReduplicationOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Bí kíp trùng điệp từ & từ láy HSK (AA, ABAB, AAB, AABB)"
+          >
+            <span>✨ Trùng điệp</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -876,6 +889,12 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       <ConnectorsModal
         isOpen={isConnectorsOpen}
         onClose={() => setIsConnectorsOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+      />
+      {/* Reduplication & Word Duplication Modal */}
+      <ReduplicationModal
+        isOpen={isReduplicationOpen}
+        onClose={() => setIsReduplicationOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>

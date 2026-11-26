@@ -13,6 +13,7 @@ import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 import { ParticlesModal } from '../common/ParticlesModal';
 import { PolyphonicModal } from '../common/PolyphonicModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
+import { ReduplicationModal } from '../common/ReduplicationModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -62,6 +63,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
   const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
+  const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -518,6 +520,17 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             <span>🔗 Liên từ</span>
           </button>
           <button
+            data-testid="open-reduplication-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsReduplicationOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Bí kíp trùng điệp từ & từ láy HSK (AA, ABAB, AAB, AABB)"
+          >
+            <span>✨ Trùng điệp</span>
+          </button>
+          <button
             onClick={() => setShowPermissionGuide(true)}
             className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
             title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
@@ -842,6 +855,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <ConnectorsModal
         isOpen={isConnectorsOpen}
         onClose={() => setIsConnectorsOpen(false)}
+      />
+      {/* Reduplication & Word Duplication Modal */}
+      <ReduplicationModal
+        isOpen={isReduplicationOpen}
+        onClose={() => setIsReduplicationOpen(false)}
       />
     </div>
   );

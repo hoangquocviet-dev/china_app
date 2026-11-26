@@ -43,6 +43,7 @@ import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
 import { ParticlesModal } from '../common/ParticlesModal';
 import { PolyphonicModal } from '../common/PolyphonicModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
+import { ReduplicationModal } from '../common/ReduplicationModal';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -104,6 +105,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
   const [isPolyphonicOpen, setIsPolyphonicOpen] = useState(false);
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
+  const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
 
   const refreshLeaderboard = useCallback(async () => {
     setLoadingBoard(true);
@@ -612,6 +614,24 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
           <div className="min-w-0">
             <div className="font-bold text-xs text-slate-100 truncate">Liên từ</div>
             <div className="text-[10px] text-slate-400 truncate">关联词</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          data-testid="games-reduplication-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsReduplicationOpen(true);
+          }}
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-emerald-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+        >
+          <div className="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+            ✨
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-slate-100 truncate">Trùng điệp</div>
+            <div className="text-[10px] text-slate-400 truncate">重叠词</div>
           </div>
         </button>
       </div>
@@ -1154,6 +1174,10 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
       <ConnectorsModal
         isOpen={isConnectorsOpen}
         onClose={() => setIsConnectorsOpen(false)}
+      />
+      <ReduplicationModal
+        isOpen={isReduplicationOpen}
+        onClose={() => setIsReduplicationOpen(false)}
       />
     </div>
   );
