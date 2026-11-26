@@ -5,6 +5,7 @@ import { INITIAL_SENTENCES } from '../../data/hsk1Sentences';
 import type { SentenceExercise } from '../../types';
 import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
+import { MeasureWordsModal } from '../common/MeasureWordsModal';
 
 interface AssemblyViewProps {
   sentences?: SentenceExercise[];
@@ -29,6 +30,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const [isEvaluated, setIsEvaluated] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showGrammarHint, setShowGrammarHint] = useState(false);
+  const [isMeasureWordsOpen, setIsMeasureWordsOpen] = useState(false);
 
   useEffect(() => {
     setExerciseIndex(0);
@@ -133,9 +135,23 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
         <span className="font-medium text-slate-300">
           Bài tập {exerciseIndex + 1} / {activeSentences.length}
         </span>
-        <span className="px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
-          Sắp xếp trật tự câu
-        </span>
+        <div className="flex items-center space-x-2">
+          <button
+            type="button"
+            data-testid="assembly-measure-words-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsMeasureWordsOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 hover:text-indigo-200 border border-indigo-500/20 font-medium transition-colors"
+            title="Tra cứu lượng từ chuẩn ngữ pháp HSK 1 - 2"
+          >
+            <span>📏 Lượng từ</span>
+          </button>
+          <span className="px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
+            Sắp xếp trật tự câu
+          </span>
+        </div>
       </div>
 
       {/* Progress Bar */}
@@ -337,6 +353,12 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
           Câu tiếp theo <ChevronRight className="w-4 h-4 ml-1" />
         </button>
       </div>
+
+      {/* 16 Essential Measure Words Modal */}
+      <MeasureWordsModal
+        isOpen={isMeasureWordsOpen}
+        onClose={() => setIsMeasureWordsOpen(false)}
+      />
     </div>
   );
 };

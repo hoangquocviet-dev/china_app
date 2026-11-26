@@ -21,6 +21,7 @@ import { matchesWordSearch } from '../../utils/pinyinHelper';
 import { AddWordModal } from './AddWordModal';
 import { ImportExportModal } from './ImportExportModal';
 import { RadicalsModal } from '../writer/RadicalsModal';
+import { MeasureWordsModal } from '../common/MeasureWordsModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -51,6 +52,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isImportExportOpen, setIsImportExportOpen] = useState(false);
   const [isRadicalsModalOpen, setIsRadicalsModalOpen] = useState(false);
+  const [isMeasureWordsModalOpen, setIsMeasureWordsModalOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -222,6 +224,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
             title="Khám phá 50 bộ thủ chữ Hán thông dụng"
           >
             <span>🏮 Bộ thủ</span>
+          </button>
+
+          <button
+            data-testid="open-measure-words-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsMeasureWordsModalOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-indigo-300 border border-indigo-500/20 hover:border-indigo-500/40 transition-colors shadow-xs"
+            title="Tra cứu 16 lượng từ thiết yếu HSK 1 - 2"
+          >
+            <span>📏 Lượng từ</span>
           </button>
 
           <button
@@ -424,6 +438,12 @@ export const WordListView: React.FC<WordListViewProps> = ({
         isOpen={isRadicalsModalOpen}
         onClose={() => setIsRadicalsModalOpen(false)}
         onSelectCharacter={(ch) => setSearchQuery(ch)}
+      />
+
+      {/* 16 Essential Measure Words Modal */}
+      <MeasureWordsModal
+        isOpen={isMeasureWordsModalOpen}
+        onClose={() => setIsMeasureWordsModalOpen(false)}
       />
     </div>
   );
