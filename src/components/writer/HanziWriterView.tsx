@@ -7,6 +7,7 @@ import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
 import bundledStrokes from '../../data/bundledStrokes.json';
 import { WorksheetModal } from './WorksheetModal';
+import { RadicalsModal } from './RadicalsModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -39,6 +40,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   );
   const [hintMessage, setHintMessage] = useState<string | null>(null);
   const [isWorksheetOpen, setIsWorksheetOpen] = useState(false);
+  const [isRadicalsOpen, setIsRadicalsOpen] = useState(false);
+
+  const handleSelectCharacterFromRadical = (hanzi: string) => {
+    const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
+    if (idx !== -1) {
+      setSelectedWordIndex(idx);
+      const chars = Array.from(words[idx].hanzi);
+      const cIdx = chars.indexOf(hanzi);
+      setCurrentCharIndex(cIdx !== -1 ? cIdx : 0);
+    }
+  };
 
   useEffect(() => {
     if (initialWordId) {
@@ -642,6 +654,18 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
             <Printer className="w-3.5 h-3.5 text-rose-400" />
             <span>In ô Mễ</span>
           </button>
+
+          <button
+            data-testid="open-radicals-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsRadicalsOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Khám phá bộ thủ chữ Hán và các chữ ví dụ"
+          >
+            <span>🏮 Bộ thủ</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -688,6 +712,13 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           words={words}
         />
       )}
+
+      {/* 50 Common Radicals Interactive Explorer Modal */}
+      <RadicalsModal
+        isOpen={isRadicalsOpen}
+        onClose={() => setIsRadicalsOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+      />
     </div>
   );
 };
