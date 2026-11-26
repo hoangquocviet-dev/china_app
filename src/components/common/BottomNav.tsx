@@ -33,7 +33,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) 
                 audioService.playClick();
                 onChangeTab(item.id);
               }}
-              className={`flex flex-col items-center justify-center space-y-0.5 px-0.5 transition-colors min-w-0 ${
+              className={`flex flex-col items-center justify-center space-y-0.5 px-0.5 transition-all min-w-0 h-full touch-manipulation select-none active:scale-90 ${
                 isActive ? 'text-rose-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
               }`}
             >

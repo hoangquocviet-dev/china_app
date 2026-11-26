@@ -119,8 +119,8 @@ export const ConnectorsModal: React.FC<ConnectorsModalProps> = ({
   const currentQuiz = CONNECTOR_QUIZ_LIST[quizIndex];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-4xl max-h-[92vh] flex flex-col bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-4xl h-[94dvh] sm:max-h-[92vh] flex flex-col bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         {/* Header */}
         <div className="relative px-5 py-4 sm:px-6 sm:py-5 border-b border-slate-200 dark:border-slate-800 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shrink-0">
           <div className="flex items-center justify-between">
@@ -143,17 +143,18 @@ export const ConnectorsModal: React.FC<ConnectorsModalProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+              className="w-11 h-11 flex items-center justify-center rounded-xl text-white/80 hover:text-white hover:bg-white/10 active:scale-90 transition-all touch-manipulation shrink-0 ml-2"
+              title="Đóng"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex items-center space-x-2 mt-4">
+          <div className="flex items-center space-x-2 mt-4 overflow-x-auto touch-scroll-x pb-1 scrollbar-none">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center space-x-1.5 min-h-[42px] px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap touch-manipulation active:scale-95 ${
                 activeTab === 'overview'
                   ? 'bg-white text-indigo-600 shadow-md scale-105'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
@@ -165,7 +166,7 @@ export const ConnectorsModal: React.FC<ConnectorsModalProps> = ({
 
             <button
               onClick={() => setActiveTab('all_connectors')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center space-x-1.5 min-h-[42px] px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap touch-manipulation active:scale-95 ${
                 activeTab === 'all_connectors'
                   ? 'bg-white text-indigo-600 shadow-md scale-105'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
@@ -177,7 +178,7 @@ export const ConnectorsModal: React.FC<ConnectorsModalProps> = ({
 
             <button
               onClick={() => setActiveTab('quiz')}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`flex items-center space-x-1.5 min-h-[42px] px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap touch-manipulation active:scale-95 ${
                 activeTab === 'quiz'
                   ? 'bg-white text-indigo-600 shadow-md scale-105'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
@@ -540,10 +541,10 @@ export const ConnectorsModal: React.FC<ConnectorsModalProps> = ({
                       </span>
                       <button
                         onClick={(e) => handleSpeak(e, currentQuiz.sentence.replace(/___/g, ''))}
-                        className="p-1.5 rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 shadow-sm"
+                        className="w-11 h-11 flex items-center justify-center rounded-xl text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-slate-700 hover:bg-indigo-100 dark:hover:bg-slate-600 active:scale-90 transition-all touch-manipulation shadow-xs shrink-0 ml-2"
                         title="Nghe câu"
                       >
-                        <Volume2 className="w-4 h-4" />
+                        <Volume2 className="w-5 h-5" />
                       </button>
                     </div>
 
@@ -581,7 +582,7 @@ export const ConnectorsModal: React.FC<ConnectorsModalProps> = ({
                           key={oIdx}
                           disabled={isQuizChecked}
                           onClick={() => handleSelectQuizOption(oIdx)}
-                          className={`p-4 rounded-xl border text-left text-sm font-medium transition-all flex items-center justify-between shadow-sm active:scale-[0.98] ${btnStyle}`}
+                          className={`min-h-[52px] p-3.5 sm:p-4 rounded-xl border text-left text-xs sm:text-sm font-semibold transition-all flex items-center justify-between shadow-sm active:scale-[0.98] touch-manipulation ${btnStyle}`}
                         >
                           <span>{opt}</span>
                           {isQuizChecked && oIdx === currentQuiz.correctIndex && (
@@ -613,7 +614,7 @@ export const ConnectorsModal: React.FC<ConnectorsModalProps> = ({
 
                       <button
                         onClick={handleNextQuiz}
-                        className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-sm shadow-md hover:from-indigo-700 hover:to-purple-700 active:scale-[0.99] transition-all flex items-center justify-center space-x-2"
+                        className="w-full min-h-[50px] py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-sm shadow-md hover:from-indigo-700 hover:to-purple-700 active:scale-95 transition-all flex items-center justify-center space-x-2 touch-manipulation"
                       >
                         <span>{quizIndex + 1 < CONNECTOR_QUIZ_LIST.length ? 'Câu tiếp theo' : 'Xem kết quả'}</span>
                         <ArrowRight className="w-4 h-4" />

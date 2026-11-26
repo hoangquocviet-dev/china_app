@@ -147,11 +147,16 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   return (
     <div className="flex flex-col flex-1 max-w-md w-full mx-auto p-4 pb-24">
       {/* Header bar */}
-      <div className="flex items-center justify-between mb-2 text-xs text-slate-400">
-        <span className="font-medium text-slate-300">
-          Bài tập {exerciseIndex + 1} / {activeSentences.length}
-        </span>
-        <div className="flex items-center space-x-1.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 text-xs text-slate-400">
+        <div className="flex items-center justify-between">
+          <span className="font-medium text-slate-300">
+            Bài tập {exerciseIndex + 1} / {activeSentences.length}
+          </span>
+          <span className="sm:hidden px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
+            Sắp xếp câu
+          </span>
+        </div>
+        <div className="flex items-center space-x-1.5 overflow-x-auto touch-scroll-x pb-1 scrollbar-none">
           <button
             type="button"
             data-testid="assembly-grammar-handbook-btn"
@@ -159,7 +164,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               audioService.playClick();
               setIsGrammarHandbookOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-300 hover:text-blue-200 border border-blue-500/20 font-medium transition-colors"
+            className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-300 hover:text-blue-200 border border-blue-500/20 font-medium transition-all active:scale-95 touch-manipulation whitespace-nowrap"
             title="Sổ tay 20 cấu trúc ngữ pháp trọng điểm HSK 1 - 2"
           >
             <span>📘 Ngữ pháp</span>
@@ -171,7 +176,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               audioService.playClick();
               setIsMeasureWordsOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 hover:text-indigo-200 border border-indigo-500/20 font-medium transition-colors"
+            className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-300 hover:text-indigo-200 border border-indigo-500/20 font-medium transition-all active:scale-95 touch-manipulation whitespace-nowrap"
             title="Tra cứu lượng từ chuẩn ngữ pháp HSK 1 - 2"
           >
             <span>📏 Lượng từ</span>
@@ -183,7 +188,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               audioService.playClick();
               setIsConnectorsOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 hover:text-purple-200 border border-purple-500/20 font-medium transition-colors"
+            className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-300 hover:text-purple-200 border border-purple-500/20 font-medium transition-all active:scale-95 touch-manipulation whitespace-nowrap"
             title="Kho 18 cặp liên từ nối câu kinh điển HSK 1 - 3"
           >
             <span>🔗 Liên từ</span>
@@ -195,7 +200,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               audioService.playClick();
               setIsReduplicationOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 hover:text-emerald-200 border border-emerald-500/20 font-medium transition-colors"
+            className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-300 hover:text-emerald-200 border border-emerald-500/20 font-medium transition-all active:scale-95 touch-manipulation whitespace-nowrap"
             title="Bí kíp trùng điệp từ & từ láy HSK (AA, ABAB, AAB, AABB)"
           >
             <span>✨ Trùng điệp</span>
@@ -207,7 +212,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               audioService.playClick();
               setIsComplementsOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 border border-cyan-500/20 font-medium transition-colors"
+            className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 border border-cyan-500/20 font-medium transition-all active:scale-95 touch-manipulation whitespace-nowrap"
             title="Kho 4 dạng bổ ngữ trọng yếu HSK 1 - 3 (Kết quả, Xu hướng, Khả năng, Trạng thái)"
           >
             <span>🎯 Bổ ngữ</span>
@@ -219,7 +224,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               audioService.playClick();
               setIsBaBeiOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-300 hover:text-rose-200 border border-rose-500/20 font-medium transition-colors"
+            className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-300 hover:text-rose-200 border border-rose-500/20 font-medium transition-all active:scale-95 touch-manipulation whitespace-nowrap"
             title="Bí kíp câu chữ 把 & câu chữ 被 HSK 2 - 3 (Câu xử lý & Bị động)"
           >
             <span>🛡️ 把·被</span>
@@ -231,7 +236,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               audioService.playClick();
               setIsComparativesOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-300 hover:text-sky-200 border border-sky-500/20 font-medium transition-colors"
+            className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-300 hover:text-sky-200 border border-sky-500/20 font-medium transition-all active:scale-95 touch-manipulation whitespace-nowrap"
             title="Bí kíp câu so sánh HSK (比, 没有, 一样, 最, 越来越)"
           >
             <span>⚖️ So sánh</span>
@@ -243,7 +248,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               audioService.playClick();
               setIsSpatialOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-300 hover:text-teal-200 border border-teal-500/20 font-medium transition-colors"
+            className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1 rounded-full bg-teal-500/10 text-teal-300 hover:text-teal-200 border border-teal-500/20 font-medium transition-all active:scale-95 touch-manipulation whitespace-nowrap"
             title="Phương vị từ & Câu tồn hiện HSK 2 - 3 (方位词与存现句)"
           >
             <span>🧭 Vị trí</span>
@@ -255,12 +260,12 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               audioService.playClick();
               setIsQuestionsOpen(true);
             }}
-            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 hover:text-indigo-200 border border-indigo-500/20 font-medium transition-colors"
+            className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-300 hover:text-indigo-200 border border-indigo-500/20 font-medium transition-all active:scale-95 touch-manipulation whitespace-nowrap"
             title="Bảo điển câu hỏi & đại từ nghi vấn HSK (疑问句)"
           >
             <span>❓ Câu hỏi</span>
           </button>
-          <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
+          <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium whitespace-nowrap">
             Sắp xếp câu
           </span>
         </div>
@@ -295,7 +300,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               audioService.playClick();
               audioService.speakChinese(currentExercise.targetSentence);
             }}
-            className="px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-all active:scale-95 shrink-0 flex items-center space-x-1.5 shadow-xs"
+            className="min-h-[44px] px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 active:bg-rose-500/30 text-rose-400 border border-rose-500/20 transition-all active:scale-95 shrink-0 flex items-center space-x-1.5 shadow-xs touch-manipulation"
             title="Nghe câu mẫu tiếng Trung để vừa nghe vừa sắp xếp"
           >
             <Volume2 className="w-4 h-4" />
@@ -313,7 +318,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
                 audioService.playClick();
                 setShowGrammarHint(!showGrammarHint);
               }}
-              className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
+              className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors min-h-[32px] touch-manipulation active:scale-95"
             >
               <HelpCircle className="w-3.5 h-3.5" />
               <span>{showGrammarHint ? 'Ẩn cấu trúc gợi ý' : '💡 Xem cấu trúc ngữ pháp'}</span>
@@ -339,7 +344,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
           {selectedTokens.length > 0 && !isCorrect && (
             <button
               onClick={handleResetCurrent}
-              className="text-xs text-amber-400 hover:underline flex items-center gap-1"
+              className="text-xs text-amber-400 hover:underline flex items-center gap-1 min-h-[36px] px-2 touch-manipulation active:scale-95"
             >
               <RotateCcw className="w-3 h-3" /> Làm lại
             </button>
@@ -364,7 +369,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               <button
                 key={idx}
                 onClick={() => handleDeselectToken(token, idx)}
-                className="px-3.5 py-2 rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white font-medium text-sm shadow-md active:scale-95 transition-all flex items-center gap-1"
+                className="min-h-[46px] min-w-[46px] px-4 py-2.5 rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 text-white font-bold text-base sm:text-lg font-kai shadow-md active:scale-90 transition-all flex items-center justify-center gap-1 touch-manipulation select-none"
               >
                 <span>{token}</span>
               </button>
@@ -386,7 +391,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
               <button
                 key={idx}
                 onClick={() => handleSelectToken(token, idx)}
-                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 border border-slate-700 font-medium text-sm shadow-sm active:scale-95 transition-all"
+                className="min-h-[46px] min-w-[46px] px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 active:bg-slate-700 text-slate-100 border border-slate-700 font-bold text-base sm:text-lg font-kai shadow-sm active:scale-90 transition-all flex items-center justify-center touch-manipulation select-none"
               >
                 {token}
               </button>
@@ -408,7 +413,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
             <span>{isCorrect ? 'Chính xác! Hoàn thành rất tốt.' : 'Chưa đúng, hãy thử sắp xếp lại!'}</span>
             <button
               onClick={() => audioService.speakChinese(currentExercise.targetSentence)}
-              className="p-1 rounded bg-slate-800/60 hover:bg-slate-800 text-slate-300"
+              className="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-800/60 hover:bg-slate-800 active:bg-slate-700 text-slate-300 touch-manipulation active:scale-90"
               title="Nghe câu hoàn chỉnh"
             >
               <Volume2 className="w-4 h-4" />
@@ -430,7 +435,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
       {isEvaluated && isCorrect ? (
         <button
           onClick={handleNext}
-          className="w-full py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center space-x-2 shadow-lg shadow-emerald-900/40 mb-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white active:scale-98"
+          className="w-full min-h-[50px] py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center space-x-2 shadow-lg shadow-emerald-900/40 mb-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white active:scale-[0.98] touch-manipulation"
         >
           <span>Câu tiếp theo</span>
           <ChevronRight className="w-4 h-4" />
@@ -439,9 +444,9 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
         <button
           onClick={handleCheck}
           disabled={selectedTokens.length === 0}
-          className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center space-x-2 shadow-lg mb-3 ${
+          className={`w-full min-h-[50px] py-3.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center space-x-2 shadow-lg mb-3 touch-manipulation ${
             selectedTokens.length > 0
-              ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-rose-900/40 active:scale-98'
+              ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-rose-900/40 active:scale-[0.98]'
               : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
           }`}
         >
@@ -454,13 +459,13 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
       <div className="flex items-center justify-between text-slate-400 mt-auto">
         <button
           onClick={handlePrev}
-          className="p-2 rounded-lg hover:bg-slate-800 flex items-center text-xs"
+          className="min-h-[44px] px-3 py-2 rounded-xl hover:bg-slate-800 active:bg-slate-750 flex items-center text-xs font-medium touch-manipulation active:scale-95 transition-all"
         >
           <ChevronLeft className="w-4 h-4 mr-1" /> Câu trước
         </button>
         <button
           onClick={handleNext}
-          className="p-2 rounded-lg hover:bg-slate-800 flex items-center text-xs"
+          className="min-h-[44px] px-3 py-2 rounded-xl hover:bg-slate-800 active:bg-slate-750 flex items-center text-xs font-medium touch-manipulation active:scale-95 transition-all"
         >
           Câu tiếp theo <ChevronRight className="w-4 h-4 ml-1" />
         </button>
