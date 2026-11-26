@@ -37,6 +37,7 @@ import { ReduplicationModal } from '../common/ReduplicationModal';
 import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
+import { SpatialModal } from '../common/SpatialModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -83,6 +84,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isComplementsOpen, setIsComplementsOpen] = useState(false);
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
+  const [isSpatialOpen, setIsSpatialOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -449,6 +451,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-spatial-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsSpatialOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-teal-300 border border-teal-500/20 hover:border-teal-500/40 transition-colors shadow-xs"
+            title="Phương vị từ & Câu tồn hiện HSK 2 - 3 (方位词与存现句)"
+          >
+            <span>🧭 Vị trí</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -772,6 +786,16 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <ComparativesModal
         isOpen={isComparativesOpen}
         onClose={() => setIsComparativesOpen(false)}
+        onSelectCharacter={onSelectWordForWriting ? (char) => {
+          const match = words.find((w) => w.hanzi.includes(char));
+          if (match) onSelectWordForWriting(match);
+        } : undefined}
+      />
+
+      {/* Spatial Position & Existential Sentences Modal */}
+      <SpatialModal
+        isOpen={isSpatialOpen}
+        onClose={() => setIsSpatialOpen(false)}
         onSelectCharacter={onSelectWordForWriting ? (char) => {
           const match = words.find((w) => w.hanzi.includes(char));
           if (match) onSelectWordForWriting(match);

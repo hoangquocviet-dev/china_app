@@ -20,6 +20,7 @@ import { ReduplicationModal } from '../common/ReduplicationModal';
 import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
+import { SpatialModal } from '../common/SpatialModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -65,6 +66,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isComplementsOpen, setIsComplementsOpen] = useState(false);
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
+  const [isSpatialOpen, setIsSpatialOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -822,6 +824,18 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>⚖️ So sánh</span>
           </button>
+
+          <button
+            data-testid="open-spatial-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsSpatialOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Phương vị từ & Câu tồn hiện HSK 2 - 3 (方位词与存现句)"
+          >
+            <span>🧭 Vị trí</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -952,6 +966,13 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       <ComparativesModal
         isOpen={isComparativesOpen}
         onClose={() => setIsComparativesOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+      />
+
+      {/* Spatial Position & Existential Sentences Modal */}
+      <SpatialModal
+        isOpen={isSpatialOpen}
+        onClose={() => setIsSpatialOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>

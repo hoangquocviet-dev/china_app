@@ -47,6 +47,7 @@ import { ReduplicationModal } from '../common/ReduplicationModal';
 import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
+import { SpatialModal } from '../common/SpatialModal';
 
 interface GamesHubViewProps {
   activeWords: ChineseWord[];
@@ -112,6 +113,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
   const [isComplementsOpen, setIsComplementsOpen] = useState(false);
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
+  const [isSpatialOpen, setIsSpatialOpen] = useState(false);
 
   const refreshLeaderboard = useCallback(async () => {
     setLoadingBoard(true);
@@ -694,6 +696,24 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             <div className="text-[10px] text-slate-400 truncate">比较句</div>
           </div>
         </button>
+
+        <button
+          type="button"
+          data-testid="games-spatial-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsSpatialOpen(true);
+          }}
+          className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-750 border border-slate-750 hover:border-teal-500/40 text-left transition-all active:scale-[0.98] shadow-xs flex items-center space-x-2"
+        >
+          <div className="w-7 h-7 rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+            🧭
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-xs text-slate-100 truncate">Phương Vị</div>
+            <div className="text-[10px] text-slate-400 truncate">存现句</div>
+          </div>
+        </button>
       </div>
 
       {/* Game Deck Source & Pinyin Hint Controls */}
@@ -1250,6 +1270,10 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
       <ComparativesModal
         isOpen={isComparativesOpen}
         onClose={() => setIsComparativesOpen(false)}
+      />
+      <SpatialModal
+        isOpen={isSpatialOpen}
+        onClose={() => setIsSpatialOpen(false)}
       />
     </div>
   );

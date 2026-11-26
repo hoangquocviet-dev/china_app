@@ -17,6 +17,7 @@ import { ReduplicationModal } from '../common/ReduplicationModal';
 import { ComplementsModal } from '../common/ComplementsModal';
 import { BaBeiModal } from '../common/BaBeiModal';
 import { ComparativesModal } from '../common/ComparativesModal';
+import { SpatialModal } from '../common/SpatialModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -70,6 +71,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isComplementsOpen, setIsComplementsOpen] = useState(false);
   const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
   const [isComparativesOpen, setIsComparativesOpen] = useState(false);
+  const [isSpatialOpen, setIsSpatialOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -569,6 +571,18 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
           >
             <span>⚖️ So sánh</span>
           </button>
+
+          <button
+            data-testid="open-spatial-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsSpatialOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Phương vị từ & Câu tồn hiện HSK 2 - 3 (方位词与存现句)"
+          >
+            <span>🧭 Vị trí</span>
+          </button>
           <button
             onClick={() => setShowPermissionGuide(true)}
             className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
@@ -914,6 +928,12 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <ComparativesModal
         isOpen={isComparativesOpen}
         onClose={() => setIsComparativesOpen(false)}
+      />
+
+      {/* Spatial Position & Existential Sentences Modal */}
+      <SpatialModal
+        isOpen={isSpatialOpen}
+        onClose={() => setIsSpatialOpen(false)}
       />
     </div>
   );
