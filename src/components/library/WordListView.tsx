@@ -19,6 +19,7 @@ import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
 import { matchesWordSearch } from '../../utils/pinyinHelper';
 import { AddWordModal } from './AddWordModal';
+import { ImportExportModal } from './ImportExportModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -47,6 +48,8 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [selectedLevel, setSelectedLevel] = useState<'ALL' | 'HSK1' | 'HSK2' | 'TOPIC'>('ALL');
   const [importMessage, setImportMessage] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isImportExportOpen, setIsImportExportOpen] = useState(false);
+  const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
   // useDeferredValue ensures typing remains 120Hz smooth even across thousands of words
@@ -98,39 +101,6 @@ export const WordListView: React.FC<WordListViewProps> = ({
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
   }, [hasMore, filteredWords.length]);
-
-  const handleExport = () => {
-    audioService.playClick();
-    const jsonStr = storageService.exportBackup();
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `hanziflow-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      const success = storageService.importBackup(content);
-      if (success) {
-        audioService.playSuccessChime();
-        setImportMessage('Nhập dữ liệu sao lưu thành công!');
-        onRefreshWords();
-      } else {
-        audioService.playErrorBuzz();
-        setImportMessage('Tập tin không hợp lệ, vui lòng kiểm tra lại.');
-      }
-      setTimeout(() => setImportMessage(null), 3500);
-    };
-    reader.readAsText(file);
-  };
 
   const handleDeleteWord = (wordId: string, wordHanzi: string) => {
     audioService.playClick();
@@ -232,28 +202,41 @@ export const WordListView: React.FC<WordListViewProps> = ({
         ))}
       </div>
 
-      {/* Stats & Backup Toolbar */}
+      {/* Stats & Multi-Format Backup Toolbar */}
       <div className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-800/50 border border-slate-800 mb-3 text-xs text-slate-400">
         <div className="flex items-center space-x-1.5 font-medium text-slate-300">
           <Sparkles className="w-3.5 h-3.5 text-rose-400" />
           <span>Sổ từ: {words.length} từ</span>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1.5">
           <button
-            onClick={handleExport}
-            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 transition-colors"
-            title="Xuất file sao lưu JSON"
+            data-testid="open-export-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setImportExportTab('export');
+              setIsImportExportOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-rose-300 border border-rose-500/20 hover:border-rose-500/40 transition-colors shadow-xs"
+            title="Xuất từ vựng: Excel CSV, Anki TSV, Markdown, JSON"
           >
             <Download className="w-3 h-3 text-rose-400" />
-            <span>Sao lưu</span>
+            <span>Xuất file</span>
           </button>
 
-          <label className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 transition-colors cursor-pointer">
+          <button
+            data-testid="open-import-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setImportExportTab('import');
+              setIsImportExportOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-amber-300 border border-amber-500/20 hover:border-amber-500/40 transition-colors shadow-xs"
+            title="Nhập từ vựng: CSV, TSV Anki, văn bản hoặc sao lưu JSON"
+          >
             <Upload className="w-3 h-3 text-amber-400" />
-            <span>Phục hồi</span>
-            <input type="file" accept=".json" onChange={handleImport} className="hidden" />
-          </label>
+            <span>Nhập file</span>
+          </button>
         </div>
       </div>
 
@@ -411,6 +394,15 @@ export const WordListView: React.FC<WordListViewProps> = ({
           onRefreshWords();
           onWordAdded?.(newWord);
         }}
+      />
+
+      {/* Multi-format Import / Export Modal */}
+      <ImportExportModal
+        isOpen={isImportExportOpen}
+        onClose={() => setIsImportExportOpen(false)}
+        words={words}
+        initialTab={importExportTab}
+        onDataChanged={onRefreshWords}
       />
     </div>
   );
