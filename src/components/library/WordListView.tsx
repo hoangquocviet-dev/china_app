@@ -30,6 +30,7 @@ import { HanziDecompositionModal } from '../common/HanziDecompositionModal';
 import { ChengyuModal } from '../common/ChengyuModal';
 import { NumbersTimeModal } from '../common/NumbersTimeModal';
 import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
+import { ParticlesModal } from '../common/ParticlesModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -69,6 +70,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isChengyuOpen, setIsChengyuOpen] = useState(false);
   const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
   const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
+  const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -351,6 +353,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-particles-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsParticlesModalOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-violet-300 border border-violet-500/20 hover:border-violet-500/40 transition-colors shadow-xs"
+            title="Bí kíp 3 chữ ĐÍCH (的·得·地) & Trợ từ tiếng Trung"
+          >
+            <span>🔤 Trợ từ</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -604,6 +618,16 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <SpokenResponsesModal
         isOpen={isSpokenModalOpen}
         onClose={() => setIsSpokenModalOpen(false)}
+        onSelectCharacter={onSelectWordForWriting ? (char) => {
+          const match = words.find((w) => w.hanzi.includes(char));
+          if (match) onSelectWordForWriting(match);
+        } : undefined}
+      />
+
+      {/* Chinese Particles & Three DEs Modal */}
+      <ParticlesModal
+        isOpen={isParticlesModalOpen}
+        onClose={() => setIsParticlesModalOpen(false)}
         onSelectCharacter={onSelectWordForWriting ? (char) => {
           const match = words.find((w) => w.hanzi.includes(char));
           if (match) onSelectWordForWriting(match);

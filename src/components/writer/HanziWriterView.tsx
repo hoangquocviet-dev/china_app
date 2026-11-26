@@ -13,6 +13,7 @@ import { HanziDecompositionModal } from '../common/HanziDecompositionModal';
 import { ChengyuModal } from '../common/ChengyuModal';
 import { NumbersTimeModal } from '../common/NumbersTimeModal';
 import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
+import { ParticlesModal } from '../common/ParticlesModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -51,6 +52,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isChengyuOpen, setIsChengyuOpen] = useState(false);
   const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
   const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
+  const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -731,6 +733,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>💬 Khẩu ngữ</span>
           </button>
+          <button
+            data-testid="open-particles-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsParticlesModalOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Bí kíp 3 chữ ĐÍCH (的·得·地) & Trợ từ tiếng Trung"
+          >
+            <span>🔤 Trợ từ</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -817,6 +830,13 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       <SpokenResponsesModal
         isOpen={isSpokenModalOpen}
         onClose={() => setIsSpokenModalOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+      />
+
+      {/* Chinese Particles & Three DEs Modal */}
+      <ParticlesModal
+        isOpen={isParticlesModalOpen}
+        onClose={() => setIsParticlesModalOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>

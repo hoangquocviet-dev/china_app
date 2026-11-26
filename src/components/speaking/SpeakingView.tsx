@@ -10,6 +10,7 @@ import { DialoguesModal } from '../common/DialoguesModal';
 import { ChengyuModal } from '../common/ChengyuModal';
 import { NumbersTimeModal } from '../common/NumbersTimeModal';
 import { SpokenResponsesModal } from '../common/SpokenResponsesModal';
+import { ParticlesModal } from '../common/ParticlesModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -56,6 +57,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isChengyuOpen, setIsChengyuOpen] = useState(false);
   const [isNumbersTimeOpen, setIsNumbersTimeOpen] = useState(false);
   const [isSpokenModalOpen, setIsSpokenModalOpen] = useState(false);
+  const [isParticlesModalOpen, setIsParticlesModalOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -479,6 +481,17 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             <span>💬 Khẩu ngữ</span>
           </button>
           <button
+            data-testid="open-particles-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsParticlesModalOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Bí kíp 3 chữ ĐÍCH (的·得·地) & Trợ từ tiếng Trung"
+          >
+            <span>🔤 Trợ từ</span>
+          </button>
+          <button
             onClick={() => setShowPermissionGuide(true)}
             className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
             title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
@@ -788,6 +801,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <SpokenResponsesModal
         isOpen={isSpokenModalOpen}
         onClose={() => setIsSpokenModalOpen(false)}
+      />
+      {/* Chinese Particles & Three DEs Modal */}
+      <ParticlesModal
+        isOpen={isParticlesModalOpen}
+        onClose={() => setIsParticlesModalOpen(false)}
       />
     </div>
   );
