@@ -8,6 +8,7 @@ import type {
   GameScores,
   BuiltInSrsProgress,
   CommunityWordRow,
+  StreakDetails,
 } from '../types';
 
 const STORAGE_KEYS = {
@@ -15,6 +16,7 @@ const STORAGE_KEYS = {
   FAVORITES: 'hanziflow_favorites',
   ACTIVE_TAB: 'hanziflow_active_tab',
   STREAK: 'hanziflow_streak',
+  STREAK_DETAILS: 'hanziflow_streak_details',
   BACKUP: 'hanziflow_backup',
   SENTENCES: 'hanziflow_sentences',
   LESSON_CONFIG: 'hanziflow_lesson_config',
@@ -61,6 +63,10 @@ class SafeStorageService {
     return () => {
       this.mutationListeners.delete(listener);
     };
+  }
+
+  public subscribe(listener: () => void): () => void {
+    return this.subscribeMutations(listener);
   }
 
   public registerCommunityWordHook(hook: (word: ChineseWord) => void): void {
@@ -562,9 +568,114 @@ class SafeStorageService {
     return this.get<string[]>(STORAGE_KEYS.DELETED_SENTENCES, []);
   }
 
+  public getStreakDetails(): StreakDetails {
+    const today = this.getTodayDateStr();
+    const raw = this.get<StreakDetails | null>(STORAGE_KEYS.STREAK_DETAILS, null);
+    if (!raw) {
+      const legacyVal = this.get<number>(STORAGE_KEYS.STREAK, 1);
+      const initialStreak = Math.max(1, legacyVal);
+      const initialDetails: StreakDetails = {
+        currentStreak: initialStreak,
+        bestStreak: initialStreak,
+        lastActiveDate: today,
+        freezeCount: 1, // Tặng 1 Khiên bảo vệ chuỗi chào mừng
+        shieldUsedToday: false,
+        history: [today],
+      };
+      this.set(STORAGE_KEYS.STREAK_DETAILS, initialDetails, false);
+      return initialDetails;
+    }
+
+    const days = this.getDaysDiff(raw.lastActiveDate, today);
+    if (days === 0) {
+      return raw;
+    } else if (days === 1) {
+      return { ...raw, shieldUsedToday: false };
+    } else if (days === 2) {
+      // Lỡ 1 ngày: Tự động kích hoạt Khiên bảo vệ chuỗi nếu có
+      if (raw.freezeCount > 0 && !raw.shieldUsedToday) {
+        const updated: StreakDetails = {
+          ...raw,
+          freezeCount: raw.freezeCount - 1,
+          shieldUsedToday: true,
+          lastActiveDate: today,
+        };
+        this.set(STORAGE_KEYS.STREAK_DETAILS, updated, false);
+        return updated;
+      } else {
+        const updated: StreakDetails = {
+          ...raw,
+          currentStreak: 0,
+          shieldUsedToday: false,
+        };
+        this.set(STORAGE_KEYS.STREAK_DETAILS, updated, false);
+        this.set(STORAGE_KEYS.STREAK, 0, false);
+        return updated;
+      }
+    } else {
+      const updated: StreakDetails = {
+        ...raw,
+        currentStreak: 0,
+        shieldUsedToday: false,
+      };
+      this.set(STORAGE_KEYS.STREAK_DETAILS, updated, false);
+      this.set(STORAGE_KEYS.STREAK, 0, false);
+      return updated;
+    }
+  }
+
+  public recordStudyActivity(): { streak: number; increased: boolean; shieldUsed: boolean } {
+    const today = this.getTodayDateStr();
+    const details = this.getStreakDetails();
+    if (details.lastActiveDate === today && details.currentStreak > 0) {
+      return { streak: details.currentStreak, increased: false, shieldUsed: details.shieldUsedToday };
+    }
+
+    const nextStreak = details.currentStreak <= 0 ? 1 : details.currentStreak + 1;
+    const nextBest = Math.max(details.bestStreak, nextStreak);
+    // Cứ mỗi 7 ngày học liên tục được nhận 1 Khiên bảo vệ (tối đa dự trữ 2 khiên)
+    let nextFreeze = details.freezeCount;
+    if (nextStreak % 7 === 0 && nextFreeze < 2) {
+      nextFreeze += 1;
+    }
+
+    const nextHistory = Array.from(new Set([...details.history, today])).slice(-30);
+    const updated: StreakDetails = {
+      currentStreak: nextStreak,
+      bestStreak: nextBest,
+      lastActiveDate: today,
+      freezeCount: nextFreeze,
+      shieldUsedToday: false,
+      history: nextHistory,
+    };
+
+    this.set(STORAGE_KEYS.STREAK_DETAILS, updated, false);
+    this.set(STORAGE_KEYS.STREAK, nextStreak, true);
+    return { streak: nextStreak, increased: true, shieldUsed: false };
+  }
+
+  private getTodayDateStr(): string {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private getDaysDiff(dateStr1: string, dateStr2: string): number {
+    if (!dateStr1 || !dateStr2) return 999;
+    try {
+      const d1 = new Date(dateStr1 + 'T00:00:00');
+      const d2 = new Date(dateStr2 + 'T00:00:00');
+      const diffTime = Math.abs(d2.getTime() - d1.getTime());
+      return Math.round(diffTime / (1000 * 60 * 60 * 24));
+    } catch {
+      return 999;
+    }
+  }
+
   public getStreak(): number {
-    const val = this.get<number>(STORAGE_KEYS.STREAK, 1);
-    return typeof val === 'number' && val >= 0 ? val : 1;
+    return this.getStreakDetails().currentStreak;
   }
 
   public applyCloudProfile(remote: any, mode: 'merge' | 'replace'): void {
@@ -766,6 +877,16 @@ class SafeStorageService {
         const nextStreak =
           mode === 'replace' ? remote.streak : Math.max(this.getStreak(), remote.streak);
         this.set(STORAGE_KEYS.STREAK, nextStreak, false);
+        const details = this.getStreakDetails();
+        this.set(
+          STORAGE_KEYS.STREAK_DETAILS,
+          {
+            ...details,
+            currentStreak: nextStreak,
+            bestStreak: Math.max(details.bestStreak, nextStreak),
+          },
+          false
+        );
       }
     } finally {
       this.suppressMutationNotify = false;

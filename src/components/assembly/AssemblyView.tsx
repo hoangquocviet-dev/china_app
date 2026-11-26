@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { INITIAL_SENTENCES } from '../../data/hsk1Sentences';
 import type { SentenceExercise } from '../../types';
 import { audioService } from '../../utils/audio';
+import { storageService } from '../../utils/storage';
 
 interface AssemblyViewProps {
   sentences?: SentenceExercise[];
@@ -77,6 +78,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
 
     if (correct) {
       audioService.playSuccessChime();
+      storageService.recordStudyActivity();
       try {
         navigator.vibrate?.([20, 30, 20]);
       } catch {}

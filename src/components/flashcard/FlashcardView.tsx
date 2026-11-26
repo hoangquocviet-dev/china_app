@@ -71,6 +71,7 @@ export const FlashcardView: React.FC<FlashcardViewProps> = ({ words, onUpdateWor
   const handleFlip = () => {
     audioService.playClick();
     setIsFlipped(!isFlipped);
+    storageService.recordStudyActivity();
   };
 
   const handleSpeak = (e: React.MouseEvent, text: string) => {

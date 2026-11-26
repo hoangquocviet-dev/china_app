@@ -160,6 +160,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
         bestScore={scores.blitzBestScore}
         onBack={() => setSelectedGame(null)}
         onFinishGame={(score, maxCombo, masteredIds) => {
+          storageService.recordStudyActivity();
           const updated = storageService.updateGameScores({
             blitzBestScore: score,
             blitzBestCombo: maxCombo,
@@ -179,6 +180,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
         bestScore={scores.matchBestScore}
         onBack={() => setSelectedGame(null)}
         onFinishGame={(score, wavesCleared, masteredIds) => {
+          storageService.recordStudyActivity();
           const updated = storageService.updateGameScores({
             matchBestScore: score,
             matchBestWaves: wavesCleared,
@@ -199,6 +201,7 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
         bestDistance={scores.runnerBestDistance}
         onBack={() => setSelectedGame(null)}
         onFinishGame={(score, distanceMeters, masteredIds) => {
+          storageService.recordStudyActivity();
           const updated = storageService.updateGameScores({
             runnerBestScore: score,
             runnerBestDistance: distanceMeters,

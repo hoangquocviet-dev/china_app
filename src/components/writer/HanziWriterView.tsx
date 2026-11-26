@@ -4,6 +4,7 @@ import { Play, RotateCcw, HelpCircle, Volume2, CheckCircle2, AlertCircle, Chevro
 import confetti from 'canvas-confetti';
 import type { ChineseWord } from '../../types';
 import { audioService } from '../../utils/audio';
+import { storageService } from '../../utils/storage';
 import bundledStrokes from '../../data/bundledStrokes.json';
 
 interface HanziWriterViewProps {
@@ -165,6 +166,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       },
       onComplete: () => {
         audioService.playSuccessChime();
+        storageService.recordStudyActivity();
         setIsCompleted(true);
         setHintMessage('Hoàn thành nét chữ xuất sắc!');
         confetti({

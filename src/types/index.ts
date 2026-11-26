@@ -87,3 +87,13 @@ export interface CommunityWordRow {
   examples: ExampleSentence[];
   updated_at: string;
 }
+
+export interface StreakDetails {
+  currentStreak: number;
+  bestStreak: number;
+  lastActiveDate: string; // 'YYYY-MM-DD'
+  freezeCount: number; // 0, 1, or 2
+  shieldUsedToday: boolean;
+  history: string[]; // ['2026-11-20', '2026-11-26']
+}
+

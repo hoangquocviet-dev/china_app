@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import type { ChineseWord, SentenceExercise } from '../../types';
 import { INITIAL_SENTENCES } from '../../data/hsk1Sentences';
 import { audioService } from '../../utils/audio';
+import { storageService } from '../../utils/storage';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -158,6 +159,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       setAccuracyScore(100);
       setEvalFeedback('Xuất sắc! Phát âm chuẩn xác 100% ngữ điệu.');
       audioService.playSuccessChime();
+      storageService.recordStudyActivity();
       confetti({
         particleCount: 40,
         spread: 70,
@@ -184,6 +186,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
     if (score >= 70) {
       setEvalFeedback('Rất tốt! Phát âm rõ ràng, gần như người bản xứ.');
       audioService.playSuccessChime();
+      storageService.recordStudyActivity();
     } else if (score >= 40) {
       setEvalFeedback('Khá tốt! Hãy chú ý thanh điệu và phát âm tròn vành rõ chữ hơn.');
     } else {

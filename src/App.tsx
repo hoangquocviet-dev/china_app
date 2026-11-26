@@ -30,6 +30,9 @@ const CustomLessonModal = lazy(() =>
 const CloudSyncModal = lazy(() =>
   import('./components/common/CloudSyncModal').then((m) => ({ default: m.CloudSyncModal }))
 );
+const StreakModal = lazy(() =>
+  import('./components/common/StreakModal').then((m) => ({ default: m.StreakModal }))
+);
 
 const ViewLoadingFallback = () => (
   <div className="flex-1 flex items-center justify-center p-8 text-slate-400 text-xs">
@@ -55,6 +58,7 @@ export function App() {
   const [lessonConfig, setLessonConfig] = useState<LessonCustomConfig>(() => storageService.getLessonConfig());
   const [isCustomLessonModalOpen, setIsCustomLessonModalOpen] = useState(false);
   const [isCloudSyncModalOpen, setIsCloudSyncModalOpen] = useState(false);
+  const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
   const [syncToast, setSyncToast] = useState<{ ok: boolean; text: string } | null>(null);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
 
@@ -356,6 +360,7 @@ export function App() {
         onReload={() => window.location.reload()}
         onOpenCustomModal={() => setIsCustomLessonModalOpen(true)}
         onOpenCloudSync={() => setIsCloudSyncModalOpen(true)}
+        onOpenStreakModal={() => setIsStreakModalOpen(true)}
       />
 
       {syncToast && (
@@ -483,6 +488,15 @@ export function App() {
             isOpen={isCloudSyncModalOpen}
             onClose={() => setIsCloudSyncModalOpen(false)}
             onDataRestored={loadWords}
+          />
+        </Suspense>
+      )}
+
+      {isStreakModalOpen && (
+        <Suspense fallback={null}>
+          <StreakModal
+            isOpen={isStreakModalOpen}
+            onClose={() => setIsStreakModalOpen(false)}
           />
         </Suspense>
       )}

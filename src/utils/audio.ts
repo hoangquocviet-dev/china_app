@@ -3,10 +3,23 @@ class AudioManager {
   private voices: SpeechSynthesisVoice[] = [];
   private chineseVoice: SpeechSynthesisVoice | null = null;
   private isSoundEnabled: boolean = true;
+  private speechRate: number = 0.85;
+  private speechRateSubscribers: Set<(rate: number) => void> = new Set();
   private fallbackAudio: HTMLAudioElement | null = null;
 
   constructor() {
     this.initVoices();
+    if (typeof window !== 'undefined') {
+      try {
+        const savedRate = window.localStorage.getItem('hanziflow_tts_speed');
+        if (savedRate) {
+          const parsed = parseFloat(savedRate);
+          if (!isNaN(parsed) && parsed >= 0.5 && parsed <= 2.0) {
+            this.speechRate = parsed;
+          }
+        }
+      } catch {}
+    }
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.onvoiceschanged = () => {
         this.initVoices();
@@ -19,6 +32,44 @@ class AudioManager {
         }
       });
     }
+  }
+
+  public getSpeechRate(): number {
+    return this.speechRate;
+  }
+
+  public setSpeechRate(rate: number): void {
+    const clamped = Math.max(0.5, Math.min(2.0, rate));
+    this.speechRate = clamped;
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem('hanziflow_tts_speed', String(clamped));
+      } catch {}
+    }
+    this.speechRateSubscribers.forEach((cb) => {
+      try { cb(clamped); } catch {}
+    });
+  }
+
+  public cycleSpeechRate(): number {
+    // 0.75x (Chậm) -> 1.0x (Chuẩn) -> 1.25x (Nhanh) -> 0.75x
+    let next = 1.0;
+    if (this.speechRate <= 0.8) {
+      next = 1.0;
+    } else if (this.speechRate <= 1.05) {
+      next = 1.25;
+    } else {
+      next = 0.75;
+    }
+    this.setSpeechRate(next);
+    return next;
+  }
+
+  public subscribeSpeechRate(callback: (rate: number) => void): () => void {
+    this.speechRateSubscribers.add(callback);
+    return () => {
+      this.speechRateSubscribers.delete(callback);
+    };
   }
 
   private getAudioContext(): AudioContext | null {
@@ -328,7 +379,8 @@ class AudioManager {
   }
 
   // Robust multi-tier Chinese speech pronunciation
-  public speakChinese(text: string, rate: number = 0.85): Promise<void> {
+  public speakChinese(text: string, rate?: number): Promise<void> {
+    const actualRate = typeof rate === 'number' ? rate : this.speechRate;
     return new Promise((resolve) => {
       if (!this.isSoundEnabled) {
         resolve();
@@ -356,7 +408,7 @@ class AudioManager {
 
           const utterance = new SpeechSynthesisUtterance(cleanText);
           utterance.lang = 'zh-CN';
-          utterance.rate = rate;
+          utterance.rate = actualRate;
 
           if (this.chineseVoice) {
             utterance.voice = this.chineseVoice;
