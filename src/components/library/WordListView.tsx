@@ -27,6 +27,7 @@ import { AntonymsModal } from '../common/AntonymsModal';
 import { ConfusingWordsModal } from '../common/ConfusingWordsModal';
 import { DialoguesModal } from '../common/DialoguesModal';
 import { HanziDecompositionModal } from '../common/HanziDecompositionModal';
+import { ChengyuModal } from '../common/ChengyuModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -63,6 +64,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isConfusingWordsOpen, setIsConfusingWordsOpen] = useState(false);
   const [isDialoguesModalOpen, setIsDialoguesModalOpen] = useState(false);
   const [isDecompositionOpen, setIsDecompositionOpen] = useState(false);
+  const [isChengyuOpen, setIsChengyuOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -309,6 +311,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-chengyu-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsChengyuOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-rose-300 border border-rose-500/20 hover:border-rose-500/40 transition-colors shadow-xs"
+            title="Kho tàng thành ngữ Hán - Việt 4 chữ & điển cố"
+          >
+            <span>🏮 Thành ngữ</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -544,6 +558,12 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <HanziDecompositionModal
         isOpen={isDecompositionOpen}
         onClose={() => setIsDecompositionOpen(false)}
+      />
+
+      {/* 24 Core Chengyu Idioms & Cultural Stories Modal */}
+      <ChengyuModal
+        isOpen={isChengyuOpen}
+        onClose={() => setIsChengyuOpen(false)}
       />
     </div>
   );

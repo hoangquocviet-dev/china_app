@@ -10,6 +10,7 @@ import { WorksheetModal } from './WorksheetModal';
 import { RadicalsModal } from './RadicalsModal';
 import { StrokeRulesModal } from './StrokeRulesModal';
 import { HanziDecompositionModal } from '../common/HanziDecompositionModal';
+import { ChengyuModal } from '../common/ChengyuModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -45,6 +46,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isRadicalsOpen, setIsRadicalsOpen] = useState(false);
   const [isStrokeRulesOpen, setIsStrokeRulesOpen] = useState(false);
   const [isDecompositionOpen, setIsDecompositionOpen] = useState(false);
+  const [isChengyuOpen, setIsChengyuOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -692,6 +694,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>🧩 Chiết tự</span>
           </button>
+          <button
+            data-testid="open-chengyu-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsChengyuOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Kho tàng thành ngữ Hán - Việt 4 chữ & điển cố"
+          >
+            <span>🏮 Thành ngữ</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -759,6 +772,13 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
         onClose={() => setIsDecompositionOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
         initialHanzi={currentChar}
+      />
+
+      {/* 24 Core Chengyu Idioms & Cultural Stories Modal */}
+      <ChengyuModal
+        isOpen={isChengyuOpen}
+        onClose={() => setIsChengyuOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>
   );

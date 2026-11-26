@@ -7,6 +7,7 @@ import { audioService } from '../../utils/audio';
 import { storageService } from '../../utils/storage';
 import { PinyinChartModal } from './PinyinChartModal';
 import { DialoguesModal } from '../common/DialoguesModal';
+import { ChengyuModal } from '../common/ChengyuModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -50,6 +51,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [hasPermissionError, setHasPermissionError] = useState(false);
   const [isPinyinChartOpen, setIsPinyinChartOpen] = useState(false);
   const [isDialoguesModalOpen, setIsDialoguesModalOpen] = useState(false);
+  const [isChengyuOpen, setIsChengyuOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -440,6 +442,17 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             <span>🔤 Pinyin</span>
           </button>
           <button
+            data-testid="open-chengyu-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsChengyuOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Kho tàng thành ngữ Hán - Việt 4 chữ & điển cố"
+          >
+            <span>🏮 Thành ngữ</span>
+          </button>
+          <button
             onClick={() => setShowPermissionGuide(true)}
             className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
             title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
@@ -734,6 +747,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <DialoguesModal
         isOpen={isDialoguesModalOpen}
         onClose={() => setIsDialoguesModalOpen(false)}
+      />
+      {/* 24 Core Chengyu Idioms & Cultural Stories Modal */}
+      <ChengyuModal
+        isOpen={isChengyuOpen}
+        onClose={() => setIsChengyuOpen(false)}
       />
     </div>
   );
