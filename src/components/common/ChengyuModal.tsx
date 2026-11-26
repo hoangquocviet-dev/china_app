@@ -118,13 +118,13 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
     <div
       role="dialog"
       data-testid="chengyu-modal"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn"
     >
-      <div className="bg-slate-900 border border-slate-750 rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-slate-900 border border-slate-750 rounded-3xl w-full max-w-2xl h-[94dvh] max-h-[94dvh] flex flex-col shadow-2xl overflow-hidden">
         {/* Modal Header */}
         <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center font-bold text-xs">
+            <div className="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center font-bold text-sm">
               🏮
             </div>
             <div>
@@ -138,30 +138,30 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
               audioService.playClick();
               onClose();
             }}
-            className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all"
+            className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-2xl transition-all touch-manipulation active:scale-90"
             aria-label="Đóng"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab switcher */}
-        <div className="px-4 py-2 bg-slate-850/80 border-b border-slate-800 flex items-center justify-between gap-2 shrink-0">
-          <div className="flex items-center space-x-1.5 bg-slate-900 p-1 rounded-xl border border-slate-750 text-xs font-semibold">
+        <div className="px-3 sm:px-4 py-2 bg-slate-850/80 border-b border-slate-800 flex items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center space-x-1.5 bg-slate-900 p-1 rounded-2xl border border-slate-750 text-xs font-semibold">
             <button
               data-testid="tab-chengyu-explore"
               onClick={() => {
                 audioService.playClick();
                 setActiveTab('explore');
               }}
-              className={`px-3 py-1 rounded-lg transition-all flex items-center space-x-1.5 ${
+              className={`min-h-[40px] px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 touch-manipulation active:scale-95 ${
                 activeTab === 'explore'
                   ? 'bg-rose-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Khám phá Thành ngữ ({CHENGYU_LIST.length})</span>
+              <BookOpen className="w-4 h-4" />
+              <span>Khám phá ({CHENGYU_LIST.length})</span>
             </button>
             <button
               data-testid="tab-chengyu-quiz"
@@ -169,25 +169,25 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
                 audioService.playClick();
                 setActiveTab('quiz');
               }}
-              className={`px-3 py-1 rounded-lg transition-all flex items-center space-x-1.5 ${
+              className={`min-h-[40px] px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 touch-manipulation active:scale-95 ${
                 activeTab === 'quiz'
                   ? 'bg-rose-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <HelpCircle className="w-3.5 h-3.5" />
+              <HelpCircle className="w-4 h-4" />
               <span>Đố Vui Điền Chữ 🏮</span>
             </button>
           </div>
 
           {activeTab === 'quiz' && (
-            <div className="flex items-center space-x-2 text-xs">
-              <span className="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+            <div className="flex items-center space-x-1.5 text-xs">
+              <span className="min-h-[36px] px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 flex items-center">
                 {quizScore} điểm
               </span>
               {quizStreak > 1 && (
-                <span className="px-2 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 font-bold flex items-center gap-1 animate-pulse">
-                  <Flame className="w-3 h-3 fill-rose-400" /> {quizStreak} streak
+                <span className="min-h-[36px] px-2.5 py-1 rounded-xl bg-rose-500/20 text-rose-300 font-bold flex items-center gap-1 animate-pulse">
+                  <Flame className="w-3.5 h-3.5 fill-rose-400" /> {quizStreak}
                 </span>
               )}
             </div>
@@ -220,7 +220,7 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
               </div>
 
               {/* Category pills */}
-              <div className="flex items-center space-x-1.5 overflow-x-auto scrollbar-none text-[11px]">
+              <div className="flex items-center space-x-1.5 overflow-x-auto touch-scroll-x pb-0.5 scrollbar-none text-xs">
                 {[
                   { id: 'all', label: 'Tất cả' },
                   { id: 'fables_origins', label: 'Ngụ ngôn & Điển cố' },
@@ -234,7 +234,7 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
                       audioService.playClick();
                       setSelectedCategory(cat.id);
                     }}
-                    className={`px-2.5 py-1 rounded-lg whitespace-nowrap transition-colors font-medium border ${
+                    className={`min-h-[36px] px-3 py-1.5 rounded-xl whitespace-nowrap transition-colors font-medium border touch-manipulation active:scale-95 ${
                       selectedCategory === cat.id
                         ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 font-bold'
                         : 'bg-slate-800/80 text-slate-400 border-slate-750 hover:text-slate-200'
@@ -297,7 +297,7 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
                       <div className="flex items-center space-x-1 shrink-0">
                         <button
                           onClick={(e) => handleSpeak(e, item.hanzi)}
-                          className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                          className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors touch-manipulation active:scale-90 flex items-center justify-center"
                           title="Phát âm cả thành ngữ"
                         >
                           <Volume2 className="w-4 h-4" />
@@ -342,7 +342,7 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
                       </div>
                       <button
                         onClick={(e) => handleSpeak(e, item.exampleSentence.hanzi)}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors shrink-0"
+                        className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors shrink-0 touch-manipulation active:scale-90 flex items-center justify-center"
                         title="Nghe câu ví dụ"
                       >
                         <Volume2 className="w-3.5 h-3.5" />
@@ -358,10 +358,10 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
                             <button
                               key={cIdx}
                               onClick={() => handlePracticeWriting(char)}
-                              className="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-rose-600/30 text-slate-300 hover:text-rose-300 border border-slate-700 text-xs font-semibold flex items-center gap-1 transition-all active:scale-95"
+                              className="min-h-[34px] px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-rose-600/30 text-slate-300 hover:text-rose-300 border border-slate-700 text-xs font-bold font-kai flex items-center gap-1 transition-all touch-manipulation active:scale-90"
                               title={`Tập viết nét chữ [${char}]`}
                             >
-                              <PenTool className="w-2.5 h-2.5" />
+                              <PenTool className="w-3 h-3 text-rose-400" />
                               <span>{char}</span>
                             </button>
                           ))}
@@ -431,9 +431,9 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
                       data-testid={`chengyu-option-${charOption}`}
                       disabled={isAnswerChecked}
                       onClick={() => handleSelectQuizOption(charOption)}
-                      className={`p-3.5 rounded-2xl border transition-all text-center flex items-center justify-center gap-2 ${btnStyle}`}
+                      className={`min-h-[54px] p-3.5 rounded-2xl border transition-all text-center flex items-center justify-center gap-2 touch-manipulation active:scale-95 ${btnStyle}`}
                     >
-                      <span className="text-xl sm:text-2xl font-bold font-sans">
+                      <span className="text-xl sm:text-2xl font-bold font-kai">
                         {charOption}
                       </span>
                       {isAnswerChecked && isCorrect && (
@@ -470,7 +470,7 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
             <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
               <button
                 onClick={handleResetQuiz}
-                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-slate-200 text-xs flex items-center gap-1 transition-colors"
+                className="min-h-[44px] px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-slate-200 text-xs flex items-center gap-1.5 transition-colors touch-manipulation active:scale-95 font-medium"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Làm lại từ đầu</span>
@@ -480,9 +480,10 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
                 <button
                   data-testid="next-chengyu-quiz-btn"
                   onClick={handleNextQuizQuestion}
-                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-all active:scale-95 shadow-md shadow-rose-950/40"
+                  className="min-h-[46px] px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-all active:scale-95 shadow-md shadow-rose-950/40 touch-manipulation flex items-center gap-1"
                 >
-                  Câu tiếp theo →
+                  <span>Câu tiếp theo</span>
+                  <span>→</span>
                 </button>
               )}
             </div>
@@ -497,7 +498,7 @@ export const ChengyuModal: React.FC<ChengyuModalProps> = ({
               audioService.playClick();
               onClose();
             }}
-            className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold transition-all active:scale-95"
+            className="min-h-[44px] px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold transition-all active:scale-95 touch-manipulation flex items-center justify-center"
           >
             Đóng
           </button>

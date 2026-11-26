@@ -111,27 +111,27 @@ export const ParticlesModal: React.FC<ParticlesModalProps> = ({
   const currentQuizItem = PARTICLES_QUIZ_LIST[quizIndex];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 md:p-6 animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4 md:p-6 animate-fade-in">
       <div
-        className="bg-white dark:bg-slate-900 w-full max-w-4xl h-[92vh] max-h-[850px] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800"
+        className="bg-white dark:bg-slate-900 w-full max-w-4xl h-[94dvh] max-h-[94dvh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800"
         data-testid="particles-modal"
       >
         {/* Header */}
-        <div className="px-6 py-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white flex items-center justify-between shrink-0 shadow-md">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-white/20 rounded-2xl backdrop-blur-sm shadow-inner">
-              <Sparkles className="w-6 h-6 text-white" />
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white flex items-center justify-between shrink-0 shadow-md">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="p-2 sm:p-2.5 bg-white/20 rounded-2xl backdrop-blur-sm shadow-inner shrink-0">
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold tracking-tight">
+                <h2 className="text-base sm:text-xl font-bold tracking-tight">
                   Trợ Từ & Bí Kíp 3 Chữ "ĐÍCH"
                 </h2>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/20 text-white backdrop-blur-sm">
+                <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-white/20 text-white backdrop-blur-sm">
                   的 · 得 · 地
                 </span>
               </div>
-              <p className="text-xs text-purple-100 mt-0.5">
+              <p className="text-[11px] sm:text-xs text-purple-100 mt-0.5 line-clamp-1">
                 Khẩu quyết phân biệt 的 - 得 - 地, trợ từ động thái 了-着-过 & trợ từ ngữ khí 吧-呢-吗
               </p>
             </div>
@@ -139,18 +139,19 @@ export const ParticlesModal: React.FC<ParticlesModalProps> = ({
           <button
             onClick={onClose}
             data-testid="close-particles-modal-btn"
-            className="p-2 rounded-full hover:bg-white/20 text-white/90 hover:text-white transition-colors"
+            className="w-11 h-11 rounded-2xl flex items-center justify-center hover:bg-white/20 text-white/90 hover:text-white transition-colors touch-manipulation active:scale-90 shrink-0"
+            aria-label="Đóng"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 px-6 pt-3 pb-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 shrink-0">
+        <div className="flex items-center gap-2 px-3 sm:px-6 pt-2.5 pb-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 shrink-0 overflow-x-auto touch-scroll-x scrollbar-none">
           <button
             onClick={() => setActiveTab('three_de')}
             data-testid="particles-tab-three-de"
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 min-h-[40px] px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all touch-manipulation active:scale-95 ${
               activeTab === 'three_de'
                 ? 'bg-violet-600 text-white shadow-md shadow-violet-600/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
@@ -162,7 +163,7 @@ export const ParticlesModal: React.FC<ParticlesModalProps> = ({
           <button
             onClick={() => setActiveTab('all_particles')}
             data-testid="particles-tab-all"
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 min-h-[40px] px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all touch-manipulation active:scale-95 ${
               activeTab === 'all_particles'
                 ? 'bg-violet-600 text-white shadow-md shadow-violet-600/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
@@ -175,7 +176,7 @@ export const ParticlesModal: React.FC<ParticlesModalProps> = ({
           <button
             onClick={() => setActiveTab('quiz')}
             data-testid="particles-tab-quiz"
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 min-h-[40px] px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all touch-manipulation active:scale-95 ${
               activeTab === 'quiz'
                 ? 'bg-violet-600 text-white shadow-md shadow-violet-600/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
@@ -184,7 +185,7 @@ export const ParticlesModal: React.FC<ParticlesModalProps> = ({
             <Sparkles className="w-4 h-4" />
             <span>Đố Vui Điền Trợ Từ ⚡</span>
             {quizScore > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-amber-400 text-amber-950 font-bold">
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-violet-400 text-violet-950 font-bold">
                 {quizScore}đ
               </span>
             )}
@@ -589,7 +590,7 @@ export const ParticlesModal: React.FC<ParticlesModalProps> = ({
                     const isCorrect = idx === currentQuizItem.correctIndex;
 
                     let btnClass =
-                      'p-4 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 ';
+                      'min-h-[54px] p-4 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 touch-manipulation active:scale-95 ';
 
                     if (!isQuizChecked) {
                       btnClass +=
@@ -612,7 +613,7 @@ export const ParticlesModal: React.FC<ParticlesModalProps> = ({
                         onClick={() => handleSelectQuizOption(idx)}
                         className={btnClass}
                       >
-                        <span className="text-2xl font-black">{opt}</span>
+                        <span className="text-2xl font-black font-kai">{opt}</span>
                       </button>
                     );
                   })}
@@ -627,7 +628,7 @@ export const ParticlesModal: React.FC<ParticlesModalProps> = ({
 
                     <button
                       onClick={handleNextQuiz}
-                      className="w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
+                      className="w-full min-h-[48px] py-3.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm shadow-md transition-all touch-manipulation active:scale-95 flex items-center justify-center gap-2"
                     >
                       <span>
                         {quizIndex + 1 < PARTICLES_QUIZ_LIST.length

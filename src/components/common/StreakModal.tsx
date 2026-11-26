@@ -78,7 +78,7 @@ export const StreakModal: React.FC<StreakModalProps> = ({ isOpen, onClose }) => 
               audioService.playClick();
               onClose();
             }}
-            className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors"
+            className="w-11 h-11 rounded-2xl flex items-center justify-center hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors touch-manipulation active:scale-90 shrink-0"
             aria-label="Đóng"
           >
             <X className="w-5 h-5" />

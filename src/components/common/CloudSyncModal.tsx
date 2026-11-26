@@ -171,7 +171,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md max-h-[90vh] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+        className="relative w-full max-w-md h-[94dvh] max-h-[94dvh] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -195,9 +195,9 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
               onClose();
             }}
             aria-label="Đóng cửa sổ Đồng bộ Đám mây"
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="w-11 h-11 rounded-2xl flex items-center justify-center bg-white/10 hover:bg-white/20 text-white transition-colors touch-manipulation active:scale-90 shrink-0"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -211,7 +211,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
               setActiveSection('mine');
               setFeedback(null);
             }}
-            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex-1 min-h-[42px] py-2 rounded-xl text-xs font-bold transition-all touch-manipulation active:scale-95 flex items-center justify-center ${
               activeSection === 'mine'
                 ? 'bg-rose-600 text-white shadow-sm shadow-rose-900/30'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
@@ -227,7 +227,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
               setActiveSection('restore');
               setFeedback(null);
             }}
-            className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex-1 min-h-[42px] py-2 rounded-xl text-xs font-bold transition-all touch-manipulation active:scale-95 flex items-center justify-center ${
               activeSection === 'restore'
                 ? 'bg-rose-600 text-white shadow-sm shadow-rose-900/30'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'

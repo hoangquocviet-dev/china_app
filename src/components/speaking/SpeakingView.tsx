@@ -409,7 +409,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             setPracticeType('word');
             resetEvalState();
           }}
-          className={`py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+          className={`min-h-[44px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all touch-manipulation active:scale-95 ${
             practiceType === 'word'
               ? 'bg-rose-600 text-white shadow-sm shadow-rose-900/30'
               : 'text-slate-400 hover:text-slate-200'
@@ -423,7 +423,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             setPracticeType('sentence');
             resetEvalState();
           }}
-          className={`py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+          className={`min-h-[44px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all touch-manipulation active:scale-95 ${
             practiceType === 'sentence'
               ? 'bg-rose-600 text-white shadow-sm shadow-rose-900/30'
               : 'text-slate-400 hover:text-slate-200'
@@ -434,20 +434,25 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       </div>
 
       {/* Item Counter & Micro Guide Button */}
-      <div className="flex items-center justify-between text-xs text-slate-400 mb-2 px-1">
-        <span className="font-medium text-slate-300">
-          {practiceType === 'word'
-            ? `Từ ${wordIndex + 1} / ${words.length || 1}`
-            : `Câu ${sentenceIndex + 1} / ${activeSentences.length}`}
-        </span>
-        <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-slate-400 mb-2 px-1">
+        <div className="flex items-center justify-between">
+          <span className="font-medium text-slate-300">
+            {practiceType === 'word'
+              ? `Từ ${wordIndex + 1} / ${words.length || 1}`
+              : `Câu ${sentenceIndex + 1} / ${activeSentences.length}`}
+          </span>
+          <span className="sm:hidden px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium text-[10px]">
+            Luyện phát âm
+          </span>
+        </div>
+        <div className="flex items-center space-x-1.5 overflow-x-auto touch-scroll-x pb-1 scrollbar-none">
           <button
             data-testid="open-dialogues-modal-btn"
             onClick={() => {
               audioService.playClick();
               setIsDialoguesModalOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Khám phá 10 tình huống hội thoại thực tế HSK 1 - 2"
           >
             <span>💬 Hội thoại HSK</span>
@@ -458,7 +463,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsPinyinChartOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Mở Bảng tra & Luyện phát âm Pinyin chuẩn: Thanh mẫu, Vận mẫu, Thanh điệu & Quy tắc biến điệu"
           >
             <span>🔤 Pinyin</span>
@@ -469,7 +474,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsChengyuOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Kho tàng thành ngữ Hán - Việt 4 chữ & điển cố"
           >
             <span>🏮 Thành ngữ</span>
@@ -480,7 +485,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsNumbersTimeOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Số đếm, đổi số, xem giờ giấc & tiền tệ"
           >
             <span>⏰ Số & Giờ</span>
@@ -491,7 +496,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsSpokenModalOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Khẩu ngữ giao tiếp & phản xạ ứng đáp"
           >
             <span>💬 Khẩu ngữ</span>
@@ -502,7 +507,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsParticlesModalOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Bí kíp 3 chữ ĐÍCH (的·得·地) & Trợ từ tiếng Trung"
           >
             <span>🔤 Trợ từ</span>
@@ -513,7 +518,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsPolyphonicOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Chữ Hán đa âm tiết (多音字) - 1 chữ nhiều cách đọc"
           >
             <span>🎭 Đa âm</span>
@@ -524,7 +529,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsConnectorsOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Kho 18 cặp liên từ nối câu HSK 1 - 3"
           >
             <span>🔗 Liên từ</span>
@@ -535,7 +540,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsReduplicationOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Bí kíp trùng điệp từ & từ láy HSK (AA, ABAB, AAB, AABB)"
           >
             <span>✨ Trùng điệp</span>
@@ -546,7 +551,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsComplementsOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Kho 4 dạng bổ ngữ trọng yếu HSK 1 - 3"
           >
             <span>🎯 Bổ ngữ</span>
@@ -557,7 +562,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsBaBeiOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Bí kíp câu chữ 把 & câu chữ 被 HSK 2 - 3"
           >
             <span>🛡️ 把·被</span>
@@ -568,7 +573,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsComparativesOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Bí kíp câu so sánh HSK (比, 没有, 一样, 最, 越来越)"
           >
             <span>⚖️ So sánh</span>
@@ -580,7 +585,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsSpatialOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Phương vị từ & Câu tồn hiện HSK 2 - 3 (方位词与存现句)"
           >
             <span>🧭 Vị trí</span>
@@ -592,17 +597,17 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               setIsQuestionsOpen(true);
             }}
-            className="text-[11px] px-2.5 py-0.5 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs whitespace-nowrap touch-manipulation"
             title="Bảo điển câu hỏi & đại từ nghi vấn HSK (疑问句)"
           >
             <span>❓ Câu hỏi</span>
           </button>
           <button
             onClick={() => setShowPermissionGuide(true)}
-            className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
+            className="min-h-[36px] text-xs px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all whitespace-nowrap touch-manipulation"
             title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
           >
-            <HelpCircle className="w-3 h-3 text-sky-400" />
+            <HelpCircle className="w-3.5 h-3.5 text-sky-400" />
             <span>Trợ giúp Micro</span>
           </button>
         </div>
@@ -665,10 +670,10 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               audioService.speakChinese(targetText, 0.9);
             }}
-            className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold flex items-center space-x-1.5 border border-slate-700 active:scale-95 transition-all"
+            className="min-h-[44px] px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 active:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center space-x-1.5 border border-slate-700 active:scale-95 transition-all touch-manipulation"
             title="Nghe phát âm chuẩn người bản xứ"
           >
-            <Volume2 className="w-3.5 h-3.5 text-rose-400" />
+            <Volume2 className="w-4 h-4 text-rose-400" />
             <span>Nghe mẫu</span>
           </button>
 
@@ -678,10 +683,10 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
               audioService.playClick();
               audioService.speakChinese(targetText, 0.65);
             }}
-            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-medium flex items-center space-x-1.5 border border-slate-700 active:scale-95 transition-all"
+            className="min-h-[44px] px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 active:bg-slate-700 text-slate-300 text-xs font-medium flex items-center space-x-1.5 border border-slate-700 active:scale-95 transition-all touch-manipulation"
             title="Nghe tốc độ chậm để nhận rõ thanh điệu"
           >
-            <Snail className="w-3.5 h-3.5 text-amber-400" />
+            <Snail className="w-4 h-4 text-amber-400" />
             <span>Nghe chậm (0.65x)</span>
           </button>
         </div>
@@ -693,7 +698,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
           type="button"
           data-testid="speaking-mic-btn"
           onClick={toggleRecording}
-          className={`relative w-20 h-20 sm:w-22 sm:h-22 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-2xl ${
+          className={`relative w-20 h-20 sm:w-22 sm:h-22 rounded-full flex items-center justify-center transition-all active:scale-90 shadow-2xl touch-manipulation select-none ${
             isRecording
               ? 'bg-rose-600 text-white shadow-rose-600/50 scale-105'
               : 'bg-gradient-to-tr from-rose-600 to-rose-500 text-white shadow-rose-900/40 hover:scale-102'
@@ -791,14 +796,14 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <div className="flex items-center justify-between text-slate-400 mt-auto pt-4">
         <button
           onClick={handlePrev}
-          className="p-2.5 rounded-xl hover:bg-slate-800 flex items-center text-xs font-medium border border-slate-800 transition-colors"
+          className="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-slate-800 active:bg-slate-750 flex items-center text-xs font-semibold border border-slate-800 transition-all touch-manipulation active:scale-95"
         >
           <ChevronLeft className="w-4 h-4 mr-1" />
           {practiceType === 'word' ? 'Từ trước' : 'Câu trước'}
         </button>
         <button
           onClick={handleNext}
-          className="p-2.5 rounded-xl hover:bg-slate-800 flex items-center text-xs font-medium border border-slate-800 transition-colors"
+          className="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-slate-800 active:bg-slate-750 flex items-center text-xs font-semibold border border-slate-800 transition-all touch-manipulation active:scale-95"
         >
           {practiceType === 'word' ? 'Từ sau' : 'Câu sau'}
           <ChevronRight className="w-4 h-4 ml-1" />

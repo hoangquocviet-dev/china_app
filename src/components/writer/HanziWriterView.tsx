@@ -340,14 +340,14 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
     <div className="flex flex-col flex-1 max-w-md w-full mx-auto p-4 pb-24">
       {/* Word & Char Selectors */}
       <div className="flex items-center justify-between mb-3 gap-2">
-        <div className="flex items-center space-x-1 flex-1 min-w-0">
+        <div className="flex items-center space-x-1.5 flex-1 min-w-0">
           <button
             onClick={handlePrevWord}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-slate-200 border border-slate-700 active:scale-95 transition-all shrink-0"
+            className="w-11 h-11 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-750 active:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 active:scale-90 transition-all shrink-0 touch-manipulation"
             title="Từ trước"
             aria-label="Từ trước"
           >
-            <ChevronLeft className="w-3.5 h-3.5" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
           <select
             value={safeWordIndex}
@@ -356,7 +356,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
               setSelectedWordIndex(Number(e.target.value));
               setCurrentCharIndex(0);
             }}
-            className="bg-slate-800 text-slate-200 text-xs rounded-xl px-2.5 py-2 border border-slate-700 focus:outline-none focus:border-rose-500 font-medium flex-1 min-w-0 w-0 truncate"
+            className="h-11 bg-slate-800 text-slate-200 text-xs sm:text-sm rounded-xl px-3 border border-slate-700 focus:outline-none focus:border-rose-500 font-semibold flex-1 min-w-0 w-0 truncate touch-manipulation"
           >
             {words.map((w, idx) => (
               <option key={w.id} value={idx}>
@@ -366,16 +366,16 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           </select>
           <button
             onClick={handleNextWord}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-slate-200 border border-slate-700 active:scale-95 transition-all shrink-0"
+            className="w-11 h-11 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-slate-750 active:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 active:scale-90 transition-all shrink-0 touch-manipulation"
             title="Từ tiếp theo"
             aria-label="Từ tiếp theo"
           >
-            <ChevronRight className="w-3.5 h-3.5" />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
         {/* Character tabs if multi-char word */}
-        <div className="flex items-center space-x-1.5 shrink-0 overflow-x-auto max-w-[48%] py-0.5">
+        <div className="flex items-center space-x-1.5 shrink-0 overflow-x-auto touch-scroll-x max-w-[48%] py-0.5">
           {characters.map((char, cIdx) => (
             <button
               key={cIdx}
@@ -383,10 +383,10 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
                 audioService.playClick();
                 setCurrentCharIndex(cIdx);
               }}
-              className={`w-8 h-8 rounded-lg font-bold text-sm transition-all ${
+              className={`w-11 h-11 rounded-xl font-bold text-base sm:text-lg font-kai transition-all touch-manipulation active:scale-90 flex items-center justify-center ${
                 currentCharIndex === cIdx
                   ? 'bg-rose-600 text-white shadow-md shadow-rose-900/30'
-                  : 'bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700'
+                  : 'bg-slate-800 text-slate-300 hover:text-white border border-slate-700 active:bg-slate-700'
               }`}
             >
               {char}
@@ -396,10 +396,10 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       </div>
 
       {/* Info card banner */}
-      <div className="p-3 rounded-2xl bg-slate-800/80 border border-slate-750 flex items-center justify-between mb-4">
+      <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-750 flex items-center justify-between mb-4">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="text-xl font-bold text-slate-100">{currentChar}</span>
+            <span className="text-2xl font-bold text-slate-100 font-kai">{currentChar}</span>
             <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 uppercase">
               {currentWord.hanviet}
             </span>
@@ -417,20 +417,20 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
         </div>
         <button
           onClick={handleSpeak}
-          className="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-all active:scale-95 border border-rose-500/20"
+          className="w-11 h-11 flex items-center justify-center rounded-2xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 active:bg-rose-500/30 transition-all active:scale-90 border border-rose-500/20 touch-manipulation shrink-0"
         >
-          <Volume2 className="w-4 h-4" />
+          <Volume2 className="w-5 h-5" />
         </button>
       </div>
 
       {/* Mode Switches */}
-      <div className="grid grid-cols-3 gap-2 p-1 bg-slate-800/80 rounded-xl border border-slate-700/80 mb-4">
+      <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-800/80 rounded-2xl border border-slate-700/80 mb-4">
         <button
           onClick={() => {
             audioService.playClick();
             setMode('animate');
           }}
-          className={`py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${
+          className={`min-h-[44px] py-2 px-2 rounded-xl text-xs font-bold transition-all touch-manipulation active:scale-95 flex items-center justify-center ${
             mode === 'animate'
               ? 'bg-rose-600 text-white shadow-sm'
               : 'text-slate-400 hover:text-slate-200'
@@ -443,7 +443,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
             audioService.playClick();
             setMode('guide');
           }}
-          className={`py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${
+          className={`min-h-[44px] py-2 px-2 rounded-xl text-xs font-bold transition-all touch-manipulation active:scale-95 flex items-center justify-center ${
             mode === 'guide'
               ? 'bg-rose-600 text-white shadow-sm'
               : 'text-slate-400 hover:text-slate-200'
@@ -456,7 +456,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
             audioService.playClick();
             setMode('quiz');
           }}
-          className={`py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${
+          className={`min-h-[44px] py-2 px-2 rounded-xl text-xs font-bold transition-all touch-manipulation active:scale-95 flex items-center justify-center ${
             mode === 'quiz'
               ? 'bg-rose-600 text-white shadow-sm'
               : 'text-slate-400 hover:text-slate-200'
@@ -598,7 +598,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
             </div>
             <button
               onClick={() => audioService.speakChinese(currentWord.hanzi)}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300"
+              className="w-11 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center touch-manipulation active:scale-90 transition-all"
               title="Nghe phát âm cả từ"
             >
               <Volume2 className="w-4 h-4" />
@@ -608,14 +608,14 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={handleReset}
-              className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 active:scale-95 transition-all"
+              className="min-h-[46px] py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 active:scale-95 transition-all touch-manipulation"
             >
               <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
               <span>Viết lại</span>
             </button>
             <button
               onClick={handleNextWord}
-              className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-semibold shadow-md shadow-rose-900/30 flex items-center justify-center gap-1.5 active:scale-95 transition-all"
+              className="min-h-[46px] py-2.5 px-3 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white text-xs font-semibold shadow-md shadow-rose-900/30 flex items-center justify-center gap-1.5 active:scale-95 transition-all touch-manipulation"
             >
               <span>Từ tiếp theo</span>
               <ChevronRight className="w-3.5 h-3.5" />
@@ -625,265 +625,261 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       )}
 
       {/* Grid Switch & Canvas Controls */}
-      <div className="flex items-center justify-between mb-3 text-xs text-slate-400 px-1 gap-1 flex-wrap">
-        <div className="flex items-center space-x-1.5">
-          <button
-            onClick={() => {
-              audioService.playClick();
-              setGridType(gridType === 'mi' ? 'tian' : 'mi');
-            }}
-            className="px-2 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-medium"
-            title="Đổi loại khung kẻ lưới"
-          >
-            {gridType === 'mi' ? 'Ô Mễ (米)' : 'Ô Điền (田)'}
-          </button>
+      <div className="flex items-center space-x-1.5 overflow-x-auto touch-scroll-x pb-1 scrollbar-none mb-3 text-xs text-slate-400 px-0.5">
+        {mode !== 'animate' && totalStrokes > 0 && (
+          <span className="min-h-[36px] px-3 py-1 rounded-xl whitespace-nowrap bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-semibold flex items-center justify-center shrink-0">
+            Nét {Math.min(currentStroke, totalStrokes)} / {totalStrokes}
+          </span>
+        )}
 
-          <button
-            data-testid="toggle-writer-mode"
-            onClick={() => {
-              audioService.playClick();
-              if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-                try {
-                  navigator.vibrate?.(12);
-                } catch {}
+        <button
+          onClick={() => {
+            audioService.playClick();
+            setGridType(gridType === 'mi' ? 'tian' : 'mi');
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-slate-800 text-slate-300 border border-slate-700 font-medium whitespace-nowrap shrink-0 touch-manipulation active:scale-95 transition-all flex items-center justify-center"
+          title="Đổi loại khung kẻ lưới"
+        >
+          {gridType === 'mi' ? 'Ô Mễ (米)' : 'Ô Điền (田)'}
+        </button>
+
+        <button
+          data-testid="toggle-writer-mode"
+          onClick={() => {
+            audioService.playClick();
+            if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+              try {
+                navigator.vibrate?.(12);
+              } catch {}
+            }
+            const nextMode = mode === 'guide' ? 'quiz' : 'guide';
+            setMode(nextMode);
+            if (writerRef.current) {
+              if (nextMode === 'guide') {
+                writerRef.current.showOutline();
+                setHintMessage('Đã bật nét mờ hướng dẫn.');
+              } else {
+                writerRef.current.hideOutline();
+                setHintMessage('Đã chuyển chế độ Thử thách: Tự nhớ nét!');
               }
-              const nextMode = mode === 'guide' ? 'quiz' : 'guide';
-              setMode(nextMode);
-              if (writerRef.current) {
-                if (nextMode === 'guide') {
-                  writerRef.current.showOutline();
-                  setHintMessage('Đã bật nét mờ hướng dẫn.');
-                } else {
-                  writerRef.current.hideOutline();
-                  setHintMessage('Đã chuyển chế độ Thử thách: Tự nhớ nét!');
-                }
-                setTimeout(() => setHintMessage(null), 2500);
-              }
-            }}
-            className={`px-2 py-1 rounded-lg border font-semibold transition-all active:scale-95 ${
-              mode === 'quiz'
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                : 'bg-slate-800 text-slate-300 border-slate-700'
-            }`}
-            title={mode === 'quiz' ? 'Đang ẩn nét mờ. Bấm để bật nét mờ' : 'Đang bật nét mờ. Bấm để thử thách tự nhớ nét'}
-          >
-            {mode === 'quiz' ? '🧠 Tự nhớ' : '✍️ Nét mờ'}
-          </button>
+              setTimeout(() => setHintMessage(null), 2500);
+            }
+          }}
+          className={`min-h-[36px] px-3 py-1 rounded-xl border font-semibold whitespace-nowrap shrink-0 transition-all touch-manipulation active:scale-95 flex items-center justify-center ${
+            mode === 'quiz'
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+              : 'bg-slate-800 text-slate-300 border-slate-700'
+          }`}
+          title={mode === 'quiz' ? 'Đang ẩn nét mờ. Bấm để bật nét mờ' : 'Đang bật nét mờ. Bấm để thử thách tự nhớ nét'}
+        >
+          {mode === 'quiz' ? '🧠 Tự nhớ' : '✍️ Nét mờ'}
+        </button>
 
-          <button
-            data-testid="open-worksheet-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsWorksheetOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Mở bảng tập viết ô Mễ khổ A4 để in hoặc xuất PDF"
-          >
-            <Printer className="w-3.5 h-3.5 text-rose-400" />
-            <span>In ô Mễ</span>
-          </button>
+        <button
+          data-testid="open-worksheet-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsWorksheetOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Mở bảng tập viết ô Mễ khổ A4 để in hoặc xuất PDF"
+        >
+          <Printer className="w-3.5 h-3.5 text-rose-400" />
+          <span>In ô Mễ</span>
+        </button>
 
-          <button
-            data-testid="open-radicals-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsRadicalsOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Khám phá bộ thủ chữ Hán và các chữ ví dụ"
-          >
-            <span>🏮 Bộ thủ</span>
-          </button>
-          <button
-            data-testid="open-stroke-rules-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsStrokeRulesOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Quy tắc bút thuận và 8 nét cơ bản trong chữ Hán"
-          >
-            <span>✍️ Bút thuận</span>
-          </button>
-          <button
-            data-testid="open-decomposition-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsDecompositionOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Chiết tự chữ Hán & bí quyết ghi nhớ liên tưởng"
-          >
-            <span>🧩 Chiết tự</span>
-          </button>
-          <button
-            data-testid="open-chengyu-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsChengyuOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Kho tàng thành ngữ Hán - Việt 4 chữ & điển cố"
-          >
-            <span>🏮 Thành ngữ</span>
-          </button>
-          <button
-            data-testid="open-numbers-time-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsNumbersTimeOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Số đếm, đổi số, xem giờ giấc & tiền tệ"
-          >
-            <span>⏰ Số & Giờ</span>
-          </button>
-          <button
-            data-testid="open-spoken-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsSpokenModalOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Khẩu ngữ giao tiếp & phản xạ ứng đáp"
-          >
-            <span>💬 Khẩu ngữ</span>
-          </button>
-          <button
-            data-testid="open-particles-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsParticlesModalOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Bí kíp 3 chữ ĐÍCH (的·得·地) & Trợ từ tiếng Trung"
-          >
-            <span>🔤 Trợ từ</span>
-          </button>
-          <button
-            data-testid="open-polyphonic-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsPolyphonicOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Chữ Hán đa âm tiết (多音字) - 1 chữ nhiều cách đọc"
-          >
-            <span>🎭 Đa âm</span>
-          </button>
-          <button
-            data-testid="open-connectors-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsConnectorsOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Kho 18 cặp liên từ nối câu HSK 1 - 3"
-          >
-            <span>🔗 Liên từ</span>
-          </button>
-          <button
-            data-testid="open-reduplication-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsReduplicationOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Bí kíp trùng điệp từ & từ láy HSK (AA, ABAB, AAB, AABB)"
-          >
-            <span>✨ Trùng điệp</span>
-          </button>
-          <button
-            data-testid="open-complements-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsComplementsOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Kho 4 dạng bổ ngữ trọng yếu HSK 1 - 3"
-          >
-            <span>🎯 Bổ ngữ</span>
-          </button>
-          <button
-            data-testid="open-babei-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsBaBeiOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Bí kíp câu chữ 把 & câu chữ 被 HSK 2 - 3"
-          >
-            <span>🛡️ 把·被</span>
-          </button>
-          <button
-            data-testid="open-comparatives-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsComparativesOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Bí kíp câu so sánh HSK (比, 没有, 一样, 最, 越来越)"
-          >
-            <span>⚖️ So sánh</span>
-          </button>
+        <button
+          data-testid="open-radicals-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsRadicalsOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Khám phá bộ thủ chữ Hán và các chữ ví dụ"
+        >
+          <span>🏮 Bộ thủ</span>
+        </button>
+        <button
+          data-testid="open-stroke-rules-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsStrokeRulesOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Quy tắc bút thuận và 8 nét cơ bản trong chữ Hán"
+        >
+          <span>✍️ Bút thuận</span>
+        </button>
+        <button
+          data-testid="open-decomposition-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsDecompositionOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Chiết tự chữ Hán & bí quyết ghi nhớ liên tưởng"
+        >
+          <span>🧩 Chiết tự</span>
+        </button>
+        <button
+          data-testid="open-chengyu-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsChengyuOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Kho tàng thành ngữ Hán - Việt 4 chữ & điển cố"
+        >
+          <span>🏮 Thành ngữ</span>
+        </button>
+        <button
+          data-testid="open-numbers-time-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsNumbersTimeOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Số đếm, đổi số, xem giờ giấc & tiền tệ"
+        >
+          <span>⏰ Số & Giờ</span>
+        </button>
+        <button
+          data-testid="open-spoken-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsSpokenModalOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Khẩu ngữ giao tiếp & phản xạ ứng đáp"
+        >
+          <span>💬 Khẩu ngữ</span>
+        </button>
+        <button
+          data-testid="open-particles-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsParticlesModalOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Bí kíp 3 chữ ĐÍCH (的·得·地) & Trợ từ tiếng Trung"
+        >
+          <span>🔤 Trợ từ</span>
+        </button>
+        <button
+          data-testid="open-polyphonic-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsPolyphonicOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Chữ Hán đa âm tiết (多音字) - 1 chữ nhiều cách đọc"
+        >
+          <span>🎭 Đa âm</span>
+        </button>
+        <button
+          data-testid="open-connectors-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsConnectorsOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Kho 18 cặp liên từ nối câu HSK 1 - 3"
+        >
+          <span>🔗 Liên từ</span>
+        </button>
+        <button
+          data-testid="open-reduplication-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsReduplicationOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Bí kíp trùng điệp từ & từ láy HSK (AA, ABAB, AAB, AABB)"
+        >
+          <span>✨ Trùng điệp</span>
+        </button>
+        <button
+          data-testid="open-complements-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsComplementsOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Kho 4 dạng bổ ngữ trọng yếu HSK 1 - 3"
+        >
+          <span>🎯 Bổ ngữ</span>
+        </button>
+        <button
+          data-testid="open-babei-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsBaBeiOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Bí kíp câu chữ 把 & câu chữ 被 HSK 2 - 3"
+        >
+          <span>🛡️ 把·被</span>
+        </button>
+        <button
+          data-testid="open-comparatives-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsComparativesOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Bí kíp câu so sánh HSK (比, 没有, 一样, 最, 越来越)"
+        >
+          <span>⚖️ So sánh</span>
+        </button>
 
-          <button
-            data-testid="open-spatial-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsSpatialOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Phương vị từ & Câu tồn hiện HSK 2 - 3 (方位词与存现句)"
-          >
-            <span>🧭 Vị trí</span>
-          </button>
+        <button
+          data-testid="open-spatial-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsSpatialOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Phương vị từ & Câu tồn hiện HSK 2 - 3 (方位词与存现句)"
+        >
+          <span>🧭 Vị trí</span>
+        </button>
 
-          <button
-            data-testid="open-questions-modal-btn"
-            onClick={() => {
-              audioService.playClick();
-              setIsQuestionsOpen(true);
-            }}
-            className="px-2 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
-            title="Bảo điển câu hỏi & đại từ nghi vấn HSK (疑问句)"
-          >
-            <span>❓ Câu hỏi</span>
-          </button>
-        </div>
-
-        <div className="flex items-center space-x-1.5">
-          {mode !== 'animate' && totalStrokes > 0 && (
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">
-              Nét {Math.min(currentStroke, totalStrokes)} / {totalStrokes}
-            </span>
-          )}
-        </div>
+        <button
+          data-testid="open-questions-modal-btn"
+          onClick={() => {
+            audioService.playClick();
+            setIsQuestionsOpen(true);
+          }}
+          className="min-h-[36px] px-3 py-1 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold whitespace-nowrap shrink-0 flex items-center gap-1 transition-all touch-manipulation active:scale-95"
+          title="Bảo điển câu hỏi & đại từ nghi vấn HSK (疑问句)"
+        >
+          <span>❓ Câu hỏi</span>
+        </button>
       </div>
 
       {/* Action Buttons */}
       <div className="grid grid-cols-3 gap-2">
         <button
           onClick={handleAnimate}
-          className="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 active:scale-95 transition-all text-xs font-medium"
+          className="flex items-center justify-center space-x-1.5 min-h-[48px] py-3 px-3 rounded-2xl bg-slate-800 hover:bg-slate-750 active:bg-slate-700 text-slate-200 border border-slate-700 active:scale-95 transition-all text-xs font-bold shadow-md touch-manipulation"
         >
-          <Play className="w-3.5 h-3.5 text-rose-400" />
+          <Play className="w-4 h-4 text-rose-400" />
           <span>Vẽ lại mẫu</span>
         </button>
 
         <button
           onClick={handleReset}
-          className="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 active:scale-95 transition-all text-xs font-medium"
+          className="flex items-center justify-center space-x-1.5 min-h-[48px] py-3 px-3 rounded-2xl bg-slate-800 hover:bg-slate-750 active:bg-slate-700 text-slate-200 border border-slate-700 active:scale-95 transition-all text-xs font-bold shadow-md touch-manipulation"
         >
-          <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
+          <RotateCcw className="w-4 h-4 text-amber-400" />
           <span>Xóa viết lại</span>
         </button>
 
         <button
           onClick={handleHint}
-          className="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700 active:scale-95 transition-all text-xs font-medium"
+          className="flex items-center justify-center space-x-1.5 min-h-[48px] py-3 px-3 rounded-2xl bg-slate-800 hover:bg-slate-750 active:bg-slate-700 text-slate-200 border border-slate-700 active:scale-95 transition-all text-xs font-bold shadow-md touch-manipulation"
         >
-          <HelpCircle className="w-3.5 h-3.5 text-sky-400" />
+          <HelpCircle className="w-4 h-4 text-sky-400" />
           <span>Gợi ý nét</span>
         </button>
       </div>

@@ -65,12 +65,12 @@ export const RadicalsModal: React.FC<RadicalsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-750 rounded-3xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+      <div className="bg-slate-900 border border-slate-750 rounded-3xl w-full max-w-lg h-[94dvh] max-h-[94dvh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold text-xs">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold text-sm">
               🏮
             </div>
             <div>
@@ -85,22 +85,22 @@ export const RadicalsModal: React.FC<RadicalsModalProps> = ({
               audioService.playClick();
               onClose();
             }}
-            className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all"
+            className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-2xl transition-all touch-manipulation active:scale-90"
             aria-label="Đóng"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Category Filter Chips */}
         <div className="p-3 bg-slate-850/60 border-b border-slate-800 shrink-0">
-          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs select-none scrollbar-none">
+          <div className="flex items-center space-x-1.5 overflow-x-auto touch-scroll-x pb-1 text-xs select-none scrollbar-none">
             <button
               onClick={() => {
                 audioService.playClick();
                 setSelectedCategory('all');
               }}
-              className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all border ${
+              className={`min-h-[38px] px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all border touch-manipulation active:scale-95 ${
                 selectedCategory === 'all'
                   ? 'bg-amber-600 text-white border-amber-500 shadow-sm'
                   : 'bg-slate-900/80 text-slate-400 hover:text-slate-200 border-slate-750'
@@ -117,7 +117,7 @@ export const RadicalsModal: React.FC<RadicalsModalProps> = ({
                     audioService.playClick();
                     setSelectedCategory(catKey);
                   }}
-                  className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all border ${
+                  className={`min-h-[38px] px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all border touch-manipulation active:scale-95 ${
                     selectedCategory === catKey
                       ? 'bg-amber-600 text-white border-amber-500 shadow-sm'
                       : 'bg-slate-900/80 text-slate-400 hover:text-slate-200 border-slate-750'
@@ -192,7 +192,7 @@ export const RadicalsModal: React.FC<RadicalsModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-1 text-slate-500 shrink-0">
+                  <div className="flex items-center space-x-1.5 text-slate-500 shrink-0">
                     <button
                       type="button"
                       onClick={(e) => {
@@ -200,12 +200,12 @@ export const RadicalsModal: React.FC<RadicalsModalProps> = ({
                         audioService.playClick();
                         audioService.speakChinese(item.originalForm || item.radical);
                       }}
-                      className="p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 transition-all active:scale-95"
+                      className="w-10 h-10 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 transition-all touch-manipulation active:scale-90 flex items-center justify-center"
                       title="Nghe phát âm bộ thủ"
                     >
                       <Volume2 className="w-4 h-4" />
                     </button>
-                    <div className="p-1">
+                    <div className="w-8 h-8 flex items-center justify-center">
                       {isExpanded ? (
                         <ChevronUp className="w-4 h-4 text-slate-400" />
                       ) : (
@@ -232,11 +232,11 @@ export const RadicalsModal: React.FC<RadicalsModalProps> = ({
                         {item.commonExamples.map((ex, exIdx) => (
                           <div
                             key={exIdx}
-                            className="p-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-1.5"
+                            className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-1.5"
                           >
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center space-x-1.5">
-                                <span className="font-bold text-sm text-slate-100">
+                                <span className="font-bold text-base text-slate-100 font-kai">
                                   {ex.hanzi}
                                 </span>
                                 <span className="text-rose-400 text-[10px] pinyin-text font-medium">
@@ -256,10 +256,10 @@ export const RadicalsModal: React.FC<RadicalsModalProps> = ({
                                   audioService.playClick();
                                   audioService.speakChinese(ex.hanzi);
                                 }}
-                                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-slate-300 transition-colors"
+                                className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 transition-colors touch-manipulation active:scale-90 flex items-center justify-center"
                                 title="Nghe phát âm"
                               >
-                                <Volume2 className="w-3.5 h-3.5" />
+                                <Volume2 className="w-4 h-4" />
                               </button>
                               {onSelectCharacter && (
                                 <button
@@ -270,10 +270,10 @@ export const RadicalsModal: React.FC<RadicalsModalProps> = ({
                                     onSelectCharacter(ex.hanzi);
                                     onClose();
                                   }}
-                                  className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-colors"
+                                  className="w-9 h-9 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-colors touch-manipulation active:scale-90 flex items-center justify-center"
                                   title="Luyện viết chữ này"
                                 >
-                                  <PenTool className="w-3.5 h-3.5" />
+                                  <PenTool className="w-4 h-4" />
                                 </button>
                               )}
                             </div>

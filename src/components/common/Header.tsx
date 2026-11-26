@@ -113,11 +113,11 @@ export const Header: React.FC<HeaderProps> = ({
                 onOpenStreakModal();
               }}
               data-testid="header-streak-btn"
-              className="flex items-center space-x-0.5 px-1.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/25 text-[11px] font-bold transition-all active:scale-95 shadow-sm"
+              className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/25 text-xs font-bold transition-all active:scale-95 shadow-sm touch-manipulation select-none"
               title={`Chuỗi học: ${streak} ngày. Bấm để xem Lịch học & Khiên bảo vệ chuỗi!`}
               aria-label="Chuỗi ngày học"
             >
-              <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
+              <Flame className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
               <span>{streak}</span>
             </button>
           )}
@@ -125,11 +125,11 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={handleToggleSpeechRate}
             data-testid="header-tts-speed-btn"
-            className="flex items-center space-x-0.5 px-1.5 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-sky-400 border border-sky-500/25 text-[11px] font-semibold transition-all active:scale-95 shadow-sm"
+            className="flex items-center space-x-1 min-h-[36px] px-2.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-sky-400 border border-sky-500/25 text-xs font-semibold transition-all active:scale-95 shadow-sm touch-manipulation select-none"
             title={`Tốc độ phát âm: ${speechRateDisplay}. Bấm để chuyển: 0.75x (Chậm) -> 1.0x (Chuẩn) -> 1.25x (Nhanh)`}
             aria-label="Tốc độ phát âm tiếng Trung"
           >
-            <Gauge className="w-3 h-3 text-sky-400 shrink-0" />
+            <Gauge className="w-3.5 h-3.5 text-sky-400 shrink-0" />
             <span>{speechRateDisplay}</span>
           </button>
 
@@ -140,11 +140,11 @@ export const Header: React.FC<HeaderProps> = ({
                 onOpenCustomModal();
               }}
               data-testid="header-custom-lesson-btn"
-              className="flex items-center space-x-1 p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-semibold shadow-sm transition-all active:scale-95"
+              className="flex items-center space-x-1.5 min-h-[36px] min-w-[36px] p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-semibold shadow-sm transition-all active:scale-95 touch-manipulation select-none"
               title="Tùy chỉnh & thêm bài học: Flashcard, Luyện viết, Ghép câu, Luyện nói"
               aria-label="Custom bài học"
             >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+              <SlidersHorizontal className="w-4 h-4 text-rose-400 shrink-0" />
               <span className="hidden sm:inline">Custom</span>
             </button>
           )}
@@ -156,7 +156,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onOpenCloudSync();
               }}
               data-testid="header-cloud-sync-btn"
-              className="relative p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors active:scale-95"
+              className="relative min-h-[36px] min-w-[36px] p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors active:scale-95 touch-manipulation select-none flex items-center justify-center"
               title="Đồng bộ Đám mây & Mã QR chuyển máy"
               aria-label="Đồng bộ Đám mây"
             >
@@ -172,7 +172,7 @@ export const Header: React.FC<HeaderProps> = ({
                 }`}
               />
               <span
-                className={`absolute top-1 right-1 w-1.5 h-1.5 rounded-full ring-1 ring-slate-900 ${
+                className={`absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full ring-1 ring-slate-900 ${
                   syncStatus === 'synced'
                     ? 'bg-emerald-400'
                     : syncStatus === 'syncing'
@@ -187,12 +187,12 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={handleReloadClick}
-            className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors active:scale-95"
+            className="min-h-[36px] min-w-[36px] p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors active:scale-95 touch-manipulation select-none flex items-center justify-center"
             title="Tải lại ứng dụng (Reload)"
             aria-label="Reload App"
           >
             <RotateCw
-              className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 hover:text-slate-200 transition-transform duration-500 ${
+              className={`w-4 h-4 text-slate-400 hover:text-slate-200 transition-transform duration-500 ${
                 isRotating ? 'animate-spin text-rose-400' : ''
               }`}
             />
@@ -203,14 +203,14 @@ export const Header: React.FC<HeaderProps> = ({
               audioService.playClick();
               onToggleSound();
             }}
-            className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors"
+            className="min-h-[36px] min-w-[36px] p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors active:scale-95 touch-manipulation select-none flex items-center justify-center"
             title={isSoundEnabled ? 'Tắt âm thanh' : 'Bật âm thanh'}
             aria-label="Toggle Sound"
           >
             {isSoundEnabled ? (
-              <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400" />
+              <Volume2 className="w-4 h-4 text-rose-400" />
             ) : (
-              <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500" />
+              <VolumeX className="w-4 h-4 text-slate-500" />
             )}
           </button>
         </div>

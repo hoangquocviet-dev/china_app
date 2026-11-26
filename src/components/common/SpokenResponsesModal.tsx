@@ -178,27 +178,27 @@ export const SpokenResponsesModal: React.FC<SpokenResponsesModalProps> = ({
   const currentQuizItem = SPOKEN_QUIZ_LIST[quizIndex];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 md:p-6 animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4 md:p-6 animate-fade-in">
       <div
-        className="bg-white dark:bg-slate-900 w-full max-w-4xl h-[92vh] max-h-[850px] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800"
+        className="bg-white dark:bg-slate-900 w-full max-w-4xl h-[94dvh] max-h-[94dvh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800"
         data-testid="spoken-responses-modal"
       >
         {/* Header */}
-        <div className="px-6 py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white flex items-center justify-between shrink-0 shadow-md">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-white/20 rounded-2xl backdrop-blur-sm shadow-inner">
-              <MessageSquare className="w-6 h-6 text-white" />
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white flex items-center justify-between shrink-0 shadow-md">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="p-2 sm:p-2.5 bg-white/20 rounded-2xl backdrop-blur-sm shadow-inner shrink-0">
+              <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold tracking-tight">
+                <h2 className="text-base sm:text-xl font-bold tracking-tight">
                   Khẩu Ngữ & Phản Xạ Ứng Đáp
                 </h2>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/20 text-white backdrop-blur-sm">
+                <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-white/20 text-white backdrop-blur-sm">
                   实用口语
                 </span>
               </div>
-              <p className="text-xs text-emerald-100 mt-0.5">
+              <p className="text-[11px] sm:text-xs text-emerald-100 mt-0.5 line-clamp-1">
                 Cặp câu giao tiếp thực tế, phản xạ hỏi - đáp tức thì & thanh toán di động
               </p>
             </div>
@@ -206,21 +206,22 @@ export const SpokenResponsesModal: React.FC<SpokenResponsesModalProps> = ({
           <button
             onClick={onClose}
             data-testid="close-spoken-modal-btn"
-            className="p-2 rounded-full hover:bg-white/20 text-white/90 hover:text-white transition-colors"
+            className="w-11 h-11 rounded-2xl flex items-center justify-center hover:bg-white/20 text-white/90 hover:text-white transition-colors touch-manipulation active:scale-90 shrink-0"
+            aria-label="Đóng"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 px-6 pt-3 pb-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 shrink-0">
+        <div className="flex items-center gap-2 px-3 sm:px-6 pt-2.5 pb-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 shrink-0 overflow-x-auto touch-scroll-x scrollbar-none">
           <button
             onClick={() => {
               setActiveTab('qa');
               setIsAutoPlaying(false);
             }}
             data-testid="spoken-tab-qa"
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 min-h-[40px] px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all touch-manipulation active:scale-95 ${
               activeTab === 'qa'
                 ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
@@ -233,7 +234,7 @@ export const SpokenResponsesModal: React.FC<SpokenResponsesModalProps> = ({
           <button
             onClick={() => setActiveTab('auto_player')}
             data-testid="spoken-tab-player"
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 min-h-[40px] px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all touch-manipulation active:scale-95 ${
               activeTab === 'auto_player'
                 ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'
@@ -642,7 +643,7 @@ export const SpokenResponsesModal: React.FC<SpokenResponsesModalProps> = ({
                     const isCorrect = idx === currentQuizItem.correctIndex;
 
                     let btnClass =
-                      'w-full p-4 rounded-2xl border text-left text-sm font-medium transition-all flex items-center justify-between ';
+                      'w-full min-h-[54px] p-4 rounded-2xl border text-left text-sm font-medium transition-all flex items-center justify-between touch-manipulation active:scale-95 ';
 
                     if (!isQuizChecked) {
                       btnClass +=
@@ -669,11 +670,12 @@ export const SpokenResponsesModal: React.FC<SpokenResponsesModalProps> = ({
                           <span className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-xs font-bold flex items-center justify-center shrink-0">
                             {String.fromCharCode(65 + idx)}
                           </span>
-                          <span className="text-base font-bold">{opt}</span>
+                          <span className="text-base font-bold font-kai">{opt}</span>
                         </div>
                         <button
                           onClick={(e) => handleSpeak(e, opt)}
-                          className="p-1 rounded-lg text-slate-400 hover:text-emerald-600"
+                          className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:bg-emerald-500/10 transition-colors touch-manipulation active:scale-90"
+                          title="Nghe câu trả lời"
                         >
                           <Volume2 className="w-4 h-4" />
                         </button>
@@ -691,7 +693,7 @@ export const SpokenResponsesModal: React.FC<SpokenResponsesModalProps> = ({
 
                     <button
                       onClick={handleNextQuiz}
-                      className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
+                      className="w-full min-h-[48px] py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition-all touch-manipulation active:scale-95 flex items-center justify-center gap-2"
                     >
                       <span>
                         {quizIndex + 1 < SPOKEN_QUIZ_LIST.length ? 'Câu tiếp theo' : 'Xem kết quả'}

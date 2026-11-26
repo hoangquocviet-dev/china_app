@@ -82,13 +82,13 @@ export const NumbersTimeModal: React.FC<NumbersTimeModalProps> = ({
     <div
       role="dialog"
       data-testid="numbers-time-modal"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn"
     >
-      <div className="bg-slate-900 border border-slate-750 rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="bg-slate-900 border border-slate-750 rounded-3xl w-full max-w-2xl h-[94dvh] max-h-[94dvh] flex flex-col shadow-2xl overflow-hidden">
         {/* Modal Header */}
         <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center font-bold text-xs">
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center font-bold text-sm">
               ⏰
             </div>
             <div>
@@ -102,23 +102,23 @@ export const NumbersTimeModal: React.FC<NumbersTimeModalProps> = ({
               audioService.playClick();
               onClose();
             }}
-            className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-all"
+            className="w-11 h-11 flex items-center justify-center text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-2xl transition-all touch-manipulation active:scale-90"
             aria-label="Đóng"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab switcher: 4 tabs */}
-        <div className="px-3 py-2 bg-slate-850/80 border-b border-slate-800 overflow-x-auto scrollbar-none flex items-center justify-between gap-2 shrink-0">
-          <div className="flex items-center space-x-1.5 bg-slate-900 p-1 rounded-xl border border-slate-750 text-xs font-semibold shrink-0">
+        <div className="px-3 py-2 bg-slate-850/80 border-b border-slate-800 overflow-x-auto touch-scroll-x pb-0.5 scrollbar-none flex items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center space-x-1.5 bg-slate-900 p-1 rounded-2xl border border-slate-750 text-xs font-semibold shrink-0">
             <button
               data-testid="tab-numbers-converter"
               onClick={() => {
                 audioService.playClick();
                 setActiveTab('numbers');
               }}
-              className={`px-3 py-1 rounded-lg transition-all flex items-center space-x-1.5 ${
+              className={`min-h-[40px] px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 touch-manipulation active:scale-95 whitespace-nowrap ${
                 activeTab === 'numbers'
                   ? 'bg-cyan-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-slate-200'
@@ -134,7 +134,7 @@ export const NumbersTimeModal: React.FC<NumbersTimeModalProps> = ({
                 audioService.playClick();
                 setActiveTab('clock');
               }}
-              className={`px-3 py-1 rounded-lg transition-all flex items-center space-x-1.5 ${
+              className={`min-h-[40px] px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 touch-manipulation active:scale-95 whitespace-nowrap ${
                 activeTab === 'clock'
                   ? 'bg-cyan-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-slate-200'
@@ -150,7 +150,7 @@ export const NumbersTimeModal: React.FC<NumbersTimeModalProps> = ({
                 audioService.playClick();
                 setActiveTab('dates_currency');
               }}
-              className={`px-3 py-1 rounded-lg transition-all flex items-center space-x-1.5 ${
+              className={`min-h-[40px] px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 touch-manipulation active:scale-95 whitespace-nowrap ${
                 activeTab === 'dates_currency'
                   ? 'bg-cyan-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-slate-200'
@@ -166,7 +166,7 @@ export const NumbersTimeModal: React.FC<NumbersTimeModalProps> = ({
                 audioService.playClick();
                 setActiveTab('quiz');
               }}
-              className={`px-3 py-1 rounded-lg transition-all flex items-center space-x-1.5 ${
+              className={`min-h-[40px] px-3.5 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 touch-manipulation active:scale-95 whitespace-nowrap ${
                 activeTab === 'quiz'
                   ? 'bg-cyan-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-slate-200'
