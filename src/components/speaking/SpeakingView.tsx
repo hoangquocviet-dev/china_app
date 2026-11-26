@@ -15,6 +15,7 @@ import { PolyphonicModal } from '../common/PolyphonicModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
 import { ReduplicationModal } from '../common/ReduplicationModal';
 import { ComplementsModal } from '../common/ComplementsModal';
+import { BaBeiModal } from '../common/BaBeiModal';
 
 interface SpeakingViewProps {
   words: ChineseWord[];
@@ -66,6 +67,7 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
   const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
   const [isComplementsOpen, setIsComplementsOpen] = useState(false);
+  const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -544,6 +546,17 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
             <span>🎯 Bổ ngữ</span>
           </button>
           <button
+            data-testid="open-babei-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsBaBeiOpen(true);
+            }}
+            className="text-[11px] px-2.5 py-0.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1 active:scale-95 transition-all font-semibold shadow-xs"
+            title="Bí kíp câu chữ 把 & câu chữ 被 HSK 2 - 3"
+          >
+            <span>🛡️ 把·被</span>
+          </button>
+          <button
             onClick={() => setShowPermissionGuide(true)}
             className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-750 text-sky-300 border border-slate-700 flex items-center gap-1 active:scale-95 transition-all"
             title="Xem hướng dẫn khắc phục lỗi Micro và lớp phủ màn hình"
@@ -878,6 +891,11 @@ export const SpeakingView: React.FC<SpeakingViewProps> = ({ words, sentences = I
       <ComplementsModal
         isOpen={isComplementsOpen}
         onClose={() => setIsComplementsOpen(false)}
+      />
+      {/* BA & BEI Sentences Modal */}
+      <BaBeiModal
+        isOpen={isBaBeiOpen}
+        onClose={() => setIsBaBeiOpen(false)}
       />
     </div>
   );

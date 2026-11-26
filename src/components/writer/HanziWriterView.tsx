@@ -18,6 +18,7 @@ import { PolyphonicModal } from '../common/PolyphonicModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
 import { ReduplicationModal } from '../common/ReduplicationModal';
 import { ComplementsModal } from '../common/ComplementsModal';
+import { BaBeiModal } from '../common/BaBeiModal';
 
 interface HanziWriterViewProps {
   words: ChineseWord[];
@@ -61,6 +62,7 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
   const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
   const [isComplementsOpen, setIsComplementsOpen] = useState(false);
+  const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
 
   const handleSelectCharacterFromRadical = (hanzi: string) => {
     const idx = words.findIndex((w) => w.hanzi.includes(hanzi));
@@ -796,6 +798,17 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
           >
             <span>🎯 Bổ ngữ</span>
           </button>
+          <button
+            data-testid="open-babei-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsBaBeiOpen(true);
+            }}
+            className="px-2 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold flex items-center gap-1 transition-all active:scale-95"
+            title="Bí kíp câu chữ 把 & câu chữ 被 HSK 2 - 3"
+          >
+            <span>🛡️ 把·被</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-1.5">
@@ -914,6 +927,12 @@ export const HanziWriterView: React.FC<HanziWriterViewProps> = ({
       <ComplementsModal
         isOpen={isComplementsOpen}
         onClose={() => setIsComplementsOpen(false)}
+        onSelectCharacter={handleSelectCharacterFromRadical}
+      />
+      {/* BA & BEI Sentences Modal */}
+      <BaBeiModal
+        isOpen={isBaBeiOpen}
+        onClose={() => setIsBaBeiOpen(false)}
         onSelectCharacter={handleSelectCharacterFromRadical}
       />
     </div>

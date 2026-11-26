@@ -10,6 +10,7 @@ import { GrammarHandbookModal } from '../common/GrammarHandbookModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
 import { ReduplicationModal } from '../common/ReduplicationModal';
 import { ComplementsModal } from '../common/ComplementsModal';
+import { BaBeiModal } from '../common/BaBeiModal';
 
 interface AssemblyViewProps {
   sentences?: SentenceExercise[];
@@ -39,6 +40,7 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
   const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
   const [isComplementsOpen, setIsComplementsOpen] = useState(false);
+  const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
 
   useEffect(() => {
     setExerciseIndex(0);
@@ -203,6 +205,18 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
             title="Kho 4 dạng bổ ngữ trọng yếu HSK 1 - 3 (Kết quả, Xu hướng, Khả năng, Trạng thái)"
           >
             <span>🎯 Bổ ngữ</span>
+          </button>
+          <button
+            type="button"
+            data-testid="assembly-babei-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsBaBeiOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-300 hover:text-rose-200 border border-rose-500/20 font-medium transition-colors"
+            title="Bí kíp câu chữ 把 & câu chữ 被 HSK 2 - 3 (Câu xử lý & Bị động)"
+          >
+            <span>🛡️ 把·被</span>
           </button>
           <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 font-medium">
             Sắp xếp câu
@@ -438,6 +452,12 @@ export const AssemblyView: React.FC<AssemblyViewProps> = ({ sentences = INITIAL_
       <ComplementsModal
         isOpen={isComplementsOpen}
         onClose={() => setIsComplementsOpen(false)}
+      />
+
+      {/* Chinese BA & BEI Sentences Modal */}
+      <BaBeiModal
+        isOpen={isBaBeiOpen}
+        onClose={() => setIsBaBeiOpen(false)}
       />
     </div>
   );

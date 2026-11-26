@@ -35,6 +35,7 @@ import { PolyphonicModal } from '../common/PolyphonicModal';
 import { ConnectorsModal } from '../common/ConnectorsModal';
 import { ReduplicationModal } from '../common/ReduplicationModal';
 import { ComplementsModal } from '../common/ComplementsModal';
+import { BaBeiModal } from '../common/BaBeiModal';
 
 interface WordListViewProps {
   words: ChineseWord[];
@@ -79,6 +80,7 @@ export const WordListView: React.FC<WordListViewProps> = ({
   const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
   const [isReduplicationOpen, setIsReduplicationOpen] = useState(false);
   const [isComplementsOpen, setIsComplementsOpen] = useState(false);
+  const [isBaBeiOpen, setIsBaBeiOpen] = useState(false);
   const [importExportTab, setImportExportTab] = useState<'export' | 'import'>('export');
   const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
@@ -421,6 +423,18 @@ export const WordListView: React.FC<WordListViewProps> = ({
           </button>
 
           <button
+            data-testid="open-babei-modal-btn"
+            onClick={() => {
+              audioService.playClick();
+              setIsBaBeiOpen(true);
+            }}
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-750 text-rose-300 border border-rose-500/20 hover:border-rose-500/40 transition-colors shadow-xs"
+            title="Bí kíp câu chữ 把 & câu chữ 被 HSK 2 - 3"
+          >
+            <span>🛡️ 把·被</span>
+          </button>
+
+          <button
             data-testid="open-export-modal-btn"
             onClick={() => {
               audioService.playClick();
@@ -724,6 +738,16 @@ export const WordListView: React.FC<WordListViewProps> = ({
       <ComplementsModal
         isOpen={isComplementsOpen}
         onClose={() => setIsComplementsOpen(false)}
+        onSelectCharacter={onSelectWordForWriting ? (char) => {
+          const match = words.find((w) => w.hanzi.includes(char));
+          if (match) onSelectWordForWriting(match);
+        } : undefined}
+      />
+
+      {/* BA & BEI Sentences Modal */}
+      <BaBeiModal
+        isOpen={isBaBeiOpen}
+        onClose={() => setIsBaBeiOpen(false)}
         onSelectCharacter={onSelectWordForWriting ? (char) => {
           const match = words.find((w) => w.hanzi.includes(char));
           if (match) onSelectWordForWriting(match);
