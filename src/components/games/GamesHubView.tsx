@@ -305,8 +305,8 @@ export const GamesHubView: React.FC<GamesHubViewProps> = ({
             🔤
           </div>
           <div className="min-w-0">
-            <div className="font-bold text-xs text-slate-100 truncate">Bảng Pinyin Chuẩn</div>
-            <div className="text-[10px] text-slate-400 truncate">Thanh mẫu, vận mẫu & thanh điệu</div>
+            <div className="font-bold text-xs text-slate-100 truncate">Bảng Pinyin & Biến Điệu</div>
+            <div className="text-[10px] text-slate-400 truncate">Thanh mẫu, vận mẫu & quy tắc biến điệu</div>
           </div>
         </button>
 

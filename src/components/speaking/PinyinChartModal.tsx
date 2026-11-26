@@ -12,6 +12,7 @@ import {
   PINYIN_INITIALS,
   PINYIN_FINALS,
   PINYIN_TONES,
+  PINYIN_TONE_SANDHI,
   type PinyinItem,
   type ToneItem,
 } from '../../data/pinyinData';
@@ -23,7 +24,7 @@ interface PinyinChartModalProps {
 }
 
 export const PinyinChartModal: React.FC<PinyinChartModalProps> = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState<'initials' | 'finals' | 'tones'>('initials');
+  const [activeTab, setActiveTab] = useState<'initials' | 'finals' | 'tones' | 'sandhi'>('initials');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedSymbol, setExpandedSymbol] = useState<string | null>(null);
 
@@ -60,6 +61,24 @@ export const PinyinChartModal: React.FC<PinyinChartModalProps> = ({ isOpen, onCl
     );
   }, [searchQuery]);
 
+  const filteredSandhi = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return PINYIN_TONE_SANDHI;
+    return PINYIN_TONE_SANDHI.filter(
+      (rule) =>
+        rule.title.toLowerCase().includes(q) ||
+        rule.formula.toLowerCase().includes(q) ||
+        rule.category.toLowerCase().includes(q) ||
+        rule.description.toLowerCase().includes(q) ||
+        rule.examples.some(
+          (ex) =>
+            ex.hanzi.includes(q) ||
+            ex.spokenPinyin.toLowerCase().includes(q) ||
+            ex.meaning.toLowerCase().includes(q)
+        )
+    );
+  }, [searchQuery]);
+
   if (!isOpen) return null;
 
   const handlePlayPinyin = (e: React.MouseEvent, item: PinyinItem) => {
@@ -85,7 +104,7 @@ export const PinyinChartModal: React.FC<PinyinChartModalProps> = ({ isOpen, onCl
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-100">Bảng Phiên Âm Pinyin Chuẩn</h3>
-              <p className="text-[11px] text-slate-400">Thanh mẫu, Vận mẫu & 4 Thanh điệu tiếng Trung</p>
+              <p className="text-[11px] text-slate-400">Thanh mẫu, Vận mẫu, Thanh điệu & Quy tắc biến điệu</p>
             </div>
           </div>
           <button
@@ -102,7 +121,7 @@ export const PinyinChartModal: React.FC<PinyinChartModalProps> = ({ isOpen, onCl
 
         {/* Navigation Tabs */}
         <div className="p-3 bg-slate-850/60 border-b border-slate-800 shrink-0">
-          <div className="grid grid-cols-3 gap-1.5 bg-slate-900 p-1 rounded-2xl border border-slate-750 text-xs font-bold">
+          <div className="grid grid-cols-4 gap-1 sm:gap-1.5 bg-slate-900 p-1 rounded-2xl border border-slate-750 text-xs font-bold">
             <button
               data-testid="pinyin-tab-initials"
               onClick={() => {
@@ -116,7 +135,7 @@ export const PinyinChartModal: React.FC<PinyinChartModalProps> = ({ isOpen, onCl
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <span>Thanh mẫu ({PINYIN_INITIALS.length})</span>
+              <span>Thanh mẫu</span>
             </button>
             <button
               data-testid="pinyin-tab-finals"
@@ -131,7 +150,7 @@ export const PinyinChartModal: React.FC<PinyinChartModalProps> = ({ isOpen, onCl
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <span>Vận mẫu ({PINYIN_FINALS.length})</span>
+              <span>Vận mẫu</span>
             </button>
             <button
               data-testid="pinyin-tab-tones"
@@ -146,7 +165,22 @@ export const PinyinChartModal: React.FC<PinyinChartModalProps> = ({ isOpen, onCl
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <span>Thanh điệu (4)</span>
+              <span>Thanh điệu</span>
+            </button>
+            <button
+              data-testid="pinyin-tab-sandhi"
+              onClick={() => {
+                audioService.playClick();
+                setActiveTab('sandhi');
+                setSearchQuery('');
+              }}
+              className={`py-2 rounded-xl transition-all flex items-center justify-center gap-1 ${
+                activeTab === 'sandhi'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-900/30'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <span>Biến điệu</span>
             </button>
           </div>
         </div>
@@ -160,7 +194,11 @@ export const PinyinChartModal: React.FC<PinyinChartModalProps> = ({ isOpen, onCl
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={`Tìm ${activeTab === 'initials' ? 'phụ âm (zh, q, b...)' : 'nguyên âm (a, ü, ang...)'} hoặc mẹo phát âm...`}
+                placeholder={
+                  activeTab === 'sandhi'
+                    ? 'Tìm quy tắc biến điệu (thanh 3, yī, bù, nǐ hǎo...)'
+                    : `Tìm ${activeTab === 'initials' ? 'phụ âm (zh, q, b...)' : 'nguyên âm (a, ü, ang...)'} hoặc mẹo phát âm...`
+                }
                 className="w-full pl-8 pr-8 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-600 text-xs focus:outline-none focus:border-rose-500"
               />
               {searchQuery && (
@@ -177,7 +215,101 @@ export const PinyinChartModal: React.FC<PinyinChartModalProps> = ({ isOpen, onCl
 
         {/* Modal Scrollable Body */}
         <div className="p-4 flex-1 overflow-y-auto space-y-3 text-xs">
-          {activeTab === 'tones' ? (
+          {activeTab === 'sandhi' ? (
+            <div className="space-y-3">
+              <div className="p-3 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs flex items-start gap-2">
+                <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-bold">Quy tắc biến điệu (Tone Sandhi 🎼):</div>
+                  <div className="text-[11px] opacity-90 mt-0.5 leading-relaxed">
+                    Trong giao tiếp thực tế, người bản xứ biến đổi thanh điệu để câu nói tự nhiên, mượt mà và không mỏi cơ miệng. Chạm vào bất kỳ từ mẫu nào bên dưới để nghe phát âm chuẩn thực tế!
+                  </div>
+                </div>
+              </div>
+
+              {filteredSandhi.map((rule) => (
+                <div
+                  key={rule.id}
+                  className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-750 hover:border-slate-700 transition-all flex flex-col gap-2.5 shadow-xs"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-bold text-slate-100 text-xs sm:text-sm">{rule.title}</h4>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 font-semibold">
+                          {rule.category}
+                        </span>
+                      </div>
+                      <div className="mt-1 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-750 text-amber-300 font-mono text-[11px] font-bold inline-block">
+                        {rule.formula}
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    {rule.description}
+                  </p>
+
+                  <div className="p-2 rounded-xl bg-slate-850 text-[11px] text-slate-400 border border-slate-800">
+                    <span className="font-bold text-amber-400">💡 Ghi nhớ: </span>
+                    {rule.tip}
+                  </div>
+
+                  {/* Interactive Word Examples */}
+                  <div className="mt-1 space-y-1.5">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">
+                      Từ mẫu thực hành (Chạm loa để nghe):
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      {rule.examples.map((ex, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => {
+                            audioService.playClick();
+                            audioService.speakChinese(ex.hanzi);
+                          }}
+                          className="p-2 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-slate-700 flex items-center justify-between cursor-pointer transition-all active:scale-98 group"
+                        >
+                          <div className="min-w-0 flex-1 mr-2">
+                            <div className="flex items-center space-x-2">
+                              <span className="font-bold text-slate-100 text-sm">{ex.hanzi}</span>
+                              <span className="text-[10px] text-slate-500 line-through">
+                                {ex.originalPinyin}
+                              </span>
+                              <span className="text-[11px] font-bold text-emerald-400 pinyin-text">
+                                ➔ {ex.spokenPinyin}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-slate-400 truncate mt-0.5">
+                              {ex.meaning}
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              audioService.playClick();
+                              audioService.speakChinese(ex.hanzi);
+                            }}
+                            className="p-1.5 rounded-lg bg-slate-800 group-hover:bg-rose-600 text-slate-400 group-hover:text-white transition-colors shrink-0"
+                            title={`Phát âm từ ${ex.hanzi}`}
+                          >
+                            <Volume2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {filteredSandhi.length === 0 && (
+                <div className="text-center py-8 text-slate-500">
+                  Không tìm thấy quy tắc biến điệu nào khớp với từ khóa "{searchQuery}".
+                </div>
+              )}
+            </div>
+          ) : activeTab === 'tones' ? (
             <div className="space-y-3">
               <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2">
                 <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />

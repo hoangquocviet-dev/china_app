@@ -10,6 +10,23 @@ export interface PinyinItem {
   group: string;
 }
 
+export interface SandhiWordExample {
+  hanzi: string;
+  originalPinyin: string;
+  spokenPinyin: string;
+  meaning: string;
+}
+
+export interface ToneSandhiRule {
+  id: string;
+  title: string;
+  formula: string;
+  category: string;
+  description: string;
+  tip: string;
+  examples: SandhiWordExample[];
+}
+
 export interface ToneItem {
   toneNumber: number;
   name: string;
@@ -615,5 +632,97 @@ export const PINYIN_TONES: ToneItem[] = [
     samplePinyin: 'ma',
     sampleHanzi: '吗',
     sampleMeaning: 'Trợ từ nghi vấn (...không?)',
+  },
+];
+
+export const PINYIN_TONE_SANDHI: ToneSandhiRule[] = [
+  {
+    id: 'two-third-tones',
+    title: 'Hai thanh 3 đi liền nhau',
+    formula: 'Thanh 3 + Thanh 3 ➔ Thanh 2 + Thanh 3',
+    category: 'Biến điệu thanh 3',
+    description: 'Khi hai âm tiết cùng mang thanh 3 đi liền nhau, âm tiết thứ nhất bắt buộc phải biến đổi đọc thành thanh 2, còn âm tiết thứ hai vẫn giữ nguyên thanh 3.',
+    tip: 'Lưu ý trên chữ viết Pinyin chuẩn vẫn giữ nguyên dấu thanh 3 gốc, nhưng khi mở miệng phát âm bắt buộc phải đọc thành thanh 2.',
+    examples: [
+      { hanzi: '你好', originalPinyin: 'nǐ hǎo', spokenPinyin: 'ní hǎo', meaning: 'Xin chào' },
+      { hanzi: '可以', originalPinyin: 'kě yǐ', spokenPinyin: 'ké yǐ', meaning: 'Có thể' },
+      { hanzi: '手表', originalPinyin: 'shǒu biǎo', spokenPinyin: 'shóu biǎo', meaning: 'Đồng hồ đeo tay' },
+      { hanzi: '了解', originalPinyin: 'liǎo jiě', spokenPinyin: 'liáo jiě', meaning: 'Hiểu rõ, tìm hiểu' },
+      { hanzi: '水饺', originalPinyin: 'shuǐ jiǎo', spokenPinyin: 'shuí jiǎo', meaning: 'Bánh sủi cảo' },
+    ],
+  },
+  {
+    id: 'half-third-tone',
+    title: 'Nửa thanh 3 (Half 3rd Tone)',
+    formula: 'Thanh 3 + (Thanh 1, 2, 4, nhẹ) ➔ Đọc nửa đầu thanh 3',
+    category: 'Biến điệu thanh 3',
+    description: 'Khi thanh 3 đứng trước thanh 1, thanh 2, thanh 4 hoặc thanh nhẹ, ta chỉ đọc phần trầm hạ giọng xuống của thanh 3 (từ mức 2 xuống 1), không uốn cong vút lên mức 4 nữa.',
+    tip: 'Giúp câu nói tự nhiên, mượt mà và không bị tốn hơi gập ghềnh khi nói chuỗi câu dài.',
+    examples: [
+      { hanzi: '北京', originalPinyin: 'Běijīng', spokenPinyin: 'Běi(hạ) jīng', meaning: 'Bắc Kinh (trước thanh 1)' },
+      { hanzi: '祖国', originalPinyin: 'zǔguó', spokenPinyin: 'zǔ(hạ) guó', meaning: 'Tổ quốc (trước thanh 2)' },
+      { hanzi: '美丽', originalPinyin: 'měilì', spokenPinyin: 'měi(hạ) lì', meaning: 'Xinh đẹp (trước thanh 4)' },
+      { hanzi: '喜欢', originalPinyin: 'xǐhuan', spokenPinyin: 'xǐ(hạ) huan', meaning: 'Yêu thích (trước thanh nhẹ)' },
+    ],
+  },
+  {
+    id: 'yi-before-fourth',
+    title: 'Chữ "一" (yī) trước thanh 4',
+    formula: '一 (yī) + Thanh 4 ➔ yí + Thanh 4',
+    category: 'Biến điệu chữ 一 (yī)',
+    description: 'Chữ "一" vốn gốc mang thanh 1 (yī). Nhưng khi đứng trước bất kỳ âm tiết nào mang thanh 4, "一" bắt buộc biến đổi đọc thành thanh 2 (yí).',
+    tip: 'Đây là quy tắc cực kỳ phổ biến trong giao tiếp hàng ngày khi dùng số lượng từ.',
+    examples: [
+      { hanzi: '一共', originalPinyin: 'yī gòng', spokenPinyin: 'yí gòng', meaning: 'Tổng cộng' },
+      { hanzi: '一定', originalPinyin: 'yī dìng', spokenPinyin: 'yí dìng', meaning: 'Nhất định' },
+      { hanzi: '一块', originalPinyin: 'yī kuài', spokenPinyin: 'yí kuài', meaning: 'Một tệ / một miếng' },
+      { hanzi: '一样', originalPinyin: 'yī yàng', spokenPinyin: 'yí yàng', meaning: 'Giống nhau' },
+      { hanzi: '一下', originalPinyin: 'yī xià', spokenPinyin: 'yí xià', meaning: 'Một lát / một chút' },
+    ],
+  },
+  {
+    id: 'yi-before-others',
+    title: 'Chữ "一" (yī) trước thanh 1, 2, 3',
+    formula: '一 (yī) + Thanh 1, 2, 3 ➔ yì + Thanh 1, 2, 3',
+    category: 'Biến điệu chữ 一 (yī)',
+    description: 'Khi chữ "一" đứng trước một âm tiết mang thanh 1, thanh 2 hoặc thanh 3, "一" sẽ biến đổi đọc thành thanh 4 (yì).',
+    tip: 'Khi đếm số (一二三) hoặc số thứ tự (第一), "一" vẫn giữ nguyên thanh 1 (yī).',
+    examples: [
+      { hanzi: '一天', originalPinyin: 'yī tiān', spokenPinyin: 'yì tiān', meaning: 'Một ngày (trước thanh 1)' },
+      { hanzi: '一年', originalPinyin: 'yī nián', spokenPinyin: 'yì nián', meaning: 'Một năm (trước thanh 2)' },
+      { hanzi: '一起', originalPinyin: 'yī qǐ', spokenPinyin: 'yì qǐ', meaning: 'Cùng nhau (trước thanh 3)' },
+      { hanzi: '一张', originalPinyin: 'yī zhāng', spokenPinyin: 'yì zhāng', meaning: 'Một tờ / một tấm (trước thanh 1)' },
+      { hanzi: '第一', originalPinyin: 'dì yī', spokenPinyin: 'dì yī (giữ nguyên)', meaning: 'Thứ nhất (số thứ tự)' },
+    ],
+  },
+  {
+    id: 'bu-before-fourth',
+    title: 'Chữ "不" (bù) trước thanh 4',
+    formula: '不 (bù) + Thanh 4 ➔ bú + Thanh 4',
+    category: 'Biến điệu chữ 不 (bù)',
+    description: 'Chữ "不" vốn gốc mang thanh 4 (bù). Khi đứng trước bất kỳ âm tiết nào cũng mang thanh 4, chữ "不" phải biến đổi đọc thành thanh 2 (bú) để câu nói thanh thoát, tránh hai âm giáng liên tiếp.',
+    tip: 'Khi đứng trước thanh 1, 2, 3 hoặc đứng một mình, "不" vẫn giữ nguyên thanh 4 (bù).',
+    examples: [
+      { hanzi: '不是', originalPinyin: 'bù shì', spokenPinyin: 'bú shì', meaning: 'Không phải' },
+      { hanzi: '不要', originalPinyin: 'bù yào', spokenPinyin: 'bú yào', meaning: 'Đừng / Không muốn' },
+      { hanzi: '不对', originalPinyin: 'bù duì', spokenPinyin: 'bú duì', meaning: 'Không đúng' },
+      { hanzi: '不客气', originalPinyin: 'bù kèqi', spokenPinyin: 'bú kèqi', meaning: 'Đừng khách sáo' },
+      { hanzi: '不好', originalPinyin: 'bù hǎo', spokenPinyin: 'bù hǎo (giữ nguyên)', meaning: 'Không tốt (trước thanh 3)' },
+    ],
+  },
+  {
+    id: 'neutral-tone',
+    title: 'Khinh thanh (Thanh nhẹ / Neutral Tone)',
+    formula: 'Âm gốc ➔ Đọc ngắn, nhẹ, không nhấn trọng âm',
+    category: 'Khinh thanh (Thanh nhẹ)',
+    description: 'Một số âm tiết trong từ ghép hoặc câu mất đi thanh điệu gốc vốn có của nó, biến thành âm đọc nhẹ và ngắn hơn, gọi là thanh nhẹ (khinh thanh). Trên Pinyin không ghi dấu.',
+    tip: 'Thường gặp ở từ xưng hô thân tộc lặp lại, trợ từ ngữ khí và hậu tố danh từ.',
+    examples: [
+      { hanzi: '妈妈', originalPinyin: 'māmā', spokenPinyin: 'māma', meaning: 'Mẹ (từ lặp thân tộc)' },
+      { hanzi: '爸爸', originalPinyin: 'bàbà', spokenPinyin: 'bàba', meaning: 'Bố (từ lặp thân tộc)' },
+      { hanzi: '谢谢', originalPinyin: 'xièxiè', spokenPinyin: 'xièxie', meaning: 'Cảm ơn' },
+      { hanzi: '好的', originalPinyin: 'hǎode', spokenPinyin: 'hǎode', meaning: 'Được rồi (trợ từ 的)' },
+      { hanzi: '走吧', originalPinyin: 'zǒuba', spokenPinyin: 'zǒuba', meaning: 'Đi thôi (trợ từ 吧)' },
+    ],
   },
 ];
